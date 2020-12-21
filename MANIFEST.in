@@ -1,0 +1,8 @@
+include README.md
+include LICENSE
+include Makefile
+include requirements*.txt
+include scripts/*
+include tests/*
+exclude non-dist/*
+exclude ort
