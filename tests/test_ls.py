@@ -58,7 +58,7 @@ def test_ls_geocoding_exception():
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
-def test_ls_reverse_geocoding(api):
+def test_ls_reverse_geocoding():
     """Test reverse geocoding."""
     ls = LS(api_key=LS_API_KEY)
     resp = ls.reverse_geocode(lat=19.1646, lng=72.8493)
@@ -250,7 +250,6 @@ def test_credentials_exception():
     """Test exception if environment variable ``LS_API_KEY`` is not present."""
     api_key = os.environ.get("LS_API_KEY")
     del os.environ["LS_API_KEY"]
-    ls = LS()
     with pytest.raises(Exception):
-        ls.api.credential_params()
+        _ = LS()
     os.environ["LS_API_KEY"] = api_key

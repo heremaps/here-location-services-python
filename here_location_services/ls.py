@@ -21,7 +21,8 @@ import os
 import urllib
 from typing import List, Optional
 
-from .apis import Api
+from .geocoding_search_api import GeocodingSearchApi
+from .isoline_routing_api import IsolineRoutingApi
 from .responses import (
     BrowseResponse,
     DiscoverResponse,
@@ -47,7 +48,12 @@ class LS:
         api_key = api_key or os.environ.get("LS_API_KEY")
         self.credentials = dict(api_key=api_key)
         self.proxies = proxies or urllib.request.getproxies()
-        self.api = Api(
+        self.geo_search_api = GeocodingSearchApi(
+            api_key=api_key,
+            proxies=proxies,
+            country=country,
+        )
+        self.isoline_routing_api = IsolineRoutingApi(
             api_key=api_key,
             proxies=proxies,
             country=country,
@@ -67,7 +73,7 @@ class LS:
         if not query or query.isspace():
             raise ValueError(f"Invalid input query: {query}")
 
-        resp = self.api.get_geocoding(query, limit=limit, lang=lang)
+        resp = self.geo_search_api.get_geocoding(query, limit=limit, lang=lang)
         return GeocoderResponse.new(resp.json())
 
     def reverse_geocode(
@@ -92,7 +98,7 @@ class LS:
         if not -180 <= lng <= 180:
             raise ValueError("Longitude must be in range -180 to 180.")
 
-        resp = self.api.get_reverse_geocoding(lat=lat, lng=lng, limit=limit, lang=lang)
+        resp = self.geo_search_api.get_reverse_geocoding(lat=lat, lng=lng, limit=limit, lang=lang)
         return ReverseGeocoderResponse.new(resp.json())
 
     def calculate_isoline(
@@ -147,7 +153,7 @@ class LS:
         if arrival and destination is None:
             raise ValueError("`arrival` must be provided with `destination`")
 
-        resp = self.api.get_isoline_routing(
+        resp = self.isoline_routing_api.get_isoline_routing(
             mode=mode,
             range=range,
             range_type=range_type,
@@ -199,7 +205,7 @@ class LS:
                 f"can not be provided together."
             )
 
-        resp = self.api.get_search_discover(
+        resp = self.geo_search_api.get_search_discover(
             query=query,
             center=center,
             radius=radius,
@@ -236,7 +242,7 @@ class LS:
             a list of BCP47 compliant Language Codes.
         :return: :class:`BrowseResponse` object.
         """
-        resp = self.api.get_search_browse(
+        resp = self.geo_search_api.get_search_browse(
             center=center,
             radius=radius,
             country_codes=country_codes,
@@ -257,5 +263,5 @@ class LS:
             a list of BCP47 compliant Language Codes.
         :return: :class:`LookupResponse` object.
         """
-        resp = self.api.get_search_lookup(location_id=location_id, lang=lang)
+        resp = self.geo_search_api.get_search_lookup(location_id=location_id, lang=lang)
         return LookupResponse.new(resp.json())
