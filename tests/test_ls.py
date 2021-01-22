@@ -16,10 +16,13 @@
 # License-Filename: LICENSE
 
 import os
+from datetime import datetime
 
 import pytest
+from geojson import FeatureCollection
 
 from here_location_services import LS
+from here_location_services.constants import ROUTING_RETURN, ROUTING_SPANS
 from here_location_services.exceptions import ApiError
 from here_location_services.responses import GeocoderResponse
 from here_location_services.utils import get_apikey
@@ -253,3 +256,28 @@ def test_credentials_exception():
     with pytest.raises(Exception):
         _ = LS()
     os.environ["LS_API_KEY"] = api_key
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_car_route():
+    """Test routing API for car route."""
+    ls = LS(api_key=LS_API_KEY)
+    result = ls.car_route(
+        origin=[52.51375, 13.42462],
+        destination=[52.52332, 13.42800],
+        via=[(52.52426, 13.43000)],
+        return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
+        departure_time=datetime.now(),
+        spans=[ROUTING_SPANS.names],
+    )
+    assert result.response["routes"][0]["sections"][0]["departure"]["place"]["location"] == {
+        "lat": 52.5137479,
+        "lng": 13.4246242,
+        "elv": 76.0,
+    }
+    assert result.response["routes"][0]["sections"][1]["departure"]["place"]["location"] == {
+        "lat": 52.5242323,
+        "lng": 13.4301462,
+        "elv": 80.0,
+    }
+    assert type(result.to_geojson()) == FeatureCollection

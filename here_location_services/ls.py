@@ -19,7 +19,9 @@
 
 import os
 import urllib
-from typing import List, Optional
+import urllib.request
+from datetime import datetime
+from typing import List, Optional, Tuple
 
 from .geocoding_search_api import GeocodingSearchApi
 from .isoline_routing_api import IsolineRoutingApi
@@ -30,7 +32,9 @@ from .responses import (
     IsolineResponse,
     LookupResponse,
     ReverseGeocoderResponse,
+    RoutingResponse,
 )
+from .routing_api import RoutingApi
 
 
 class LS:
@@ -54,6 +58,11 @@ class LS:
             country=country,
         )
         self.isoline_routing_api = IsolineRoutingApi(
+            api_key=api_key,
+            proxies=proxies,
+            country=country,
+        )
+        self.routing_api = RoutingApi(
             api_key=api_key,
             proxies=proxies,
             country=country,
@@ -265,3 +274,233 @@ class LS:
         """
         resp = self.geo_search_api.get_search_lookup(location_id=location_id, lang=lang)
         return LookupResponse.new(resp.json())
+
+    def car_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``car`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode.
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans.
+        :return: :class:`requests.Response` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="car",
+            origin=origin,
+            destination=destination,
+            via=via,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())
+
+    def bicycle_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``bicycle`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode.
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans.
+        :return: :class:`requests.Response` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="bicycle",
+            origin=origin,
+            destination=destination,
+            via=via,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())
+
+    def truck_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``truck`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode.
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans.
+        :return: :class:`requests.Response` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="truck",
+            origin=origin,
+            destination=destination,
+            via=via,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())
+
+    def scooter_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``scooter`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode.
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans.
+        :return: :class:`requests.Response` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="scooter",
+            origin=origin,
+            destination=destination,
+            via=via,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())
+
+    def pedestrian_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``pedestrian`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode.
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans.
+        :return: :class:`requests.Response` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="pedestrian",
+            origin=origin,
+            destination=destination,
+            via=via,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())

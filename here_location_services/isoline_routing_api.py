@@ -77,7 +77,6 @@ class IsolineRoutingApi(Api):
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200.
         """
-        self._base_url = f"https://isoline.route.ls.{self._get_url_string()}"
         path = "routing/7.2/calculateisoline.json"
         url = f"{self._base_url}/{path}"
         params: Dict[str, str] = {
