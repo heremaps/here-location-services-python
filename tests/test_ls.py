@@ -22,7 +22,14 @@ import pytest
 from geojson import FeatureCollection
 
 from here_location_services import LS
-from here_location_services.constants import ROUTING_RETURN, ROUTING_SPANS
+from here_location_services.constants import (
+    ROUTE_COURSE,
+    ROUTE_MATCH_SIDEOF_STREET,
+    ROUTING_RETURN,
+    ROUTING_SPANS,
+    PlaceOptions,
+    WayPointOptions,
+)
 from here_location_services.exceptions import ApiError
 from here_location_services.responses import GeocoderResponse
 from here_location_services.utils import get_apikey
@@ -281,3 +288,87 @@ def test_car_route():
         "elv": 80.0,
     }
     assert type(result.to_geojson()) == FeatureCollection
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_car_route_extra_options():
+    """Test routing API for car route."""
+    place_options = PlaceOptions(
+        course=ROUTE_COURSE.west,
+        sideof_street_hint=[52.512149, 13.304076],
+        match_sideof_street=ROUTE_MATCH_SIDEOF_STREET.always,
+        radius=10,
+        min_course_distance=10,
+    )
+    via_waypoint_options = WayPointOptions(stop_duration=0, pass_through=True)
+    dest_waypoint_options = WayPointOptions(stop_duration=10, pass_through=False)
+    ls = LS(api_key=LS_API_KEY)
+    _ = ls.car_route(
+        origin=[52.51375, 13.42462],
+        destination=[52.52332, 13.42800],
+        via=[(52.52426, 13.43000), (52.123, 13.22), (52.343, 13.444)],
+        origin_place_options=place_options,
+        destination_place_options=place_options,
+        via_place_options=place_options,
+        via_waypoint_options=via_waypoint_options,
+        destination_waypoint_options=dest_waypoint_options,
+        return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
+        departure_time=datetime.now(),
+        spans=[ROUTING_SPANS.names],
+    )
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_bicycle_route():
+    """Test routing API for car route."""
+    ls = LS(api_key=LS_API_KEY)
+    result = ls.bicycle_route(
+        origin=[52.51375, 13.42462],
+        destination=[52.52332, 13.42800],
+        via=[(52.52426, 13.43000)],
+        return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
+        departure_time=datetime.now(),
+        spans=[ROUTING_SPANS.names],
+    )
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_truck_route():
+    """Test routing API for truck route."""
+    ls = LS(api_key=LS_API_KEY)
+    result = ls.bicycle_route(
+        origin=[52.51375, 13.42462],
+        destination=[52.52332, 13.42800],
+        via=[(52.52426, 13.43000)],
+        return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
+        departure_time=datetime.now(),
+        spans=[ROUTING_SPANS.names],
+    )
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_scooter_route():
+    """Test routing API for scooter route."""
+    ls = LS(api_key=LS_API_KEY)
+    result = ls.scooter_route(
+        origin=[52.51375, 13.42462],
+        destination=[52.52332, 13.42800],
+        via=[(52.52426, 13.43000)],
+        return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
+        departure_time=datetime.now(),
+        spans=[ROUTING_SPANS.names],
+    )
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_pedestrian_route():
+    """Test routing API for pedestrian route."""
+    ls = LS(api_key=LS_API_KEY)
+    result = ls.pedestrian_route(
+        origin=[52.51375, 13.42462],
+        destination=[52.52332, 13.42800],
+        via=[(52.52426, 13.43000)],
+        return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
+        departure_time=datetime.now(),
+        spans=[ROUTING_SPANS.names],
+    )

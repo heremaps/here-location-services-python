@@ -24,6 +24,7 @@ from typing import Dict, List, Optional, Tuple
 import requests
 
 from .apis import Api
+from .constants import PlaceOptions, WayPointOptions
 from .exceptions import ApiError
 
 
@@ -42,6 +43,11 @@ class RoutingApi(Api):
         origin: List,
         destination: List,
         via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
         routing_mode: str = "fast",
         alternatives: int = 0,
@@ -50,12 +56,21 @@ class RoutingApi(Api):
         return_results: Optional[List] = None,
         spans: Optional[List] = None,
     ):
-        """Calculate ``car`` route between two endpoints.
+        """Calculate route between two endpoints.
+
+        See further information `here <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>_`.  # noqa E501
 
         :param transport_mode: A string to represent mode of transport.
         :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for ``via``.
         :param departure_time: :class:`datetime.datetime` object.
         :param routing_mode: A string to represent routing mode.
         :param alternatives: Number of alternative routes to return aside from the optimal route.
@@ -79,9 +94,26 @@ class RoutingApi(Api):
         }
         if via:
             lat, lng = via[0]
-            url += f"?via={lat},{lng}"
-            for lat, lng in via[1:]:
-                url += f"&via{lat},{lng}"
+            via_str = f"?via={lat},{lng}"
+            if len(via) > 1:
+                vias = "&".join("via=" + str(item[0]) + "," + str(item[1]) for item in via[1:])
+                via_str = via_str + "&" + vias
+            if via_place_options:
+                via_place_opt = ";".join(
+                    key + "=" + str(val)
+                    for key, val in vars(via_place_options).items()
+                    if val is not None
+                )
+                via_str = via_str + ";" + via_place_opt
+            if via_waypoint_options:
+                via_way_opt = "!".join(
+                    key + "=" + str(val)
+                    for key, val in vars(via_waypoint_options).items()
+                    if val is not None
+                )
+                via_str = via_str + "!" + via_way_opt
+            url += via_str
+
         if departure_time:
             params["departureTime"] = departure_time.isoformat(timespec="seconds")
         params["routingMode"] = routing_mode
@@ -92,6 +124,30 @@ class RoutingApi(Api):
             params["return"] = ",".join(return_results)
         if spans:
             params["spans"] = ",".join(spans)
+
+        if origin_place_options:
+            origin_place_opt = ";".join(
+                key + "=" + str(val)
+                for key, val in vars(origin_place_options).items()
+                if val is not None
+            )
+            params["origin"] = ";".join([params["origin"], origin_place_opt])
+
+        if destination_place_options:
+            dest_place_opt = ";".join(
+                key + "=" + str(val)
+                for key, val in vars(destination_place_options).items()
+                if val is not None
+            )
+            params["destination"] = ";".join([params["destination"], dest_place_opt])
+
+        if destination_waypoint_options:
+            dest_way_opt = "!".join(
+                key + "=" + str(val)
+                for key, val in vars(destination_waypoint_options).items()
+                if val is not None
+            )
+            params["destination"] = "!".join([params["destination"], dest_way_opt])
 
         if self.credential_params:
             params.update(self.credential_params)

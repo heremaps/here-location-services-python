@@ -23,6 +23,7 @@ import urllib.request
 from datetime import datetime
 from typing import List, Optional, Tuple
 
+from .constants import PlaceOptions, WayPointOptions
 from .geocoding_search_api import GeocodingSearchApi
 from .isoline_routing_api import IsolineRoutingApi
 from .responses import (
@@ -280,6 +281,11 @@ class LS:
         origin: List,
         destination: List,
         via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
         routing_mode: str = "fast",
         alternatives: int = 0,
@@ -293,6 +299,14 @@ class LS:
         :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
         :param departure_time: :class:`datetime.datetime` object.
         :param routing_mode: A string to represent routing mode.
         :param alternatives: Number of alternative routes to return aside from the optimal route.
@@ -311,6 +325,11 @@ class LS:
             origin=origin,
             destination=destination,
             via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
             departure_time=departure_time,
             routing_mode=routing_mode,
             alternatives=alternatives,
@@ -326,6 +345,11 @@ class LS:
         origin: List,
         destination: List,
         via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
         routing_mode: str = "fast",
         alternatives: int = 0,
@@ -339,6 +363,14 @@ class LS:
         :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
         :param departure_time: :class:`datetime.datetime` object.
         :param routing_mode: A string to represent routing mode.
         :param alternatives: Number of alternative routes to return aside from the optimal route.
@@ -357,6 +389,11 @@ class LS:
             origin=origin,
             destination=destination,
             via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
             departure_time=departure_time,
             routing_mode=routing_mode,
             alternatives=alternatives,
@@ -372,6 +409,11 @@ class LS:
         origin: List,
         destination: List,
         via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
         routing_mode: str = "fast",
         alternatives: int = 0,
@@ -385,6 +427,14 @@ class LS:
         :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
         :param departure_time: :class:`datetime.datetime` object.
         :param routing_mode: A string to represent routing mode.
         :param alternatives: Number of alternative routes to return aside from the optimal route.
@@ -403,6 +453,11 @@ class LS:
             origin=origin,
             destination=destination,
             via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
             departure_time=departure_time,
             routing_mode=routing_mode,
             alternatives=alternatives,
@@ -418,6 +473,11 @@ class LS:
         origin: List,
         destination: List,
         via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
         routing_mode: str = "fast",
         alternatives: int = 0,
@@ -431,6 +491,14 @@ class LS:
         :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
         :param departure_time: :class:`datetime.datetime` object.
         :param routing_mode: A string to represent routing mode.
         :param alternatives: Number of alternative routes to return aside from the optimal route.
@@ -449,6 +517,11 @@ class LS:
             origin=origin,
             destination=destination,
             via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
             departure_time=departure_time,
             routing_mode=routing_mode,
             alternatives=alternatives,
@@ -464,6 +537,11 @@ class LS:
         origin: List,
         destination: List,
         via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
         routing_mode: str = "fast",
         alternatives: int = 0,
@@ -477,6 +555,14 @@ class LS:
         :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
         :param departure_time: :class:`datetime.datetime` object.
         :param routing_mode: A string to represent routing mode.
         :param alternatives: Number of alternative routes to return aside from the optimal route.
@@ -495,6 +581,11 @@ class LS:
             origin=origin,
             destination=destination,
             via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
             departure_time=departure_time,
             routing_mode=routing_mode,
             alternatives=alternatives,

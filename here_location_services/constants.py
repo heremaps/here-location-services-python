@@ -17,6 +17,9 @@
 
 """This module defines all the constants which will be required as inputs to various APIs."""
 
+import json
+from typing import List, Optional
+
 
 class Bunch(dict):
     """A class for dot notation implementation of dictionary."""
@@ -164,3 +167,87 @@ transport_mode = {
 }
 
 ROUTING_TRANSPORT_MODE = RoutingTransportMode(**transport_mode)
+
+
+class RouteCourse(Bunch):
+    """A class to define constant attributes for Course option."""
+
+
+route_course = {"east": 90, "south": 180, "west": 270, "north": 360}
+
+ROUTE_COURSE = RouteCourse(**route_course)
+
+
+class RouteMatchSideOfStreet(Bunch):
+    """A class to define constant attribuites for ``matchSideOfStreet``."""
+
+
+match_sideof_street = {"always": "always", "onlyIfDivided": "onlyIfDivided"}
+
+ROUTE_MATCH_SIDEOF_STREET = RouteMatchSideOfStreet(**match_sideof_street)
+
+
+class PlaceOptions:
+    """A class to define ``PlaceOptions`` for ``origin``/ ``via``/ ``destination``.
+
+    Various options can be found here:
+    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>_`.  # noqa E501
+    """
+
+    def __init__(
+        self,
+        course: Optional[int] = None,
+        sideof_street_hint: Optional[List[float]] = None,
+        match_sideof_street: Optional[str] = None,
+        namehint: Optional[str] = None,
+        radius: Optional[int] = None,
+        min_course_distance: Optional[int] = None,
+    ):
+        """Object Initializer.
+
+        :param course: An int representing degrees clock-wise from north.
+            Indicating desired direction at the place. E.g. 90 indicating ``east``.
+            This is defined in constant ``ROUTE_COURSE``.
+        :param sideof_street_hint: A list of latitude and longitude.Indicating the side of the
+            street that should be used.
+        :param match_sideof_street:
+        :param namehint: A string for the router to look for the place with the most similar name.
+            This can e.g. include things like: North being used to differentiate between
+            interstates I66 North and I66 South, Downtown Avenue being used to correctly
+            select a residental street.
+        :param radius: In meters Asks the router to consider all places within the given radius as
+            potential candidates for route calculation. This can be either because it is not
+            important which place is used, or because it is unknown. Radius more than 200 meter
+            are not supported.
+        :param min_course_distance: In meters Asks the routing service to try find a route that
+            avoids actions for the indicated distance. E.g. if the origin is determined by a moving
+            vehicle, the user might not have time to react to early actions.
+        """
+        self.course = course
+        self.sideOfStreetHint: Optional[str] = None
+        if sideof_street_hint is not None:
+            self.sideOfStreetHint = ",".join([str(point) for point in sideof_street_hint])
+        self.matchSideOfStreet = match_sideof_street
+        self.namehint = namehint
+        self.radius = radius
+        self.minCourseDistance = min_course_distance
+
+    def __repr__(self):
+        """Return string representation of this instance."""
+        return json.dumps(self.__dict__)
+
+
+class WayPointOptions:
+    """A class to define ``PlaceOptions`` for ``via``/ ``destination``.
+
+    Various options can be found here:
+    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>_`.  # noqa E501
+    """
+
+    def __init__(self, stop_duration: Optional[int] = None, pass_through: Optional[bool] = None):
+        self.stopDuration = stop_duration
+        self.passThrough = pass_through
+
+    def __repr__(self):
+        """Return string representation of this instance."""
+        return json.dumps(self.__dict__)
