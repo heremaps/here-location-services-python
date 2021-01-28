@@ -24,7 +24,7 @@ from typing import Dict, List, Optional, Tuple
 import requests
 
 from .apis import Api
-from .constants import PlaceOptions, WayPointOptions
+from .constants import PlaceOptions, Scooter, WayPointOptions
 from .exceptions import ApiError
 
 
@@ -48,6 +48,7 @@ class RoutingApi(Api):
         via_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         via_waypoint_options: Optional[WayPointOptions] = None,
+        scooter: Optional[Scooter] = None,
         departure_time: Optional[datetime] = None,
         routing_mode: str = "fast",
         alternatives: int = 0,
@@ -71,6 +72,7 @@ class RoutingApi(Api):
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
             for ``destination``.
         :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for ``via``.
+        :param scooter: Additional attributes for scooter route.
         :param departure_time: :class:`datetime.datetime` object.
         :param routing_mode: A string to represent routing mode.
         :param alternatives: Number of alternative routes to return aside from the optimal route.
@@ -148,6 +150,12 @@ class RoutingApi(Api):
                 if val is not None
             )
             params["destination"] = "!".join([params["destination"], dest_way_opt])
+
+        if scooter:
+            if scooter.allowHighway is True:
+                params["scooter[allowHighway]"] = "true"
+            else:
+                params["scooter[allowHighway]"] = "false"
 
         if self.credential_params:
             params.update(self.credential_params)

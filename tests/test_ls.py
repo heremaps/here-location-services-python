@@ -322,7 +322,7 @@ def test_car_route_extra_options():
 def test_bicycle_route():
     """Test routing API for car route."""
     ls = LS(api_key=LS_API_KEY)
-    result = ls.bicycle_route(
+    _ = ls.bicycle_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
         via=[(52.52426, 13.43000)],
@@ -336,7 +336,7 @@ def test_bicycle_route():
 def test_truck_route():
     """Test routing API for truck route."""
     ls = LS(api_key=LS_API_KEY)
-    result = ls.bicycle_route(
+    _ = ls.bicycle_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
         via=[(52.52426, 13.43000)],
@@ -350,7 +350,7 @@ def test_truck_route():
 def test_scooter_route():
     """Test routing API for scooter route."""
     ls = LS(api_key=LS_API_KEY)
-    result = ls.scooter_route(
+    _ = ls.scooter_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
         via=[(52.52426, 13.43000)],
@@ -364,7 +364,7 @@ def test_scooter_route():
 def test_pedestrian_route():
     """Test routing API for pedestrian route."""
     ls = LS(api_key=LS_API_KEY)
-    result = ls.pedestrian_route(
+    _ = ls.pedestrian_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
         via=[(52.52426, 13.43000)],

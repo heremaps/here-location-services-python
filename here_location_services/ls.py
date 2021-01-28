@@ -23,7 +23,7 @@ import urllib.request
 from datetime import datetime
 from typing import List, Optional, Tuple
 
-from .constants import PlaceOptions, WayPointOptions
+from .constants import PlaceOptions, Scooter, WayPointOptions
 from .geocoding_search_api import GeocodingSearchApi
 from .isoline_routing_api import IsolineRoutingApi
 from .responses import (
@@ -478,6 +478,7 @@ class LS:
         via_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         via_waypoint_options: Optional[WayPointOptions] = None,
+        scooter: Optional[Scooter] = None,
         departure_time: Optional[datetime] = None,
         routing_mode: str = "fast",
         alternatives: int = 0,
@@ -499,6 +500,7 @@ class LS:
             for ``destination``.
         :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
             ``via``.
+        :param scooter: Additional attributes for scooter route.
         :param departure_time: :class:`datetime.datetime` object.
         :param routing_mode: A string to represent routing mode.
         :param alternatives: Number of alternative routes to return aside from the optimal route.
@@ -522,6 +524,7 @@ class LS:
             via_place_options=via_place_options,
             destination_waypoint_options=destination_waypoint_options,
             via_waypoint_options=via_waypoint_options,
+            scooter=scooter,
             departure_time=departure_time,
             routing_mode=routing_mode,
             alternatives=alternatives,

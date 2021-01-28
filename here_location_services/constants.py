@@ -251,3 +251,25 @@ class WayPointOptions:
     def __repr__(self):
         """Return string representation of this instance."""
         return json.dumps(self.__dict__)
+
+
+class Scooter:
+    """A class to define attributes specific for scooter route.
+
+    Scooter specific parameters.
+    allowHighway: Specifies whether scooter is allowed on highway or not.
+    This parameter is optional. If not provided, then by default scooter is not allowed to use
+    highway. There is a similar parameter avoid[features]=controlledAccessHighway to disallow
+    highway usage. avoid[features] takes precedence so if this parameter is also used then
+    scooters are not allowed to use highways even if allowHighway is used with value as true.
+    Possible values:
+    true: scooter is allowed to use highway.
+    false: scooter is not allowed to use highway.
+    """
+
+    def __init__(self, allow_highway: bool):
+        self.allowHighway = allow_highway
+
+    def __repr__(self):
+        """Return string representation of this instance."""
+        return json.dumps(self.__dict__)
