@@ -5,4 +5,4 @@ dependencies:
   - geojson
   - requests
   - pip:
-    - "-r ../../requirements_dev.txt"
+    - "-r ../requirements_dev.txt"
