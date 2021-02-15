@@ -1,10 +1,12 @@
 # HERE Location Services for Python
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/heremaps/here-location-services-python/master?urlpath=lab/tree/docs/notebooks)
+
 A Python client for [HERE Location Services](https://developer.here.com/documentation#services).
 
 ## Usage
 **[Geocoding using HERE Geocoding & Search API](https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-geocode-brief.html).**
-# ![Geocoding Example](images/geocoding.gif)
+# ![Geocoding Example](https://github.com/heremaps/here-location-services-python/raw/master/images/geocoding.gif)
 
 ## Prerequisites
 
@@ -42,7 +44,7 @@ $ pytest -v --cov=here_location_services tests
 
 ## Documentation
 
-A collection of example notebooks is provided in the [docs/notebooks](./docs/notebooks) directory.
+Documentation is available [here](https://here-location-services-python.readthedocs.io/en/latest/).
 
 Run the below commands to build the docs locally:
 

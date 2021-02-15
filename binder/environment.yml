@@ -1,0 +1,14 @@
+name: here_location_services
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - xyzspaces
+  - jupyterlab==2.2.9
+  - shapely
+  - pip:
+    - here-map-widget-for-jupyter
+    - "-r ../requirements.txt"
+    - "-r ../requirements_dev.txt"
+    - "-r ../docs/requirements.txt"
+    - "-e ../"
