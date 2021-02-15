@@ -1,5 +1,7 @@
 # HERE Location Services for Python
 
+[![Tests](https://github.com/heremaps/here-location-services-python/workflows/Tests/badge.svg)](https://github.com/heremaps/here-location-services-python/actions)
+[![Documentation Status](https://readthedocs.org/projects/here-location-services-python/badge/?version=latest)](https://here-location-services-python.readthedocs.io/en/latest/?badge=latest)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/heremaps/here-location-services-python/master?urlpath=lab/tree/docs/notebooks)
 
 A Python client for [HERE Location Services](https://developer.here.com/documentation#services).
