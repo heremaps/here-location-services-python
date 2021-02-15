@@ -10,5 +10,4 @@ dependencies:
     - here-map-widget-for-jupyter
     - "-r ../requirements.txt"
     - "-r ../requirements_dev.txt"
-    - "-r ../docs/requirements.txt"
     - "-e ../"
