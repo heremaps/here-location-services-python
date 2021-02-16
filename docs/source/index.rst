@@ -3,16 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-here-location-services
-======================
-HERE Location Services for Python.
+HERE Location Services for Python
+=================================
 
-This package provides a pure Python interface over `HERE Location Services`_
-REST APIs.
-HERE exposes `REST APIs`_ and this library makes it even easier to use those APIs for Python developers.
+A Python client for `HERE Location Services`_.
 
-.. _HERE Location Services: https://developer.here.com/documentation/geocoding-search-api/dev_guide/index.html
-.. _REST APIs: https://developer.here.com/documentation
+.. _HERE Location Services: https://developer.here.com/documentation#services
 
 .. toctree::
   :maxdepth: 1
@@ -48,7 +44,7 @@ HERE exposes `REST APIs`_ and this library makes it even easier to use those API
   :maxdepth: 1
   :caption: CONTRIBUTION
 
-  Contributing to here-location-services <contributing>
+  Contributing to HERE Location Services for Python <contributing>
 
 
 Indices and tables

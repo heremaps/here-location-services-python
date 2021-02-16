@@ -1,46 +1,38 @@
 # HERE Location Services for Python
 
-This library provides a pure Python interface over [HERE Location Services](https://developer.here.com/documentation/geocoding-search-api/dev_guide/index.html)
-REST APIs. HERE exposes [REST APIs](https://developer.here.com/documentation) and this library makes it even easier to use those APIs for
-Python developers, data scientists and data analysts.
+[![Tests](https://github.com/heremaps/here-location-services-python/workflows/Tests/badge.svg)](https://github.com/heremaps/here-location-services-python/actions)
+[![Documentation Status](https://readthedocs.org/projects/here-location-services-python/badge/?version=latest)](https://here-location-services-python.readthedocs.io/en/latest/?badge=latest)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/heremaps/here-location-services-python/master?urlpath=lab/tree/docs/notebooks)
 
-The GIF below shows a basic example of a geocoding service.
-# ![Geocoding Example](images/geocoding.gif)
+A Python client for [HERE Location Services](https://developer.here.com/documentation#services).
+
+## Usage
+**[Geocoding using HERE Geocoding & Search API](https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-geocode-brief.html).**
+# ![Geocoding Example](https://github.com/heremaps/here-location-services-python/raw/master/images/geocoding.gif)
 
 ## Prerequisites
 
-Before you can install this package, run its test-suite, or open a sample notebook using it you need to make sure you meet the following prerequisites:
+Before you can install `HERE Location Services for Python`, run its test-suite, or use the example notebooks to make sure you meet the following prerequisites:
 
 - A Python installation, 3.6+ recommended, with the `pip` command available to install dependencies.
 - A HERE developer account, freely available under [HERE Developer Portal](https://developer.here.com).
-- A Location Services API key from the [HERE Developer Portal](https://developer.here.com/) under the `projects` section in your profile, in an environment variable named `LS_API_KEY` which you can set like this (with a valid value, of course):
+- An [API key](https://developer.here.com/documentation/identity-access-management/dev_guide/topics/dev-apikey.html) from the [HERE Developer Portal](https://developer.here.com), in an environment variable named `LS_API_KEY` which you can set like this (with a valid value, of course):
   ```bash
-  export LS_API_KEY="MY-LS-API-KEY"
+  $ export LS_API_KEY="MY-LS-API-KEY"
   ```
   
 ## Installation
 
-This package can be installed with `pip` from various sources. For now only the first is recommended:
+- Install `HERE Location Services for Python` from [PyPI](https://pypi.org/) using the below command:
 
-- Install from [PyPI](https://pypi.org/):
   ```bash
-    pip install here-location-services
+  $ pip install here-location-services
   ```
 
-- Install from GitHub:
-  ```bash
-  pip install -e git+https://github.com/heremaps/here-location-services-python#egg=here-location-services
-  ```
+- Install `HERE Location Services for Python` from GitHub using the below command:
 
-If you want to run the test suite or experiment with the sample notebooks bundled you need to clone the whole repository:
-
-- Make a local clone of the repository hosting this package. The following command should do:
   ```bash
-  git clone https://github.com/heremaps/here-location-services-python.git
-  ```
-- Change into the repo root directory:
-  ```bash
-  cd here-location-services-python
+  $ pip install -e git+https://github.com/heremaps/here-location-services-python#egg=here-location-services
   ```
 
 ## Run Test Suite
@@ -48,25 +40,24 @@ If you want to run the test suite or experiment with the sample notebooks bundle
 To run the test suite you can do this locally, which should provide a test coverage of 100%:
 
 ```bash
-pip install -r requirements_dev.txt
-pytest -v --cov=here_location_services tests
+$ pip install -r requirements_dev.txt
+$ pytest -v --cov=here_location_services tests
 ```
 
 ## Documentation
 
-For now documentation consists of sample notebooks in `docs/notebooks` directory.
+Documentation is available [here](https://here-location-services-python.readthedocs.io/en/latest/).
 
-Run below commands to build the docs locally in the `docs/source` directory of the cloned repository.
+Run the below commands to build the docs locally:
 
 ```bash
-pip install -e .
-pip install -r requirements_dev.txt
-sh scripts/build_docs.sh
+$ pip install -e .
+$ pip install -r requirements_dev.txt
+$ sh scripts/build_docs.sh
 ```
 
 ## Hello World Example
-This is a tiny "Hello World" like example that you can run to get geocoding 
-for a given address right away! Just make sure to use your own real API key!
+This is a tiny "Hello World" like example that you can run to geocode the given address right away. Just make sure to use your own real API key.
 
 ```python
 import json
@@ -84,7 +75,7 @@ print(json.dumps(geo.to_geojson(), indent=2, sort_keys=True))
 ```
 
 # License
-Copyright (C) 2019-2020 HERE Europe B.V.
+Copyright (C) 2019-2021 HERE Europe B.V.
 
 See the [License](LICENSE) file in the root of this project for license details.
 

@@ -1,6 +1,6 @@
 Lookup
 ======
-Every place or location object known by HERE has a location identifier or "ID". `Lookup API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-lookup-brief.html>`_ is used to look up a place by its HERE ID.
+Every place or location object known by HERE has a location identifier or "ID". `Lookup endpoint of HERE Geocoding & Search API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-lookup-brief.html>`_ is used to look up a place by its HERE ID.
 
 Example
 -------

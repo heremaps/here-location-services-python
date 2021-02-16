@@ -20,8 +20,8 @@ sys.path.insert(0, target_dir)
 
 # -- Project information -----------------------------------------------------
 
-project = 'here_location_services'
-copyright = '2019-2020, HERE Europe B.V.'
+project = 'HERE Location Services for Python'
+copyright = 'Copyright (C) 2019-2021 HERE Europe B.V.'
 author = 'HERE Europe B.V.'
 
 

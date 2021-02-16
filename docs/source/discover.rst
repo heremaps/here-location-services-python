@@ -1,6 +1,6 @@
 Discover
 ========
-`Discover API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-discover-brief.html>`_ simplifies searching for places. The user submits a free-form text request that returns candidate items (places and addresses related) in the order of intent matching relevance.
+`Discover endpoint of HERE Geocoding & Search API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-discover-brief.html>`_ simplifies searching for places. The user submits a free-form text request that returns candidate items (places and addresses related) in the order of intent matching relevance.
 
 Example
 -------

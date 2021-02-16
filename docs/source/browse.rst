@@ -1,6 +1,6 @@
 Browse
 ======
-`Browse API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-browse-brief.html>`_ provides a structured search by filtering items by category and name at a given geo-position and radius. Items returned are places, streets or localities, ranked by increasing distance.
+`Browse endpoint of HERE Geocoding & Search API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-browse-brief.html>`_ provides a structured search by filtering items by category and name at a given geo-position and radius. Items returned are places, streets or localities, ranked by increasing distance.
 
 Example
 -------

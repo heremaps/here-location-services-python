@@ -1,6 +1,6 @@
 Geocode
 =========
-`HERE Geocoding & Search API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-geocode-brief.html>`_ is used to find the geo-coordinates of a known address, place, locality or administrative area, even if the query is incomplete or partly incorrect. It also returns a complete postal address string and address details.
+`Geocode endpoint of HERE Geocoding & Search API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-geocode-brief.html>`_ is used to find the geo-coordinates of a known address, place, locality or administrative area, even if the query is incomplete or partly incorrect. It also returns a complete postal address string and address details.
 
 Example
 -------
