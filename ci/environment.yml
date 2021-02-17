@@ -2,7 +2,9 @@ name: test
 channels:
   - conda-forge
 dependencies:
+  - pip
   - geojson
   - requests
   - pip:
+    - "-r ../requirements.txt"
     - "-r ../requirements_dev.txt"
