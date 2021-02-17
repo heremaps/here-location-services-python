@@ -37,7 +37,7 @@ Before you can install `HERE Location Services for Python`, run its test-suite, 
 
 ## Run Test Suite
 
-To run the test suite you can do this locally, which should provide a test coverage of 100%:
+Run the test suite using below commands:
 
 ```bash
 $ pip install -r requirements_dev.txt

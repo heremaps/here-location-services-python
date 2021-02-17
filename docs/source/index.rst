@@ -32,6 +32,7 @@ A Python client for `HERE Location Services`_.
   :caption: Routing
 
   Isoline Routing <isoline_routing>
+  Routing <routing>
 
 .. toctree::
   :maxdepth: 1

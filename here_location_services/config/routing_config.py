@@ -1,7 +1,7 @@
 # Copyright (C) 2019-2021 HERE Europe B.V.
 # SPDX-License-Identifier: Apache-2.0
 
-"""This module defines all the constants which will be required as inputs to various APIs."""
+"""This module defines all the configs which will be required as inputs to routing APIs."""
 
 import json
 from typing import List, Optional
@@ -33,6 +33,8 @@ class RoutingMode(Bunch):
     """
 
 
+#: Use this config for routing_mode of routing API.
+#: Example: for ``fast`` routing_mdoe use ``ROUTING_MODE.fast``.
 ROUTING_MODE = RoutingMode(**{"fast": "fast", "short": "short"})
 
 
@@ -95,6 +97,8 @@ return_attributes = {
     "passthrough": "passthrough",
     "incidents": "incidents",
 }
+#: Use this config for return attributes from routing API for param ``return_results``.
+#: Example: To return polyline in results use ``ROUTING_RETURN.polyline``.
 ROUTING_RETURN = RoutingReturn(**return_attributes)
 
 
@@ -129,6 +133,8 @@ routing_spans = {
     "consumption": "consumption",
 }
 
+#: Use this config for spans of routing API.
+#: Example: for ``walkAttributes`` routing_mdoe use ``ROUTING_SPANS.walkAttributes``.
 ROUTING_SPANS = RoutingSpans(**routing_spans)
 
 

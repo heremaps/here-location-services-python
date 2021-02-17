@@ -15,10 +15,11 @@ Submodules
 
    here_location_services.__version__
    here_location_services.apis
-   here_location_services.constants.rst
+   here_location_services.config
+   here_location_services.config.routing_config
+   here_location_services.config.url_config
    here_location_services.geocoding_search_api
    here_location_services.isoline_routing_api
-   here_location_services.config
    here_location_services.exceptions
    here_location_services.ls
    here_location_services.responses

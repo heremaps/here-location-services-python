@@ -9,7 +9,7 @@ import urllib
 import urllib.request
 from typing import Optional
 
-from .config import conf
+from here_location_services.config.url_config import conf
 
 
 class Api:

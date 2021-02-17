@@ -9,8 +9,9 @@ from typing import Dict, List, Optional, Tuple
 
 import requests
 
+from here_location_services.config.routing_config import PlaceOptions, Scooter, WayPointOptions
+
 from .apis import Api
-from .constants import PlaceOptions, Scooter, WayPointOptions
 from .exceptions import ApiError
 
 

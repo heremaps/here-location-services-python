@@ -8,7 +8,7 @@ import pytest
 from geojson import FeatureCollection
 
 from here_location_services import LS
-from here_location_services.constants import (
+from here_location_services.config.routing_config import (
     ROUTE_COURSE,
     ROUTE_MATCH_SIDEOF_STREET,
     ROUTING_RETURN,

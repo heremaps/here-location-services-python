@@ -9,7 +9,8 @@ import urllib.request
 from datetime import datetime
 from typing import List, Optional, Tuple
 
-from .constants import PlaceOptions, Scooter, WayPointOptions
+from here_location_services.config.routing_config import PlaceOptions, Scooter, WayPointOptions
+
 from .geocoding_search_api import GeocodingSearchApi
 from .isoline_routing_api import IsolineRoutingApi
 from .responses import (
@@ -294,7 +295,7 @@ class LS:
         :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
             ``via``.
         :param departure_time: :class:`datetime.datetime` object.
-        :param routing_mode: A string to represent routing mode.
+        :param routing_mode: A string to represent routing mode. use config defined in :attr:`ROUTING_MODE <here_location_services.config.routing_config.ROUTING_MODE>`  # noqa: E501
         :param alternatives: Number of alternative routes to return aside from the optimal route.
             default value is ``0`` and maximum is ``6``.
         :param units: A string representing units of measurement used in guidance instructions.
@@ -303,8 +304,8 @@ class LS:
             The value should comply with the IETF BCP 47.
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
-            spans.
-        :return: :class:`requests.Response` object.
+            spans. use config defined in :attr:`ROUTING_SPANS <here_location_services.config.routing_config.ROUTING_SPANS>`  # noqa: E501
+        :return: :class:`RoutingResponse` object.
         """
         resp = self.routing_api.route(
             transport_mode="car",
@@ -368,7 +369,7 @@ class LS:
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
             spans.
-        :return: :class:`requests.Response` object.
+        :return: :class:`RoutingResponse` object.
         """
         resp = self.routing_api.route(
             transport_mode="bicycle",
@@ -432,7 +433,7 @@ class LS:
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
             spans.
-        :return: :class:`requests.Response` object.
+        :return: :class:`RoutingResponse` object.
         """
         resp = self.routing_api.route(
             transport_mode="truck",
@@ -498,7 +499,7 @@ class LS:
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
             spans.
-        :return: :class:`requests.Response` object.
+        :return: :class:`RoutingResponse` object.
         """
         resp = self.routing_api.route(
             transport_mode="scooter",
@@ -563,7 +564,7 @@ class LS:
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
             spans.
-        :return: :class:`requests.Response` object.
+        :return: :class:`RoutingResponse` object.
         """
         resp = self.routing_api.route(
             transport_mode="pedestrian",
