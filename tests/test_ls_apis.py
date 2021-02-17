@@ -11,10 +11,10 @@ LS_API_KEY = get_apikey()
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
-def test_geocoding(api):
+def test_geocoding(geo_search_api):
     """Test geocoding api."""
     address = "Goregaon West, Mumbai 400062, India"
-    resp = api.get_geocoding(query=address)
+    resp = geo_search_api.get_geocoding(query=address)
     assert type(resp) == requests.Response
     assert resp.status_code == 200
 
@@ -29,17 +29,17 @@ def test_geocoding_exception():
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
-def test_reverse_geocoding(api):
+def test_reverse_geocoding(geo_search_api):
     """Test reverse geocoding."""
-    resp = api.get_reverse_geocoding(lat=19.1646, lng=72.8493)
+    resp = geo_search_api.get_reverse_geocoding(lat=19.1646, lng=72.8493)
     assert type(resp) == requests.Response
     assert resp.status_code == 200
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
-def test_isonline_routing(api):
+def test_isonline_routing(isoline_routing_api):
     """Test isonline routing api."""
-    result = api.get_isoline_routing(
+    result = isoline_routing_api.get_isoline_routing(
         start=[52.5, 13.4], range="900", range_type="time", mode="fastest;car;"
     )
 

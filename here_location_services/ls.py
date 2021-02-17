@@ -5,9 +5,14 @@
 
 import os
 import urllib
-from typing import List, Optional
+import urllib.request
+from datetime import datetime
+from typing import List, Optional, Tuple
 
-from .apis import Api
+from here_location_services.config.routing_config import PlaceOptions, Scooter, WayPointOptions
+
+from .geocoding_search_api import GeocodingSearchApi
+from .isoline_routing_api import IsolineRoutingApi
 from .responses import (
     BrowseResponse,
     DiscoverResponse,
@@ -15,7 +20,9 @@ from .responses import (
     IsolineResponse,
     LookupResponse,
     ReverseGeocoderResponse,
+    RoutingResponse,
 )
+from .routing_api import RoutingApi
 
 
 class LS:
@@ -33,7 +40,17 @@ class LS:
         api_key = api_key or os.environ.get("LS_API_KEY")
         self.credentials = dict(api_key=api_key)
         self.proxies = proxies or urllib.request.getproxies()
-        self.api = Api(
+        self.geo_search_api = GeocodingSearchApi(
+            api_key=api_key,
+            proxies=proxies,
+            country=country,
+        )
+        self.isoline_routing_api = IsolineRoutingApi(
+            api_key=api_key,
+            proxies=proxies,
+            country=country,
+        )
+        self.routing_api = RoutingApi(
             api_key=api_key,
             proxies=proxies,
             country=country,
@@ -53,7 +70,7 @@ class LS:
         if not query or query.isspace():
             raise ValueError(f"Invalid input query: {query}")
 
-        resp = self.api.get_geocoding(query, limit=limit, lang=lang)
+        resp = self.geo_search_api.get_geocoding(query, limit=limit, lang=lang)
         return GeocoderResponse.new(resp.json())
 
     def reverse_geocode(
@@ -78,7 +95,7 @@ class LS:
         if not -180 <= lng <= 180:
             raise ValueError("Longitude must be in range -180 to 180.")
 
-        resp = self.api.get_reverse_geocoding(lat=lat, lng=lng, limit=limit, lang=lang)
+        resp = self.geo_search_api.get_reverse_geocoding(lat=lat, lng=lng, limit=limit, lang=lang)
         return ReverseGeocoderResponse.new(resp.json())
 
     def calculate_isoline(
@@ -133,7 +150,7 @@ class LS:
         if arrival and destination is None:
             raise ValueError("`arrival` must be provided with `destination`")
 
-        resp = self.api.get_isoline_routing(
+        resp = self.isoline_routing_api.get_isoline_routing(
             mode=mode,
             range=range,
             range_type=range_type,
@@ -185,7 +202,7 @@ class LS:
                 f"can not be provided together."
             )
 
-        resp = self.api.get_search_discover(
+        resp = self.geo_search_api.get_search_discover(
             query=query,
             center=center,
             radius=radius,
@@ -222,7 +239,7 @@ class LS:
             a list of BCP47 compliant Language Codes.
         :return: :class:`BrowseResponse` object.
         """
-        resp = self.api.get_search_browse(
+        resp = self.geo_search_api.get_search_browse(
             center=center,
             radius=radius,
             country_codes=country_codes,
@@ -243,5 +260,328 @@ class LS:
             a list of BCP47 compliant Language Codes.
         :return: :class:`LookupResponse` object.
         """
-        resp = self.api.get_search_lookup(location_id=location_id, lang=lang)
+        resp = self.geo_search_api.get_search_lookup(location_id=location_id, lang=lang)
         return LookupResponse.new(resp.json())
+
+    def car_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``car`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode. use config defined in :attr:`ROUTING_MODE <here_location_services.config.routing_config.ROUTING_MODE>`  # noqa: E501
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans. use config defined in :attr:`ROUTING_SPANS <here_location_services.config.routing_config.ROUTING_SPANS>`  # noqa: E501
+        :return: :class:`RoutingResponse` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="car",
+            origin=origin,
+            destination=destination,
+            via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())
+
+    def bicycle_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``bicycle`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode.
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans.
+        :return: :class:`RoutingResponse` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="bicycle",
+            origin=origin,
+            destination=destination,
+            via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())
+
+    def truck_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``truck`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode.
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans.
+        :return: :class:`RoutingResponse` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="truck",
+            origin=origin,
+            destination=destination,
+            via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())
+
+    def scooter_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
+        scooter: Optional[Scooter] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``scooter`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
+        :param scooter: Additional attributes for scooter route.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode.
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans.
+        :return: :class:`RoutingResponse` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="scooter",
+            origin=origin,
+            destination=destination,
+            via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
+            scooter=scooter,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())
+
+    def pedestrian_route(
+        self,
+        origin: List,
+        destination: List,
+        via: Optional[List[Tuple]] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        via_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
+        via_waypoint_options: Optional[WayPointOptions] = None,
+        departure_time: Optional[datetime] = None,
+        routing_mode: str = "fast",
+        alternatives: int = 0,
+        units: str = "metric",
+        lang: str = "en-US",
+        return_results: Optional[List] = None,
+        spans: Optional[List] = None,
+    ) -> RoutingResponse:
+        """Calculate ``pedestrian`` route between two endpoints.
+
+        :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
+        :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
+        :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
+        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
+            ``via``.
+        :param departure_time: :class:`datetime.datetime` object.
+        :param routing_mode: A string to represent routing mode.
+        :param alternatives: Number of alternative routes to return aside from the optimal route.
+            default value is ``0`` and maximum is ``6``.
+        :param units: A string representing units of measurement used in guidance instructions.
+            The default is metric.
+        :param lang: A string representing preferred language of the response.
+            The value should comply with the IETF BCP 47.
+        :param return_results: A list of strings.
+        :param spans: A list of strings to define which attributes are included in the response
+            spans.
+        :return: :class:`RoutingResponse` object.
+        """
+        resp = self.routing_api.route(
+            transport_mode="pedestrian",
+            origin=origin,
+            destination=destination,
+            via=via,
+            origin_place_options=origin_place_options,
+            destination_place_options=destination_place_options,
+            via_place_options=via_place_options,
+            destination_waypoint_options=destination_waypoint_options,
+            via_waypoint_options=via_waypoint_options,
+            departure_time=departure_time,
+            routing_mode=routing_mode,
+            alternatives=alternatives,
+            units=units,
+            lang=lang,
+            return_results=return_results,
+            spans=spans,
+        )
+        return RoutingResponse.new(resp.json())

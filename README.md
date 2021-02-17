@@ -24,20 +24,20 @@ Before you can install `HERE Location Services for Python`, run its test-suite, 
 ## Installation
 
 - Install `HERE Location Services for Python` from [PyPI](https://pypi.org/) using the below command:
-  
+
   ```bash
   $ pip install here-location-services
   ```
 
 - Install `HERE Location Services for Python` from GitHub using the below command:
-  
+
   ```bash
   $ pip install -e git+https://github.com/heremaps/here-location-services-python#egg=here-location-services
   ```
 
 ## Run Test Suite
 
-To run the test suite you can do this locally, which should provide a test coverage of 100%:
+Run the test suite using below commands:
 
 ```bash
 $ pip install -r requirements_dev.txt
@@ -78,3 +78,4 @@ print(json.dumps(geo.to_geojson(), indent=2, sort_keys=True))
 Copyright (C) 2019-2021 HERE Europe B.V.
 
 See the [License](LICENSE) file in the root of this project for license details.
+

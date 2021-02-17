@@ -32,9 +32,6 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 	find . -name '.ipynb_checkpoints' -exec rm -fr {} +
 
-dockerize:
-	jupyter-repo2docker --user-id 1000 --env XYZ_TOKEN=${XYZ_TOKEN} .
-
 install:
 	python3 -m pip install -e .
 

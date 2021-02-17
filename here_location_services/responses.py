@@ -7,7 +7,8 @@ This module contains classes for accessing the responses from Location Services 
 
 import json
 
-from geojson import Feature, FeatureCollection, Point, Polygon
+import flexpolyline as fp
+from geojson import Feature, FeatureCollection, LineString, Point, Polygon
 
 
 class ApiResponse:
@@ -113,3 +114,25 @@ class LookupResponse(ApiResponse):
         self._filters = {"items": None}
         for param, default in self._filters.items():
             setattr(self, param, kwargs)
+
+
+class RoutingResponse(ApiResponse):
+    """A class representing the search routing API response data."""
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._filters = {"routes": None}
+        for param, default in self._filters.items():
+            setattr(self, param, kwargs.get(param, default))
+
+    def to_geojson(self):
+        """Return API response as GeoJSON."""
+        feature_collection = FeatureCollection([])
+        for route in self.response["routes"]:
+            for section in route["sections"]:
+                polyline = section["polyline"]
+                lstring = fp.decode(polyline)
+                lstring = [(coord[1], coord[0], coord[2]) for coord in lstring]
+                f = Feature(geometry=LineString(lstring), properties=section)
+                feature_collection.features.append(f)
+        return feature_collection
