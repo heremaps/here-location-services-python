@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/heremaps/here-location-services-python/workflows/Tests/badge.svg)](https://github.com/heremaps/here-location-services-python/actions)
 [![Documentation Status](https://readthedocs.org/projects/here-location-services-python/badge/?version=latest)](https://here-location-services-python.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/heremaps/here-location-services-python/branch/master/graph/badge.svg?token=G7Q1DWFI3W)](https://codecov.io/gh/heremaps/here-location-services-python)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/heremaps/here-location-services-python/master?urlpath=lab/tree/docs/notebooks)
 
 A Python client for [HERE Location Services](https://developer.here.com/documentation#services).
