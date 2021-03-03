@@ -36,7 +36,7 @@ def test_ls_geocoding():
     assert geo_json.type == "FeatureCollection"
     assert geo_json.features
     pos = resp.items[0]["position"]
-    assert len(resp.items) == 2
+    assert len(resp.items) == 1
     assert pos == {"lat": 37.37634, "lng": -122.03405}
 
 
@@ -192,7 +192,7 @@ def test_ls_browse():
         center=[19.1663, 72.8526],
         radius=9000,
         limit=5,
-        categories=["300-3000-0025", "300-3100.550-5510-0202", "500-5520,600-6100-0062"],
+        categories=["300-3000-0025", "300-3100,550-5510-0202", "500-5520,600-6100-0062"],
         lang="en",
     )
     assert len(result.items) == 5
