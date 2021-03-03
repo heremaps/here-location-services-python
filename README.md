@@ -24,6 +24,11 @@ Before you can install `HERE Location Services for Python`, run its test-suite, 
   
 ## Installation
 
+- Install `HERE Location Services for Python` with conda from the Anaconda [conda-forge channel](https://anaconda.org/conda-forge/here-location-services) using the below command:
+
+    ```bash
+    $ conda install -c conda-forge here-location-services
+    ```
 - Install `HERE Location Services for Python` from [PyPI](https://pypi.org/) using the below command:
 
   ```bash
