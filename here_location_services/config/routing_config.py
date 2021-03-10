@@ -6,13 +6,7 @@
 import json
 from typing import List, Optional
 
-
-class Bunch(dict):
-    """A class for dot notation implementation of dictionary."""
-
-    def __init__(self, **kwargs):
-        dict.__init__(self, kwargs)
-        self.__dict__ = self
+from .base_config import Bunch
 
 
 class RoutingMode(Bunch):
@@ -34,7 +28,7 @@ class RoutingMode(Bunch):
 
 
 #: Use this config for routing_mode of routing API.
-#: Example: for ``fast`` routing_mdoe use ``ROUTING_MODE.fast``.
+#: Example: for ``fast`` routing_mode use ``ROUTING_MODE.fast``.
 ROUTING_MODE = RoutingMode(**{"fast": "fast", "short": "short"})
 
 
@@ -134,7 +128,7 @@ routing_spans = {
 }
 
 #: Use this config for spans of routing API.
-#: Example: for ``walkAttributes`` routing_mdoe use ``ROUTING_SPANS.walkAttributes``.
+#: Example: for ``walkAttributes`` routing_mode use ``ROUTING_SPANS.walkAttributes``.
 ROUTING_SPANS = RoutingSpans(**routing_spans)
 
 
@@ -158,6 +152,8 @@ transport_mode = {
     "scooter": "scooter",
 }
 
+#: Use this config for transport_mode of routing API.
+#: Example: for ``car`` transport_mode use ``ROUTING_TRANSPORT_MODE.car``.
 ROUTING_TRANSPORT_MODE = RoutingTransportMode(**transport_mode)
 
 

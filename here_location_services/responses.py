@@ -136,3 +136,17 @@ class RoutingResponse(ApiResponse):
                 f = Feature(geometry=LineString(lstring), properties=section)
                 feature_collection.features.append(f)
         return feature_collection
+
+
+class MatrixRoutingResponse(ApiResponse):
+    """A class representing Matrix routing response data."""
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._filters = {"matrix": None}
+        for param, default in self._filters.items():
+            setattr(self, param, kwargs.get(param, default))
+
+    def to_geojson(self):
+        """Return API response as GeoJSON."""
+        raise NotImplementedError("This method is not valid for MatrixRoutingResponse.")

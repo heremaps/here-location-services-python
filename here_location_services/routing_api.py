@@ -19,9 +19,12 @@ class RoutingApi(Api):
     """A class for accessing HERE routing APIs."""
 
     def __init__(
-        self, api_key: Optional[str] = None, proxies: Optional[dict] = None, country: str = "row"
+        self,
+        api_key: Optional[str] = None,
+        proxies: Optional[dict] = None,
+        country: str = "row",
     ):
-        super(RoutingApi, self).__init__(api_key, proxies, country)
+        super().__init__(api_key, proxies, country)
         self._base_url = f"https://router.{self._get_url_string()}"
 
     def route(

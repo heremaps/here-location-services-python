@@ -7,7 +7,9 @@ This module contains base classes for accessing the Location Services RESTful AP
 
 import urllib
 import urllib.request
-from typing import Optional
+from typing import Dict, Optional
+
+import requests
 
 from here_location_services.config.url_config import conf
 
@@ -23,6 +25,7 @@ class Api:
     ):
         self.credentials = dict(api_key=api_key)
         self.proxies = proxies or urllib.request.getproxies()
+        self.headers: Dict[str, str] = {}
         self.country = country
 
     @property
@@ -53,3 +56,18 @@ class Api:
             raise Exception(
                 f"api_key: {self.credentials['api_key']} is not present in credentials."
             )
+
+    def post(self, url: str, data: Dict, params: Optional[Dict] = None):
+        """
+        Send HTTP POST request.
+
+        :param url: A string to represent URL.
+        :param data: A dictionary to represent the post data
+        :param params: An optional dict for query params.
+        :return: :class:`requests.Response` object.
+        """
+        self.headers.update({"Content-Type": "application/json"})
+        resp = requests.post(
+            url, params=params, json=data, proxies=self.proxies, headers=self.headers
+        )
+        return resp
