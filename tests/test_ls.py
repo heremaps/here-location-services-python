@@ -474,7 +474,6 @@ def test_matrix_route():
     assert mat["numOrigins"] == 3
     assert mat["numDestinations"] == 3
     assert len(mat["distances"]) == 9
-    assert mat["errorCodes"] == [0, 3, 0, 3, 0, 3, 0, 3, 0]
 
     profile = PROFILE.carShort
     result2 = ls.matrix(
@@ -529,7 +528,6 @@ def test_matrix_route_async():
     assert mat["numOrigins"] == 3
     assert mat["numDestinations"] == 3
     assert len(mat["distances"]) == 9
-    assert mat["errorCodes"] == [0, 3, 0, 3, 0, 3, 0, 3, 0]
 
 
 def test_matrix_routing_config():
