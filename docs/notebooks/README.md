@@ -28,3 +28,5 @@ Follow installation steps from here: [here-map-widget-for-jupyter](https://githu
 
 - [Location Services](./location_services.ipynb) - Examples of various location services.
 - [Restaurant Search](./isoline_routing_restaurant_search.ipynb) - Usecase of restarant search using isoline routing.
+- [Routing](./routing.ipynb) - Examples of routing API.
+- [Matrix Routing](./matrix_routing.ipynb) - Examples of Matrix routing API.
