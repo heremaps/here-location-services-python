@@ -51,7 +51,7 @@ class PolygonRegion:
 class AutoCircleRegion:
     """A class to define attributes of AutoCircle Region for Matrix Routing API."""
 
-    def __init__(self, margin: int):
+    def __init__(self, margin: int = 10000):
         self.type = "autoCircle"
         self.margin = margin
 
