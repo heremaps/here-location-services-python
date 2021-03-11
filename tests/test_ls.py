@@ -31,6 +31,7 @@ from here_location_services.config.routing_config import (
     ROUTING_SPANS,
     ROUTING_TRANSPORT_MODE,
     PlaceOptions,
+    Scooter,
     WayPointOptions,
 )
 from here_location_services.exceptions import ApiError
@@ -361,6 +362,7 @@ def test_truck_route():
 def test_scooter_route():
     """Test routing API for scooter route."""
     ls = LS(api_key=LS_API_KEY)
+    scooter = Scooter(allow_highway=True)
     _ = ls.scooter_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
@@ -368,6 +370,7 @@ def test_scooter_route():
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
+        scooter=scooter,
     )
 
 
@@ -438,6 +441,13 @@ def test_matrix_route():
     region_definition = WorldRegion()
     matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
     avoid_areas = AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
+    assert json.loads(avoid_areas.__str__()) == {
+        "type": "boundingBox",
+        "north": 68.1766451354,
+        "south": 7.96553477623,
+        "west": 97.4025614766,
+        "east": 35.4940095078,
+    }
     truck = Truck(
         shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
         gross_weight=100,
@@ -478,6 +488,48 @@ def test_matrix_route():
     assert mat2["numDestinations"] == 3
     with pytest.raises(NotImplementedError):
         result2.to_geojson()
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_matrix_route_async():
+    """Test Matrix routing."""
+    ls = LS(api_key=LS_API_KEY)
+    origins = [
+        {"lat": 37.76, "lng": -122.42},
+        {"lat": 40.63, "lng": -74.09},
+        {"lat": 30.26, "lng": -97.74},
+    ]
+    region_definition = WorldRegion()
+    matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
+    avoid_areas = AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
+    truck = Truck(
+        shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
+        gross_weight=100,
+        weight_per_axle=10,
+        height=10,
+        width=10,
+        length=10,
+        tunnel_category="B",
+        axle_count=4,
+    )
+    result = ls.matrix(
+        origins=origins,
+        region_definition=region_definition,
+        async_req=True,
+        destinations=origins,
+        routing_mode=ROUTING_MODE.fast,
+        departure_time="any",
+        transport_mode=ROUTING_TRANSPORT_MODE.truck,
+        avoid_features=[AVOID_FEATURES.tollRoad],
+        avoid_areas=[avoid_areas],
+        truck=truck,
+        matrix_attributes=matrix_attributes,
+    )
+    mat = result.matrix
+    assert mat["numOrigins"] == 3
+    assert mat["numDestinations"] == 3
+    assert len(mat["distances"]) == 9
+    assert mat["errorCodes"] == [0, 3, 0, 3, 0, 3, 0, 3, 0]
 
 
 def test_matrix_routing_config():

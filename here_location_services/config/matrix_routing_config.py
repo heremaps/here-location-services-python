@@ -198,9 +198,10 @@ class Truck:
         :param length: Vehicle length, in centimeters. Should be in range [0, 5000]
         :param tunnel_category: A string for category of tunnel. Valid values are "B", "C", "D", "E".
             Specifies the `cargo tunnel restriction code <https://adrbook.com/en/2017/ADR/8.6.3>`_.
-            Route will pass only through tunnels of less restrictive categories.
-        :param axle_count: Total number of axles that the vehicle has. Should be in range [2, 255]
-        :param truck_type: A string to represent type of truck.
+            The route will pass only through tunnels of less restrictive categories.
+        :param axle_count: Total number of axles that the vehicle has. Should be in the
+            range [2, 255].
+        :param truck_type: A string to represent the type of truck.
         :param trailer_count: Number of trailers attached to the vehicle.
         """
         self.shippedHazardousGoods = shipped_hazardous_goods

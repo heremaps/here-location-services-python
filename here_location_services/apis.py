@@ -57,6 +57,22 @@ class Api:
                 f"api_key: {self.credentials['api_key']} is not present in credentials."
             )
 
+    def get(self, url: str, params: Optional[Dict] = None, **kwargs):
+        """Send HTTP GET request.
+
+        :param url: A string to represent URL.
+        :param params: An optional dict for query params.
+        :param kwargs: An optional extra arguments.
+        :return: :class:`requests.Response` object.
+        """
+        if self.credential_params:
+            if not params:
+                params = self.credential_params
+            else:
+                params.update(self.credential_params)
+        resp = requests.get(url, params=params, **kwargs)
+        return resp
+
     def post(self, url: str, data: Dict, params: Optional[Dict] = None):
         """
         Send HTTP POST request.

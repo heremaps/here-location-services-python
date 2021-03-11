@@ -34,10 +34,10 @@ ROUTING_MODE = RoutingMode(**{"fast": "fast", "short": "short"})
 
 class RoutingReturn(Bunch):
     """A class to define constant attributes which are included in routing API's response
-    as part of data representation of route or section.
+    as part of the data representation of route or section.
 
     * ``polyline`` - Polyline for the route in Flexible Polyline Encoding. Either a 2D polyline
-      (without elevation specified), or a 3D polyline with the 3rd dimension type Elevation
+      (without elevation specified) or a 3D polyline with the 3rd dimension type Elevation
       (with elevation specified).
 
     * ``actions`` - Actions (such as maneuvers or tasks) that must be taken to complete the
@@ -46,9 +46,9 @@ class RoutingReturn(Bunch):
     * instructions - Include instructions in returned actions. Instructions are localized to the
       requested language.
 
-    * ``summary`` - Include summary for the section.
+    * ``summary`` - Include a summary for the section.
 
-    * ``travelSummary`` - Include summary for the travel portion of the section.
+    * ``travelSummary`` - Include a summary for the travel portion of the section.
 
     * ``turnByTurnActions`` - Include all information necessary to support turn by turn guidance
       to complete the section.
@@ -74,7 +74,7 @@ class RoutingReturn(Bunch):
     * If ``turnByTurnActions`` is requested, then ``polyline`` must also be requested as well.
 
     * If at least one attribute is requested within the ``spans`` parameter, then ``polyline``
-      must be request as well.
+      must be requested as well.
     """
 
 
@@ -179,7 +179,8 @@ class PlaceOptions:
     """A class to define ``PlaceOptions`` for ``origin``/ ``via``/ ``destination``.
 
     Various options can be found here:
-    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>_`.  # noqa E501
+
+    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>_`. # noqa E501
     """
 
     def __init__(
@@ -194,7 +195,7 @@ class PlaceOptions:
         """Object Initializer.
 
         :param course: An int representing degrees clock-wise from north.
-            Indicating desired direction at the place. E.g. 90 indicating ``east``.
+            Indicating the desired direction at the place. E.g. 90 indicating ``east``.
             This is defined in constant ``ROUTE_COURSE``.
         :param sideof_street_hint: A list of latitude and longitude.Indicating the side of the
             street that should be used.
@@ -202,12 +203,12 @@ class PlaceOptions:
         :param namehint: A string for the router to look for the place with the most similar name.
             This can e.g. include things like: North being used to differentiate between
             interstates I66 North and I66 South, Downtown Avenue being used to correctly
-            select a residental street.
+            select a residential street.
         :param radius: In meters Asks the router to consider all places within the given radius as
             potential candidates for route calculation. This can be either because it is not
-            important which place is used, or because it is unknown. Radius more than 200 meter
+            important which place is used, or because it is unknown. Radius more than 200 meters
             are not supported.
-        :param min_course_distance: In meters Asks the routing service to try find a route that
+        :param min_course_distance: In meters Asks the routing service to try to find a route that
             avoids actions for the indicated distance. E.g. if the origin is determined by a moving
             vehicle, the user might not have time to react to early actions.
         """
@@ -242,17 +243,18 @@ class WayPointOptions:
 
 
 class Scooter:
-    """A class to define attributes specific for scooter route.
+    """A class to define attributes specific for the scooter route.
 
-    Scooter specific parameters.
-    allowHighway: Specifies whether scooter is allowed on highway or not.
+    Scooter specific parameters:
+
+    allowHighway: Specifies whether the scooter is allowed on the highway or not.
     This parameter is optional. If not provided, then by default scooter is not allowed to use
-    highway. There is a similar parameter avoid[features]=controlledAccessHighway to disallow
+    highway. There is a similar parameter ``avoid[features]=controlledAccessHighway`` to disallow
     highway usage. avoid[features] takes precedence so if this parameter is also used then
     scooters are not allowed to use highways even if allowHighway is used with value as true.
     Possible values:
-    true: scooter is allowed to use highway.
-    false: scooter is not allowed to use highway.
+    true: scooter is allowed to use the highway.
+    false: scooter is not allowed to use the highway.
     """
 
     def __init__(self, allow_highway: bool):
