@@ -45,3 +45,10 @@ def test_isonline_routing(isoline_routing_api):
 
     coordinates = result.json()["response"]["isoline"][0]["component"][0]["shape"]
     assert coordinates[0]
+
+
+def test_credentials_exception():
+    """Test exception for credentials."""
+    api = Api()
+    with pytest.raises(Exception):
+        _ = api.credential_params

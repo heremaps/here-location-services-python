@@ -16,9 +16,12 @@ class IsolineRoutingApi(Api):
     """A class for accessing HERE isoline routing API."""
 
     def __init__(
-        self, api_key: Optional[str] = None, proxies: Optional[dict] = None, country: str = "row"
+        self,
+        api_key: Optional[str] = None,
+        proxies: Optional[dict] = None,
+        country: str = "row",
     ):
-        super(IsolineRoutingApi, self).__init__(api_key, proxies, country)
+        super().__init__(api_key, proxies, country)
         self._base_url = f"https://isoline.route.ls.{self._get_url_string()}"
 
     def get_isoline_routing(

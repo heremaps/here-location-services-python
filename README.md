@@ -3,6 +3,14 @@
 [![Tests](https://github.com/heremaps/here-location-services-python/workflows/Tests/badge.svg)](https://github.com/heremaps/here-location-services-python/actions)
 [![Documentation Status](https://readthedocs.org/projects/here-location-services-python/badge/?version=latest)](https://here-location-services-python.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/heremaps/here-location-services-python/branch/master/graph/badge.svg?token=G7Q1DWFI3W)](https://codecov.io/gh/heremaps/here-location-services-python)
+[![PyPI - Status](https://img.shields.io/pypi/status/here-location-services)](https://pypi.org/project/here-location-services/)
+[![PyPI - Python Version](https://img.shields.io/pypi/v/here-location-services.svg?logo=pypi)](https://pypi.org/project/here-location-services/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/here-location-services)](https://pypi.org/project/here-location-services/)
+[![PyPI - License](https://img.shields.io/pypi/l/here-location-services)](https://pypi.org/project/here-location-services/)
+[![Downloads](https://pepy.tech/badge/here-location-services)](https://pepy.tech/project/here-location-services)
+[![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/here-location-services?logo=conda-forge)](https://anaconda.org/conda-forge/here-location-services)
+[![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/here-location-services)](https://anaconda.org/conda-forge/here-location-services)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/here-location-services/badges/latest_release_date.svg)](https://anaconda.org/conda-forge/here-location-services)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/heremaps/here-location-services-python/master?urlpath=lab/tree/docs/notebooks)
 
 A Python client for [HERE Location Services](https://developer.here.com/documentation#services).

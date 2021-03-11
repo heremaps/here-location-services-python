@@ -16,9 +16,12 @@ class GeocodingSearchApi(Api):
     """A class for accessing HERE Geocoding & search APIs."""
 
     def __init__(
-        self, api_key: Optional[str] = None, proxies: Optional[dict] = None, country: str = "row"
+        self,
+        api_key: Optional[str] = None,
+        proxies: Optional[dict] = None,
+        country: str = "row",
     ):
-        super(GeocodingSearchApi, self).__init__(api_key, proxies, country)
+        super().__init__(api_key, proxies, country)
         self._base_url = "https://{0}.search.{1}"
 
     def get_geocoding(self, query: str, limit: int = 20, lang: str = "en-US") -> requests.Response:

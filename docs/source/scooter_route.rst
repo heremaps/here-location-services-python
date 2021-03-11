@@ -1,6 +1,6 @@
 Scooter route Example
 =====================
-Calculate scooter route between origin and destination.
+Calculate the scooter route between origin and destination.
 
 .. code-block:: python
 

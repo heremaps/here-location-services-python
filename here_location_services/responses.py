@@ -9,6 +9,7 @@ import json
 
 import flexpolyline as fp
 from geojson import Feature, FeatureCollection, LineString, Point, Polygon
+from pandas import DataFrame
 
 
 class ApiResponse:
@@ -136,3 +137,37 @@ class RoutingResponse(ApiResponse):
                 f = Feature(geometry=LineString(lstring), properties=section)
                 feature_collection.features.append(f)
         return feature_collection
+
+
+class MatrixRoutingResponse(ApiResponse):
+    """A class representing Matrix routing response data."""
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._filters = {"matrix": None}
+        for param, default in self._filters.items():
+            setattr(self, param, kwargs.get(param, default))
+
+    def to_geojson(self):
+        """Return API response as GeoJSON."""
+        raise NotImplementedError("This method is not valid for MatrixRoutingResponse.")
+
+    def to_distnaces_matrix(self):
+        """Return distnaces matrix in a dataframe."""
+        if self.matrix and self.matrix.get("distances"):
+            distances = self.matrix.get("distances")
+            dest_count = self.matrix.get("numDestinations")
+            nested_distances = [
+                distances[i : i + dest_count] for i in range(0, len(distances), dest_count)
+            ]
+            return DataFrame(nested_distances, columns=range(dest_count))
+
+    def to_travel_times_matrix(self):
+        """Return travel times matrix in a dataframe."""
+        if self.matrix and self.matrix.get("travelTimes"):
+            distances = self.matrix.get("travelTimes")
+            dest_count = self.matrix.get("numDestinations")
+            nested_distances = [
+                distances[i : i + dest_count] for i in range(0, len(distances), dest_count)
+            ]
+            return DataFrame(nested_distances, columns=range(dest_count))

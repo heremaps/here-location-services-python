@@ -7,18 +7,30 @@ import os
 import urllib
 import urllib.request
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from here_location_services.config.routing_config import PlaceOptions, Scooter, WayPointOptions
 
+from .config.matrix_routing_config import (
+    AutoCircleRegion,
+    AvoidBoundingBox,
+    BoundingBoxRegion,
+    CircleRegion,
+    PolygonRegion,
+    Truck,
+    WorldRegion,
+)
+from .exceptions import ApiError
 from .geocoding_search_api import GeocodingSearchApi
 from .isoline_routing_api import IsolineRoutingApi
+from .matrix_routing_api import MatrixRoutingApi
 from .responses import (
     BrowseResponse,
     DiscoverResponse,
     GeocoderResponse,
     IsolineResponse,
     LookupResponse,
+    MatrixRoutingResponse,
     ReverseGeocoderResponse,
     RoutingResponse,
 )
@@ -54,6 +66,9 @@ class LS:
             api_key=api_key,
             proxies=proxies,
             country=country,
+        )
+        self.matrix_routing_api = MatrixRoutingApi(
+            api_key=api_key, proxies=proxies, country=country
         )
 
     def geocode(self, query: str, limit: int = 20, lang: str = "en-US") -> GeocoderResponse:
@@ -585,3 +600,115 @@ class LS:
             spans=spans,
         )
         return RoutingResponse.new(resp.json())
+
+    def matrix(
+        self,
+        origins: List[Dict],
+        region_definition: Union[
+            CircleRegion, BoundingBoxRegion, PolygonRegion, AutoCircleRegion, WorldRegion
+        ],
+        async_req: bool = False,
+        destinations: Optional[List[Dict]] = None,
+        profile: Optional[str] = None,
+        departure_time: Optional[Union[datetime, str]] = None,
+        routing_mode: Optional[str] = None,
+        transport_mode: Optional[str] = None,
+        avoid_features: Optional[List[str]] = None,
+        avoid_areas: Optional[List[AvoidBoundingBox]] = None,
+        truck: Optional[Truck] = None,
+        matrix_attributes: Optional[List[str]] = None,
+    ) -> MatrixRoutingResponse:
+        """
+        Calculate routing matrix between multiple ``origins`` and ``destinations`` using
+        synchronous and asynchronous requests.
+
+        A routing matrix is a matrix with rows labeled by origins and columns by destinations.
+        Each entry of the matrix is travel time or distance from the origin to the destination.
+        The response contains 2 optional flat arrays ``TravelTimes`` and ``distances`` depending
+        upon the specified ``matrix_attributes``. Each array represents a 2D matrix where rows (i)
+        corresponds to ``origins`` and columns (j) to destinations. The kth position in the array
+        corresponds to the (i, j) position in the matrix defined by the following relationship:
+        k = num_destitions * i + j.
+
+        :param origins: A list of dictionaries containing lat and long for origin points.
+        :param region_definition: Definition of a region in which the matrix will be calculated.
+            Use object of atleast one of the following regions:
+            :class:`here_location_services.config.matrix_routing_config.CircleRegion`
+            :class:`here_location_services.config.matrix_routing_config.BoundingBoxRegion`
+            :class:`here_location_services.config.matrix_routing_config.PolygonRegion`
+            :class:`here_location_services.config.matrix_routing_config.AutoCircleRegion`
+            :class:`here_location_services.config.matrix_routing_config.WorldRegion`
+        :param async_req: If set to True reuqests will be sent to asynchronous matrix routing API
+            else It will be sent to synchronous matrix routing API. For larger matrices, or longer
+            routes, or routes in denser road networks, it is recommended to set to True.
+        :param destinations: A list of dictionaries containing lat and long for destination points.
+            When no destinations are specified the matrix is assumed to be quadratic with origins
+            used as destinations.
+        :param profile: A string to represent profile id. A set predefined profile ids for route
+            calculation can be used from config
+            :attr:`PROFILE <here_location_services.config.matrix_routing_config.PROFILE>`
+        :param departure_time: :class:`datetime.datetime` object with explicit timezon. When
+            departure_time is not specified, it is implicitly assumed to be the current time.
+            The special value ``any`` enforces non time-aware routing.
+        :param routing_mode: A string to represent routing mode. Routing mode values are defined
+            in :attr:`ROUTING_MODE <here_location_services.config.routing_config.ROUTING_MODE>`
+        :param transport_mode: A string to represent transport mode. Transport modes are defined
+            in :attr:`ROUTING_TRANSPORT_MODE <here_location_services.config.routing_config.ROUTING_TRANSPORT_MODE>` # noqa E501
+        :param avoid_features: Avoid routes that violate these properties. Avoid features are
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.matrix_routing_config.AVOID_FEATURES>` # noqa E501
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
+            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>` # noqa E501
+        :param truck: Different truck options to use during route calculation when
+            transportMode = truck. use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>` # noqa E501
+        :param matrix_attributes: Defines which attributes are included in the response as part of
+            the data representation of the matrix entries summaries. Matrix attributes are defined
+            in :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>` # noqa E501
+        :raises ValueError: If conflicting options are provided.
+        :raises ApiError: If API response status code is not as expected.
+        :return: :class:`MatrixRoutingResponse` object.
+        """
+        if profile and type(region_definition) != WorldRegion:
+            raise ValueError("profile must be used with WorldRegion only.")
+        if truck and transport_mode != "truck":
+            raise ValueError("Truck option must be used when transport_mode is truck")
+        if async_req is True:
+            resp = self.matrix_routing_api.matrix_route_async(
+                origins=origins,
+                region_definition=region_definition,
+                destinations=destinations,
+                profile=profile,
+                departure_time=departure_time,
+                routing_mode=routing_mode,
+                transport_mode=transport_mode,
+                avoid_features=avoid_features,
+                avoid_areas=avoid_areas,
+                truck=truck,
+                matrix_attributes=matrix_attributes,
+            )
+            status_url = resp["statusUrl"]
+            while True:
+                resp_status = self.matrix_routing_api.get_async_matrix_route_status(status_url)
+                if resp_status.status_code == 200 and resp_status.json().get("error"):
+                    raise ApiError(resp_status)
+                elif resp_status.status_code == 303:
+                    result_url = resp_status.json()["resultUrl"]
+                    break
+                elif resp_status.status_code in (401, 403, 404, 500):
+                    raise ApiError(resp_status)
+            result = self.matrix_routing_api.get_async_matrix_route_results(result_url)
+            return MatrixRoutingResponse.new(result)
+        else:
+            resp = self.matrix_routing_api.matrix_route(
+                origins=origins,
+                region_definition=region_definition,
+                destinations=destinations,
+                profile=profile,
+                departure_time=departure_time,
+                routing_mode=routing_mode,
+                transport_mode=transport_mode,
+                avoid_features=avoid_features,
+                avoid_areas=avoid_areas,
+                truck=truck,
+                matrix_attributes=matrix_attributes,
+            )
+            return MatrixRoutingResponse.new(resp)

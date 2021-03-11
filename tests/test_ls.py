@@ -1,19 +1,37 @@
 # Copyright (C) 2019-2021 HERE Europe B.V.
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import os
 from datetime import datetime
 
 import pytest
+import pytz
 from geojson import FeatureCollection
 
 from here_location_services import LS
+from here_location_services.config.matrix_routing_config import (
+    AVOID_FEATURES,
+    MATRIX_ATTRIBUTES,
+    PROFILE,
+    SHIPPED_HAZARDOUS_GOODS,
+    AutoCircleRegion,
+    AvoidBoundingBox,
+    BoundingBoxRegion,
+    CircleRegion,
+    PolygonRegion,
+    Truck,
+    WorldRegion,
+)
 from here_location_services.config.routing_config import (
     ROUTE_COURSE,
     ROUTE_MATCH_SIDEOF_STREET,
+    ROUTING_MODE,
     ROUTING_RETURN,
     ROUTING_SPANS,
+    ROUTING_TRANSPORT_MODE,
     PlaceOptions,
+    Scooter,
     WayPointOptions,
 )
 from here_location_services.exceptions import ApiError
@@ -285,7 +303,16 @@ def test_car_route_extra_options():
         radius=10,
         min_course_distance=10,
     )
+    assert json.loads(place_options.__str__()) == {
+        "course": 270,
+        "sideOfStreetHint": "52.512149,13.304076",
+        "matchSideOfStreet": "always",
+        "namehint": None,
+        "radius": 10,
+        "minCourseDistance": 10,
+    }
     via_waypoint_options = WayPointOptions(stop_duration=0, pass_through=True)
+    assert json.loads(via_waypoint_options.__str__()) == {"stopDuration": 0, "passThrough": True}
     dest_waypoint_options = WayPointOptions(stop_duration=10, pass_through=False)
     ls = LS(api_key=LS_API_KEY)
     _ = ls.car_route(
@@ -321,7 +348,7 @@ def test_bicycle_route():
 def test_truck_route():
     """Test routing API for truck route."""
     ls = LS(api_key=LS_API_KEY)
-    _ = ls.bicycle_route(
+    _ = ls.truck_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
         via=[(52.52426, 13.43000)],
@@ -335,6 +362,7 @@ def test_truck_route():
 def test_scooter_route():
     """Test routing API for scooter route."""
     ls = LS(api_key=LS_API_KEY)
+    scooter = Scooter(allow_highway=True)
     _ = ls.scooter_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
@@ -342,6 +370,7 @@ def test_scooter_route():
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
+        scooter=scooter,
     )
 
 
@@ -357,3 +386,172 @@ def test_pedestrian_route():
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
     )
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_matrix_route_exception():
+    """Test exceptions for Matrix routing."""
+    ls = LS(api_key=LS_API_KEY)
+    origins = [
+        {"lat": 37.76, "lng": -122.42},
+        {"lat": 40.63, "lng": -74.09},
+        {"lat": 30.26, "lng": -97.74},
+        {"lat": 40.63, "lng": -74.09},
+    ]
+    region_definition = CircleRegion(radius=1000, center={"lat": 37.76, "lng": -122.42})
+    matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
+    profile = PROFILE.carFast
+    truck = Truck(
+        shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
+        gross_weight=100,
+        weight_per_axle=10,
+        height=10,
+        width=10,
+        length=10,
+        tunnel_category="B",
+        axle_count=4,
+    )
+    with pytest.raises(ValueError):
+        ls.matrix(
+            origins=origins,
+            region_definition=region_definition,
+            profile=profile,
+            matrix_attributes=matrix_attributes,
+        )
+
+    with pytest.raises(ValueError):
+        ls.matrix(
+            origins=origins,
+            region_definition=region_definition,
+            matrix_attributes=matrix_attributes,
+            transport_mode=ROUTING_TRANSPORT_MODE.car,
+            truck=truck,
+        )
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_matrix_route():
+    """Test Matrix routing."""
+    ls = LS(api_key=LS_API_KEY)
+    origins = [
+        {"lat": 37.76, "lng": -122.42},
+        {"lat": 40.63, "lng": -74.09},
+        {"lat": 30.26, "lng": -97.74},
+    ]
+    region_definition = WorldRegion()
+    matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
+    avoid_areas = AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
+    assert json.loads(avoid_areas.__str__()) == {
+        "type": "boundingBox",
+        "north": 68.1766451354,
+        "south": 7.96553477623,
+        "west": 97.4025614766,
+        "east": 35.4940095078,
+    }
+    truck = Truck(
+        shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
+        gross_weight=100,
+        weight_per_axle=10,
+        height=10,
+        width=10,
+        length=10,
+        tunnel_category="B",
+        axle_count=4,
+    )
+    result = ls.matrix(
+        origins=origins,
+        region_definition=region_definition,
+        destinations=origins,
+        routing_mode=ROUTING_MODE.fast,
+        departure_time=datetime.now(tz=pytz.utc),
+        transport_mode=ROUTING_TRANSPORT_MODE.truck,
+        avoid_features=[AVOID_FEATURES.tollRoad],
+        avoid_areas=[avoid_areas],
+        truck=truck,
+        matrix_attributes=matrix_attributes,
+    )
+    mat = result.matrix
+    assert mat["numOrigins"] == 3
+    assert mat["numDestinations"] == 3
+    assert len(mat["distances"]) == 9
+    assert mat["errorCodes"] == [0, 3, 0, 3, 0, 3, 0, 3, 0]
+
+    profile = PROFILE.carShort
+    result2 = ls.matrix(
+        origins=origins,
+        region_definition=region_definition,
+        matrix_attributes=matrix_attributes,
+        profile=profile,
+    )
+    mat2 = result2.matrix
+    assert mat2["numOrigins"] == 3
+    assert mat2["numDestinations"] == 3
+    with pytest.raises(NotImplementedError):
+        result2.to_geojson()
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_matrix_route_async():
+    """Test Matrix routing."""
+    ls = LS(api_key=LS_API_KEY)
+    origins = [
+        {"lat": 37.76, "lng": -122.42},
+        {"lat": 40.63, "lng": -74.09},
+        {"lat": 30.26, "lng": -97.74},
+    ]
+    region_definition = WorldRegion()
+    matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
+    avoid_areas = AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
+    truck = Truck(
+        shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
+        gross_weight=100,
+        weight_per_axle=10,
+        height=10,
+        width=10,
+        length=10,
+        tunnel_category="B",
+        axle_count=4,
+    )
+    result = ls.matrix(
+        origins=origins,
+        region_definition=region_definition,
+        async_req=True,
+        destinations=origins,
+        routing_mode=ROUTING_MODE.fast,
+        departure_time="any",
+        transport_mode=ROUTING_TRANSPORT_MODE.truck,
+        avoid_features=[AVOID_FEATURES.tollRoad],
+        avoid_areas=[avoid_areas],
+        truck=truck,
+        matrix_attributes=matrix_attributes,
+    )
+    mat = result.matrix
+    assert mat["numOrigins"] == 3
+    assert mat["numDestinations"] == 3
+    assert len(mat["distances"]) == 9
+    assert mat["errorCodes"] == [0, 3, 0, 3, 0, 3, 0, 3, 0]
+
+
+def test_matrix_routing_config():
+    """Test Matrix routing config objects."""
+    circle = CircleRegion(radius=1000, center={"lat": 37.76, "lng": -122.42})
+    assert json.loads(circle.__str__()) == {
+        "type": "circle",
+        "center": {"lat": 37.76, "lng": -122.42},
+        "radius": 1000,
+    }
+
+    bbox = BoundingBoxRegion(0, 0, 0, 0)
+    assert json.loads(bbox.__str__()) == {
+        "type": "boundingBox",
+        "north": 0,
+        "south": 0,
+        "west": 0,
+        "east": 0,
+    }
+
+    poly = PolygonRegion(outer=[1, 1, 1, 1, 1, 1])
+    assert json.loads(poly.__str__()) == {"type": "polygon", "outer": [1, 1, 1, 1, 1, 1]}
+
+    autocircle = AutoCircleRegion(margin=100)
+    assert json.loads(autocircle.__str__()) == {"type": "autoCircle", "margin": 100}
