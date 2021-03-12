@@ -3,10 +3,6 @@
 
 """
 This module contains top level imports for ``here_location_services`` package.
-
-.. warning::
-    The internal implementation of some of the modules is highly subject to change.
-
 """
 
 from .__version__ import __version__  # noqa: F401

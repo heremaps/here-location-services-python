@@ -37,7 +37,7 @@ Before you can install `HERE Location Services for Python`, run its test-suite, 
     ```bash
     $ conda install -c conda-forge here-location-services
     ```
-- Install `HERE Location Services for Python` from [PyPI](https://pypi.org/) using the below command:
+- Install `HERE Location Services for Python` from [PyPI](https://pypi.org/project/here-location-services/) using the below command:
 
   ```bash
   $ pip install here-location-services

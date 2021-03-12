@@ -1,8 +1,8 @@
 # Copyright (C) 2019-2021 HERE Europe B.V.
 # SPDX-License-Identifier: Apache-2.0
 
-"""This module contains classes for accessing `HERE Geocoding & Search API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/index.html>_`. # noqa E501
-"""
+"""This module contains classes for accessing `HERE Geocoding & Search API <https://developer.here.com/documentation/geocoding-search-api/dev_guide/index.html>`_.
+"""  # noqa: E501
 
 from typing import Dict, List, Optional
 
@@ -33,7 +33,7 @@ class GeocodingSearchApi(Api):
 
         .. |geocoder| raw:: html
 
-           <a href="https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-geocode-brief.html" target="_blank">Geocode</a>  # noqa E501
+           <a href="https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-geocode-brief.html" target="_blank">Geocode</a>
 
         :param query: a string containing the query to make.
         :param limit: An int representing maximum number of results to be returned.
@@ -42,7 +42,7 @@ class GeocodingSearchApi(Api):
             a list of BCP47 compliant Language Codes.
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200.
-        """
+        """  # noqa E501
         path = "/v1/geocode"
         url = self._base_url.format("geocode", self._get_url_string()) + path
         params: dict = dict(q=query, limit=limit, lang=lang)
@@ -64,7 +64,7 @@ class GeocodingSearchApi(Api):
 
         .. |reverse_geocode| raw:: html
 
-           <a href="https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-reverse-geocode-brief.html" target="_blank">Reverse Geocode</a>  # noqa E501
+           <a href="https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics/endpoint-reverse-geocode-brief.html" target="_blank">Reverse Geocode</a>
 
         :param lat: A float representing latitude of point.
         :param lng: A float representing longitude of point.
@@ -74,7 +74,7 @@ class GeocodingSearchApi(Api):
             a list of BCP47 compliant Language Codes.
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200.
-        """
+        """  # noqa E501
         path = "/v1/revgeocode"
         url = self._base_url.format("geocode", self._get_url_string()) + path
         params: dict = dict(at=f"{lat},{lng}", limit=limit, lang=lang)

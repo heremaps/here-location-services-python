@@ -23,6 +23,7 @@ from here_location_services.config.matrix_routing_config import (
     Truck,
     WorldRegion,
 )
+from here_location_services.config.routing_config import AVOID_FEATURES as ROUTING_AVOID_FEATURES
 from here_location_services.config.routing_config import (
     ROUTE_COURSE,
     ROUTE_MATCH_SIDEOF_STREET,
@@ -272,6 +273,8 @@ def test_credentials_exception():
 def test_car_route():
     """Test routing API for car route."""
     ls = LS(api_key=LS_API_KEY)
+    avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
+    avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
     result = ls.car_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
@@ -279,6 +282,8 @@ def test_car_route():
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
+        avoid_areas=avoid_areas,
+        avoid_features=avoid_features,
     )
     assert result.response["routes"][0]["sections"][0]["departure"]["place"]["location"] == {
         "lat": 52.5137479,
@@ -334,6 +339,8 @@ def test_car_route_extra_options():
 def test_bicycle_route():
     """Test routing API for car route."""
     ls = LS(api_key=LS_API_KEY)
+    avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
+    avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
     _ = ls.bicycle_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
@@ -341,6 +348,8 @@ def test_bicycle_route():
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
+        avoid_areas=avoid_areas,
+        avoid_features=avoid_features,
     )
 
 
@@ -348,6 +357,18 @@ def test_bicycle_route():
 def test_truck_route():
     """Test routing API for truck route."""
     ls = LS(api_key=LS_API_KEY)
+    truck = Truck(
+        shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
+        gross_weight=100,
+        weight_per_axle=10,
+        height=10,
+        width=10,
+        length=10,
+        tunnel_category="B",
+        axle_count=4,
+    )
+    avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
+    avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
     _ = ls.truck_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
@@ -355,6 +376,9 @@ def test_truck_route():
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
+        truck=truck,
+        avoid_areas=avoid_areas,
+        avoid_features=avoid_features,
     )
 
 

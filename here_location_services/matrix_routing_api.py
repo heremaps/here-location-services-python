@@ -1,6 +1,6 @@
 """
-This module contains classes for accessing `HERE Matrix Routing API <https://developer.here.com/documentation/matrix-routing-api/8.3.0/dev_guide/index.html>_`. # noqa E501
-"""
+This module contains classes for accessing `HERE Matrix Routing API <https://developer.here.com/documentation/matrix-routing-api/8.3.0/dev_guide/index.html>`_.
+"""  # noqa E501
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
@@ -78,7 +78,7 @@ class MatrixRoutingApi(Api):
                 avoid["areas"].append(vars(area))
             data["avoid"] = avoid
         if truck:
-            data["truck"] = vars(truck)
+            data["truck"] = {k: v for k, v in vars(truck).items() if v is not None}
         if matrix_attributes:
             data["matrixAttributes"] = matrix_attributes
         resp = self.post(url, data=data, params=params)
@@ -124,18 +124,18 @@ class MatrixRoutingApi(Api):
         :param routing_mode: A string to represent routing mode. Routing mode values are defined
             in :attr:`ROUTING_MODE <here_location_services.config.routing_config.ROUTING_MODE>`
         :param transport_mode: A string to represent transport mode. Transport modes are defined
-            in :attr:`ROUTING_TRANSPORT_MODE <here_location_services.config.routing_config.ROUTING_TRANSPORT_MODE>` # noqa E501
+            in :attr:`ROUTING_TRANSPORT_MODE <here_location_services.config.routing_config.ROUTING_TRANSPORT_MODE>`
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
-            defined in :attr:`AVOID_FEATURES <here_location_services.config.matrix_routing_config.AVOID_FEATURES>` # noqa E501
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.matrix_routing_config.AVOID_FEATURES>`
         :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
-            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>` # noqa E501
+            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>`
         :param truck: Different truck options to use during route calculation when
-            transportMode = truck. use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>` # noqa E501
+            transportMode = truck. use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>`
         :param matrix_attributes: Defines which attributes are included in the response as part of
             the data representation of the matrix entries summaries. Matrix attributes are defined
-            in :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>` # noqa E501
+            in :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>`
         :return: :class:`requests.Response` object.
-        """
+        """  # noqa E501
         return self.__send_post_request(
             async_req="false",
             origins=origins,
@@ -188,18 +188,18 @@ class MatrixRoutingApi(Api):
         :param routing_mode: A string to represent routing mode. Routing mode values are defined
             in :attr:`ROUTING_MODE <here_location_services.config.routing_config.ROUTING_MODE>`
         :param transport_mode: A string to represent transport mode. Transport modes are defined
-            in :attr:`ROUTING_TRANSPORT_MODE <here_location_services.config.routing_config.ROUTING_TRANSPORT_MODE>` # noqa E501
+            in :attr:`ROUTING_TRANSPORT_MODE <here_location_services.config.routing_config.ROUTING_TRANSPORT_MODE>`
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
-            defined in :attr:`AVOID_FEATURES <here_location_services.config.matrix_routing_config.AVOID_FEATURES>` # noqa E501
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.matrix_routing_config.AVOID_FEATURES>`
         :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
-            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>` # noqa E501
+            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>`
         :param truck: Different truck options to use during route calculation when
-            transportMode = truck. use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>` # noqa E501
+            transportMode = truck. use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>`
         :param matrix_attributes: Defines which attributes are included in the response as part of
             the data representation of the matrix entries summaries. Matrix attributes are defined
-            in :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>` # noqa E501
+            in :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>`
         :return: :class:`requests.Response` object.
-        """
+        """  # noqa E501
         return self.__send_post_request(
             async_req="true",
             origins=origins,

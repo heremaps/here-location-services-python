@@ -3,7 +3,7 @@
 
 """This module defines all the configs which will be required as inputs to matrix Routing API."""
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from .base_config import Bunch
 
@@ -173,14 +173,14 @@ class Truck:
 
     def __init__(
         self,
-        shipped_hazardous_goods: List,
-        gross_weight: int,
-        weight_per_axle: int,
-        height: int,
-        width: int,
-        length: int,
-        tunnel_category: str,
-        axle_count: int,
+        shipped_hazardous_goods: Optional[List] = None,
+        gross_weight: Optional[int] = None,
+        weight_per_axle: Optional[int] = None,
+        height: Optional[int] = None,
+        width: Optional[int] = None,
+        length: Optional[int] = None,
+        tunnel_category: Optional[str] = None,
+        axle_count: Optional[int] = None,
         truck_type: str = "straight",
         trailer_count: int = 0,
     ):
@@ -188,7 +188,7 @@ class Truck:
 
         :param shipped_hazardous_goods: List of hazardous materials in the vehicle. valid values
             for hazardous materials can be used from config
-            :attr:`SHIPPED_HAZARDOUS_GOODS <here_location_services.config.matrix_routing_config.SHIPPED_HAZARDOUS_GOODS>`  # noqa E501
+            :attr:`SHIPPED_HAZARDOUS_GOODS <here_location_services.config.matrix_routing_config.SHIPPED_HAZARDOUS_GOODS>`
         :param gross_weight: Total vehicle weight, including trailers and shipped goods, in
             kilograms. Should be greater than or equal to zero.
         :param weight_per_axle: Vehicle weight per axle, in kilograms. Should be greater than or
@@ -203,7 +203,7 @@ class Truck:
             range [2, 255].
         :param truck_type: A string to represent the type of truck.
         :param trailer_count: Number of trailers attached to the vehicle.
-        """
+        """  # noqa E501
         self.shippedHazardousGoods = shipped_hazardous_goods
         self.grossWeight = gross_weight
         self.weightPerAxle = weight_per_axle
