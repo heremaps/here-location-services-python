@@ -7,6 +7,7 @@ import os
 import urllib
 import urllib.request
 from datetime import datetime
+from time import sleep
 from typing import Dict, List, Optional, Tuple, Union
 
 from here_location_services.config.routing_config import PlaceOptions, Scooter, WayPointOptions
@@ -295,6 +296,8 @@ class LS:
         lang: str = "en-US",
         return_results: Optional[List] = None,
         spans: Optional[List] = None,
+        avoid_features: Optional[List[str]] = None,
+        avoid_areas: Optional[List[AvoidBoundingBox]] = None,
     ) -> RoutingResponse:
         """Calculate ``car`` route between two endpoints.
 
@@ -310,7 +313,7 @@ class LS:
         :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for
             ``via``.
         :param departure_time: :class:`datetime.datetime` object.
-        :param routing_mode: A string to represent routing mode. use config defined in :attr:`ROUTING_MODE <here_location_services.config.routing_config.ROUTING_MODE>`  # noqa: E501
+        :param routing_mode: A string to represent routing mode. use config defined in :attr:`ROUTING_MODE <here_location_services.config.routing_config.ROUTING_MODE>`
         :param alternatives: Number of alternative routes to return aside from the optimal route.
             default value is ``0`` and maximum is ``6``.
         :param units: A string representing units of measurement used in guidance instructions.
@@ -319,9 +322,12 @@ class LS:
             The value should comply with the IETF BCP 47.
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
-            spans. use config defined in :attr:`ROUTING_SPANS <here_location_services.config.routing_config.ROUTING_SPANS>`  # noqa: E501
+            spans. use config defined in :attr:`ROUTING_SPANS <here_location_services.config.routing_config.ROUTING_SPANS>`
+        :param avoid_features: Avoid routes that violate these properties. Avoid features are
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
         :return: :class:`RoutingResponse` object.
-        """
+        """  # noqa: E501
         resp = self.routing_api.route(
             transport_mode="car",
             origin=origin,
@@ -339,6 +345,8 @@ class LS:
             lang=lang,
             return_results=return_results,
             spans=spans,
+            avoid_features=avoid_features,
+            avoid_areas=avoid_areas,
         )
         return RoutingResponse.new(resp.json())
 
@@ -359,6 +367,8 @@ class LS:
         lang: str = "en-US",
         return_results: Optional[List] = None,
         spans: Optional[List] = None,
+        avoid_features: Optional[List[str]] = None,
+        avoid_areas: Optional[List[AvoidBoundingBox]] = None,
     ) -> RoutingResponse:
         """Calculate ``bicycle`` route between two endpoints.
 
@@ -384,8 +394,11 @@ class LS:
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
             spans.
+        :param avoid_features: Avoid routes that violate these properties. Avoid features are
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
         :return: :class:`RoutingResponse` object.
-        """
+        """  # noqa E501
         resp = self.routing_api.route(
             transport_mode="bicycle",
             origin=origin,
@@ -403,6 +416,8 @@ class LS:
             lang=lang,
             return_results=return_results,
             spans=spans,
+            avoid_features=avoid_features,
+            avoid_areas=avoid_areas,
         )
         return RoutingResponse.new(resp.json())
 
@@ -423,6 +438,9 @@ class LS:
         lang: str = "en-US",
         return_results: Optional[List] = None,
         spans: Optional[List] = None,
+        truck: Optional[Truck] = None,
+        avoid_features: Optional[List[str]] = None,
+        avoid_areas: Optional[List[AvoidBoundingBox]] = None,
     ) -> RoutingResponse:
         """Calculate ``truck`` route between two endpoints.
 
@@ -448,8 +466,13 @@ class LS:
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
             spans.
+        :param truck: Different truck options to use during route calculation.
+            use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>`
+        :param avoid_features: Avoid routes that violate these properties. Avoid features are
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
         :return: :class:`RoutingResponse` object.
-        """
+        """  # noqa E501
         resp = self.routing_api.route(
             transport_mode="truck",
             origin=origin,
@@ -467,6 +490,9 @@ class LS:
             lang=lang,
             return_results=return_results,
             spans=spans,
+            truck=truck,
+            avoid_features=avoid_features,
+            avoid_areas=avoid_areas,
         )
         return RoutingResponse.new(resp.json())
 
@@ -488,6 +514,8 @@ class LS:
         lang: str = "en-US",
         return_results: Optional[List] = None,
         spans: Optional[List] = None,
+        avoid_features: Optional[List[str]] = None,
+        avoid_areas: Optional[List[AvoidBoundingBox]] = None,
     ) -> RoutingResponse:
         """Calculate ``scooter`` route between two endpoints.
 
@@ -514,8 +542,11 @@ class LS:
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
             spans.
+        :param avoid_features: Avoid routes that violate these properties. Avoid features are
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
         :return: :class:`RoutingResponse` object.
-        """
+        """  # noqa E501
         resp = self.routing_api.route(
             transport_mode="scooter",
             origin=origin,
@@ -534,6 +565,8 @@ class LS:
             lang=lang,
             return_results=return_results,
             spans=spans,
+            avoid_features=avoid_features,
+            avoid_areas=avoid_areas,
         )
         return RoutingResponse.new(resp.json())
 
@@ -554,6 +587,8 @@ class LS:
         lang: str = "en-US",
         return_results: Optional[List] = None,
         spans: Optional[List] = None,
+        avoid_features: Optional[List[str]] = None,
+        avoid_areas: Optional[List[AvoidBoundingBox]] = None,
     ) -> RoutingResponse:
         """Calculate ``pedestrian`` route between two endpoints.
 
@@ -579,8 +614,11 @@ class LS:
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
             spans.
+        :param avoid_features: Avoid routes that violate these properties. Avoid features are
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
         :return: :class:`RoutingResponse` object.
-        """
+        """  # noqa E501
         resp = self.routing_api.route(
             transport_mode="pedestrian",
             origin=origin,
@@ -598,6 +636,8 @@ class LS:
             lang=lang,
             return_results=return_results,
             spans=spans,
+            avoid_features=avoid_features,
+            avoid_areas=avoid_areas,
         )
         return RoutingResponse.new(resp.json())
 
@@ -653,20 +693,20 @@ class LS:
         :param routing_mode: A string to represent routing mode. Routing mode values are defined
             in :attr:`ROUTING_MODE <here_location_services.config.routing_config.ROUTING_MODE>`
         :param transport_mode: A string to represent transport mode. Transport modes are defined
-            in :attr:`ROUTING_TRANSPORT_MODE <here_location_services.config.routing_config.ROUTING_TRANSPORT_MODE>` # noqa E501
+            in :attr:`ROUTING_TRANSPORT_MODE <here_location_services.config.routing_config.ROUTING_TRANSPORT_MODE>`
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
-            defined in :attr:`AVOID_FEATURES <here_location_services.config.matrix_routing_config.AVOID_FEATURES>` # noqa E501
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.matrix_routing_config.AVOID_FEATURES>`
         :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
-            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>` # noqa E501
+            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>`
         :param truck: Different truck options to use during route calculation when
-            transportMode = truck. use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>` # noqa E501
+            transport_mode = truck. use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>`
         :param matrix_attributes: Defines which attributes are included in the response as part of
             the data representation of the matrix entries summaries. Matrix attributes are defined
-            in :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>` # noqa E501
+            in :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>`
         :raises ValueError: If conflicting options are provided.
         :raises ApiError: If API response status code is not as expected.
         :return: :class:`MatrixRoutingResponse` object.
-        """
+        """  # noqa E501
         if profile and type(region_definition) != WorldRegion:
             raise ValueError("profile must be used with WorldRegion only.")
         if truck and transport_mode != "truck":
@@ -695,6 +735,7 @@ class LS:
                     break
                 elif resp_status.status_code in (401, 403, 404, 500):
                     raise ApiError(resp_status)
+                sleep(2)
             result = self.matrix_routing_api.get_async_matrix_route_results(result_url)
             return MatrixRoutingResponse.new(result)
         else:

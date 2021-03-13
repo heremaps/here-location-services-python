@@ -1,8 +1,8 @@
 # Copyright (C) 2019-2021 HERE Europe B.V.
 # SPDX-License-Identifier: Apache-2.0
 
-"""This module contains classes for accessing `HERE Routing API <https://developer.here.com/documentation/routing/dev_guide/topics/request-isoline.html>_`. # noqa E501
-"""
+"""This module contains classes for accessing `HERE Routing API <https://developer.here.com/documentation/routing/dev_guide/topics/request-isoline.html>`_.
+"""  # noqa E501
 
 from typing import Dict, List, Optional
 

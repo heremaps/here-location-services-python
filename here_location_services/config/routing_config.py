@@ -172,7 +172,29 @@ class RouteMatchSideOfStreet(Bunch):
 
 match_sideof_street = {"always": "always", "onlyIfDivided": "onlyIfDivided"}
 
+#: Use this config for transport_mode of routing API.
+#: Example: for ``car`` transport_mode use ``ROUTING_TRANSPORT_MODE.car``.
 ROUTE_MATCH_SIDEOF_STREET = RouteMatchSideOfStreet(**match_sideof_street)
+
+
+class AvoidFeatures(Bunch):
+    """A class to define constant values for features to avoid during route calculation."""
+
+
+#: Use this config for match_sideof_street for PlaceOptions.
+#: Example: for match_sideof_street ``always`` use ``ROUTE_MATCH_SIDEOF_STREET.always``.
+AVOID_FEATURES = AvoidFeatures(
+    **{
+        "seasonalClosure": "seasonalClosure",
+        "tollRoad": "tollRoad",
+        "controlledAccessHighway": "controlledAccessHighway",
+        "ferry": "ferry",
+        "carShuttleTrain": "carShuttleTrain",
+        "tunnel": "tunnel",
+        "dirtRoad": "dirtRoad",
+        "difficultTurns": "difficultTurns",
+    }
+)
 
 
 class PlaceOptions:
@@ -180,8 +202,8 @@ class PlaceOptions:
 
     Various options can be found here:
 
-    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>_`. # noqa E501
-    """
+    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>`_.
+    """  # noqa E501
 
     def __init__(
         self,
@@ -199,7 +221,19 @@ class PlaceOptions:
             This is defined in constant ``ROUTE_COURSE``.
         :param sideof_street_hint: A list of latitude and longitude.Indicating the side of the
             street that should be used.
-        :param match_sideof_street:
+        :param match_sideof_street: Specifies how the location set by ``sideof_street_hint`` should
+            be handled. If this is set then sideof_street_hint should also be set. There are two
+            valid values for match_sideof_street:
+
+            ``always``:
+            Always prefer the given side of street.
+
+            ``onlyIfDivided``:
+            Only prefer using side of street set by ``sideof_street_hint`` in case the street
+            has dividers. This is the default behavior.
+
+            These values are mainted as config in:
+            :attr:`ROUTE_MATCH_SIDEOF_STREET <here_location_services.config.routing_config.ROUTE_MATCH_SIDEOF_STREET>`
         :param namehint: A string for the router to look for the place with the most similar name.
             This can e.g. include things like: North being used to differentiate between
             interstates I66 North and I66 South, Downtown Avenue being used to correctly
@@ -211,7 +245,7 @@ class PlaceOptions:
         :param min_course_distance: In meters Asks the routing service to try to find a route that
             avoids actions for the indicated distance. E.g. if the origin is determined by a moving
             vehicle, the user might not have time to react to early actions.
-        """
+        """  # noqa E501
         self.course = course
         self.sideOfStreetHint: Optional[str] = None
         if sideof_street_hint is not None:
@@ -230,8 +264,9 @@ class WayPointOptions:
     """A class to define ``PlaceOptions`` for ``via``/ ``destination``.
 
     Various options can be found here:
-    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>_`.  # noqa E501
-    """
+
+    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>`_.
+    """  # noqa E501
 
     def __init__(self, stop_duration: Optional[int] = None, pass_through: Optional[bool] = None):
         self.stopDuration = stop_duration

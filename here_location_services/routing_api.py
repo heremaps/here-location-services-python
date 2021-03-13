@@ -1,14 +1,15 @@
 # Copyright (C) 2019-2021 HERE Europe B.V.
 # SPDX-License-Identifier: Apache-2.0
 
-"""This module contains classes for accessing `HERE Routing API <https://developer.here.com/documentation/routing-api/8.17.0/dev_guide/index.html>_`. # noqa E501
-"""
+"""This module contains classes for accessing `HERE Routing API <https://developer.here.com/documentation/routing-api/8.17.0/dev_guide/index.html>`_.
+"""  # noqa E501
 
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 import requests
 
+from here_location_services.config.matrix_routing_config import AvoidBoundingBox, Truck
 from here_location_services.config.routing_config import PlaceOptions, Scooter, WayPointOptions
 
 from .apis import Api
@@ -46,10 +47,13 @@ class RoutingApi(Api):
         lang: str = "en-US",
         return_results: Optional[List] = None,
         spans: Optional[List] = None,
+        truck: Optional[Truck] = None,
+        avoid_features: Optional[List[str]] = None,
+        avoid_areas: Optional[List[AvoidBoundingBox]] = None,
     ):
         """Calculate route between two endpoints.
 
-        See further information `here <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>_`.  # noqa E501
+        See further information `here <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>_`.
 
         :param transport_mode: A string to represent mode of transport.
         :param origin: A list of ``latitude`` and ``longitude`` of origin point of route.
@@ -74,9 +78,15 @@ class RoutingApi(Api):
         :param return_results: A list of strings.
         :param spans: A list of strings to define which attributes are included in the response
             spans.
+        :param truck: Different truck options to use during route calculation.
+            use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>`
+        :param avoid_features: Avoid routes that violate these properties. Avoid features are
+            defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
+            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>`
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200.
-        """
+        """  # noqa E501
         path = "v8/routes"
         url = f"{self._base_url}/{path}"
         params: Dict[str, str] = {
@@ -146,6 +156,30 @@ class RoutingApi(Api):
                 params["scooter[allowHighway]"] = "true"
             else:
                 params["scooter[allowHighway]"] = "false"
+
+        if truck:
+            for key, val in vars(truck).items():
+                if key == "shippedHazardousGoods" and val:
+                    params[f"truck[{key}]"] = ",".join(val)
+                elif val is not None:
+                    params[f"truck[{key}]"] = val
+
+        if avoid_features:
+            params["avoid[features]"] = ",".join(avoid_features)
+
+        if avoid_areas:
+            bbox_areas = []
+            for area in avoid_areas:
+                area_attrs = vars(area)
+                bbox_areas.append(
+                    "bbox:{west},{south},{east},{north}".format(
+                        west=area_attrs["west"],
+                        south=area_attrs["south"],
+                        east=area_attrs["east"],
+                        north=area_attrs["north"],
+                    )
+                )
+            params["avoid[areas]"] = "|".join(bbox_areas)
 
         if self.credential_params:
             params.update(self.credential_params)
