@@ -298,6 +298,7 @@ class LS:
         spans: Optional[List] = None,
         avoid_features: Optional[List[str]] = None,
         avoid_areas: Optional[List[AvoidBoundingBox]] = None,
+        exclude: Optional[List[str]] = None,
     ) -> RoutingResponse:
         """Calculate ``car`` route between two endpoints.
 
@@ -325,7 +326,9 @@ class LS:
             spans. use config defined in :attr:`ROUTING_SPANS <here_location_services.config.routing_config.ROUTING_SPANS>`
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
             defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
-        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area.
+        :param exclude: A comma separated list of three-letter country codes
+            (ISO-3166-1 alpha-3 code) that routes will exclude.
         :return: :class:`RoutingResponse` object.
         """  # noqa: E501
         resp = self.routing_api.route(
@@ -347,6 +350,7 @@ class LS:
             spans=spans,
             avoid_features=avoid_features,
             avoid_areas=avoid_areas,
+            exclude=exclude,
         )
         return RoutingResponse.new(resp.json())
 
@@ -369,6 +373,7 @@ class LS:
         spans: Optional[List] = None,
         avoid_features: Optional[List[str]] = None,
         avoid_areas: Optional[List[AvoidBoundingBox]] = None,
+        exclude: Optional[List[str]] = None,
     ) -> RoutingResponse:
         """Calculate ``bicycle`` route between two endpoints.
 
@@ -396,7 +401,9 @@ class LS:
             spans.
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
             defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
-        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area.
+        :param exclude: A comma separated list of three-letter country codes
+            (ISO-3166-1 alpha-3 code) that routes will exclude.
         :return: :class:`RoutingResponse` object.
         """  # noqa E501
         resp = self.routing_api.route(
@@ -418,6 +425,7 @@ class LS:
             spans=spans,
             avoid_features=avoid_features,
             avoid_areas=avoid_areas,
+            exclude=exclude,
         )
         return RoutingResponse.new(resp.json())
 
@@ -441,6 +449,7 @@ class LS:
         truck: Optional[Truck] = None,
         avoid_features: Optional[List[str]] = None,
         avoid_areas: Optional[List[AvoidBoundingBox]] = None,
+        exclude: Optional[List[str]] = None,
     ) -> RoutingResponse:
         """Calculate ``truck`` route between two endpoints.
 
@@ -470,7 +479,9 @@ class LS:
             use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>`
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
             defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
-        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area.
+        :param exclude: A comma separated list of three-letter country codes
+            (ISO-3166-1 alpha-3 code) that routes will exclude.
         :return: :class:`RoutingResponse` object.
         """  # noqa E501
         resp = self.routing_api.route(
@@ -493,6 +504,7 @@ class LS:
             truck=truck,
             avoid_features=avoid_features,
             avoid_areas=avoid_areas,
+            exclude=exclude,
         )
         return RoutingResponse.new(resp.json())
 
@@ -516,6 +528,7 @@ class LS:
         spans: Optional[List] = None,
         avoid_features: Optional[List[str]] = None,
         avoid_areas: Optional[List[AvoidBoundingBox]] = None,
+        exclude: Optional[List[str]] = None,
     ) -> RoutingResponse:
         """Calculate ``scooter`` route between two endpoints.
 
@@ -544,7 +557,9 @@ class LS:
             spans.
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
             defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
-        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area.
+        :param exclude: A comma separated list of three-letter country codes
+            (ISO-3166-1 alpha-3 code) that routes will exclude.
         :return: :class:`RoutingResponse` object.
         """  # noqa E501
         resp = self.routing_api.route(
@@ -567,6 +582,7 @@ class LS:
             spans=spans,
             avoid_features=avoid_features,
             avoid_areas=avoid_areas,
+            exclude=exclude,
         )
         return RoutingResponse.new(resp.json())
 
@@ -589,6 +605,7 @@ class LS:
         spans: Optional[List] = None,
         avoid_features: Optional[List[str]] = None,
         avoid_areas: Optional[List[AvoidBoundingBox]] = None,
+        exclude: Optional[List[str]] = None,
     ) -> RoutingResponse:
         """Calculate ``pedestrian`` route between two endpoints.
 
@@ -616,7 +633,9 @@ class LS:
             spans.
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
             defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
-        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
+        :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area.
+        :param exclude: A comma separated list of three-letter country codes
+            (ISO-3166-1 alpha-3 code) that routes will exclude.
         :return: :class:`RoutingResponse` object.
         """  # noqa E501
         resp = self.routing_api.route(
@@ -638,6 +657,7 @@ class LS:
             spans=spans,
             avoid_features=avoid_features,
             avoid_areas=avoid_areas,
+            exclude=exclude,
         )
         return RoutingResponse.new(resp.json())
 
@@ -673,11 +693,16 @@ class LS:
         :param origins: A list of dictionaries containing lat and long for origin points.
         :param region_definition: Definition of a region in which the matrix will be calculated.
             Use object of atleast one of the following regions:
-            :class:`here_location_services.config.matrix_routing_config.CircleRegion`
-            :class:`here_location_services.config.matrix_routing_config.BoundingBoxRegion`
-            :class:`here_location_services.config.matrix_routing_config.PolygonRegion`
-            :class:`here_location_services.config.matrix_routing_config.AutoCircleRegion`
-            :class:`here_location_services.config.matrix_routing_config.WorldRegion`
+
+            :class:`CircleRegion <here_location_services.config.matrix_routing_config.CircleRegion>`
+
+            :class:`BoundingBoxRegion <here_location_services.config.matrix_routing_config.BoundingBoxRegion>`
+
+            :class:`PolygonRegion <here_location_services.config.matrix_routing_config.PolygonRegion>`
+
+            :class:`AutoCircleRegion <here_location_services.config.matrix_routing_config.AutoCircleRegion>`
+
+            :class:`WorldRegion <here_location_services.config.matrix_routing_config.WorldRegion>`
         :param async_req: If set to True reuqests will be sent to asynchronous matrix routing API
             else It will be sent to synchronous matrix routing API. For larger matrices, or longer
             routes, or routes in denser road networks, it is recommended to set to True.
@@ -687,7 +712,7 @@ class LS:
         :param profile: A string to represent profile id. A set predefined profile ids for route
             calculation can be used from config
             :attr:`PROFILE <here_location_services.config.matrix_routing_config.PROFILE>`
-        :param departure_time: :class:`datetime.datetime` object with explicit timezon. When
+        :param departure_time: :class:`datetime.datetime` object with explicit timezone. When
             departure_time is not specified, it is implicitly assumed to be the current time.
             The special value ``any`` enforces non time-aware routing.
         :param routing_mode: A string to represent routing mode. Routing mode values are defined
@@ -697,9 +722,9 @@ class LS:
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
             defined in :attr:`AVOID_FEATURES <here_location_services.config.matrix_routing_config.AVOID_FEATURES>`
         :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
-            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>`
+            use object of :class:`AvoidBoundingBox <here_location_services.config.matrix_routing_config.AvoidBoundingBox>`
         :param truck: Different truck options to use during route calculation when
-            transport_mode = truck. use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>`
+            transport_mode = truck. use object of :class:`Truck <here_location_services.config.matrix_routing_config.Truck>`
         :param matrix_attributes: Defines which attributes are included in the response as part of
             the data representation of the matrix entries summaries. Matrix attributes are defined
             in :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>`
