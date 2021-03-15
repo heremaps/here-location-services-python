@@ -284,6 +284,7 @@ def test_car_route():
         spans=[ROUTING_SPANS.names],
         avoid_areas=avoid_areas,
         avoid_features=avoid_features,
+        exclude=["IND", "NZL", "AUS"],
     )
     assert result.response["routes"][0]["sections"][0]["departure"]["place"]["location"] == {
         "lat": 52.5137479,
@@ -350,6 +351,7 @@ def test_bicycle_route():
         spans=[ROUTING_SPANS.names],
         avoid_areas=avoid_areas,
         avoid_features=avoid_features,
+        exclude=["IND", "NZL", "AUS"],
     )
 
 
@@ -379,6 +381,7 @@ def test_truck_route():
         truck=truck,
         avoid_areas=avoid_areas,
         avoid_features=avoid_features,
+        exclude=["IND", "NZL", "AUS"],
     )
 
 
@@ -395,6 +398,7 @@ def test_scooter_route():
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
         scooter=scooter,
+        exclude=["IND", "NZL", "AUS"],
     )
 
 
@@ -409,6 +413,7 @@ def test_pedestrian_route():
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
+        exclude=["IND", "NZL", "AUS"],
     )
 
 

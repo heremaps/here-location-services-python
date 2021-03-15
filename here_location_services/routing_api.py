@@ -50,6 +50,7 @@ class RoutingApi(Api):
         truck: Optional[Truck] = None,
         avoid_features: Optional[List[str]] = None,
         avoid_areas: Optional[List[AvoidBoundingBox]] = None,
+        exclude: Optional[List[str]] = None,
     ):
         """Calculate route between two endpoints.
 
@@ -83,7 +84,9 @@ class RoutingApi(Api):
         :param avoid_features: Avoid routes that violate these properties. Avoid features are
             defined in :attr:`AVOID_FEATURES <here_location_services.config.routing_config.AVOID_FEATURES>`
         :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
-            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>`
+            use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>`.
+        :param exclude: A comma separated list of three-letter country codes
+            (ISO-3166-1 alpha-3 code) that routes will exclude.
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200.
         """  # noqa E501
@@ -180,6 +183,9 @@ class RoutingApi(Api):
                     )
                 )
             params["avoid[areas]"] = "|".join(bbox_areas)
+
+        if exclude:
+            params["exclude"] = ",".join(exclude)
 
         if self.credential_params:
             params.update(self.credential_params)
