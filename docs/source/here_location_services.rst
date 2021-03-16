@@ -19,6 +19,7 @@ Submodules
    here_location_services.config.base_config
    here_location_services.config.routing_config
    here_location_services.config.matrix_routing_config
+   here_location_services.config.search_config.rst
    here_location_services.config.url_config
    here_location_services.geocoding_search_api
    here_location_services.isoline_routing_api
