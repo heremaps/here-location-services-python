@@ -35,6 +35,7 @@ from here_location_services.config.routing_config import (
     Scooter,
     WayPointOptions,
 )
+from here_location_services.config.search_config import PLACES_CATEGORIES
 from here_location_services.exceptions import ApiError
 from here_location_services.responses import GeocoderResponse
 from here_location_services.utils import get_apikey
@@ -211,7 +212,13 @@ def test_ls_browse():
         center=[19.1663, 72.8526],
         radius=9000,
         limit=5,
-        categories=["300-3000-0025", "300-3100,550-5510-0202", "500-5520,600-6100-0062"],
+        categories=[
+            PLACES_CATEGORIES.historical_monument,
+            PLACES_CATEGORIES.museum,
+            PLACES_CATEGORIES.park_recreation_area,
+            PLACES_CATEGORIES.leisure,
+            PLACES_CATEGORIES.shopping_mall,
+        ],
         lang="en",
     )
     assert len(result.items) == 5
@@ -221,7 +228,7 @@ def test_ls_browse():
         name="starbucks",
         country_codes=["IND"],
         limit=10,
-        categories=["100-1000-0000"],
+        categories=[PLACES_CATEGORIES.restaurant],
         lang="en",
     )
     assert len(result2.items) == 10
@@ -230,7 +237,7 @@ def test_ls_browse():
         center=[19.1663, 72.8526],
         name="starbucks",
         bounding_box=[13.08836, 52.33812, 13.761, 52.6755],
-        categories=["100-1000-0000"],
+        categories=[PLACES_CATEGORIES.restaurant],
         lang="en",
     )
     assert len(result3.items) == 20
@@ -241,7 +248,13 @@ def test_ls_browse():
             center=[19.1663, 72.8526],
             radius=9000,
             limit=5,
-            categories=["300-3000-0025", "300-3100.550-5510-0202", "500-5520,600-6100-0062"],
+            categories=[
+                PLACES_CATEGORIES.historical_monument,
+                PLACES_CATEGORIES.museum,
+                PLACES_CATEGORIES.park_recreation_area,
+                PLACES_CATEGORIES.leisure,
+                PLACES_CATEGORIES.shopping_mall,
+            ],
         )
 
 
