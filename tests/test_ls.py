@@ -79,9 +79,7 @@ def test_ls_reverse_geocoding():
     ls = LS(api_key=LS_API_KEY)
     resp = ls.reverse_geocode(lat=19.1646, lng=72.8493)
     address = resp.items[0]["address"]["label"]
-    assert (
-        address == "Goregaon East Railway Station(East ENT), Goregaon West, Mumbai 400062, India"
-    )
+    assert address == "Goregaon, Goregaon West, Mumbai 400062, India"
     resp1 = ls.reverse_geocode(lat=19.1646, lng=72.8493, limit=4)
     assert len(resp1.items) == 4
 
@@ -240,7 +238,7 @@ def test_ls_browse():
         categories=[PLACES_CATEGORIES.restaurant],
         lang="en",
     )
-    assert len(result3.items) == 20
+    assert len(result3.items) == 13
 
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
