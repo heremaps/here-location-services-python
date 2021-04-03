@@ -79,7 +79,7 @@ def test_ls_reverse_geocoding():
     ls = LS(api_key=LS_API_KEY)
     resp = ls.reverse_geocode(lat=19.1646, lng=72.8493)
     address = resp.items[0]["address"]["label"]
-    assert address == "Goregaon, Goregaon West, Mumbai 400062, India"
+    assert "Goregaon" in address
     resp1 = ls.reverse_geocode(lat=19.1646, lng=72.8493, limit=4)
     assert len(resp1.items) == 4
 
