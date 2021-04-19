@@ -4,10 +4,10 @@ channels:
 dependencies:
   - pip
   - xyzspaces
-  - jupyterlab==2.2.9
+  - jupyterlab
   - shapely
+  - here-map-widget-for-jupyter
   - pip:
-    - here-map-widget-for-jupyter
     - "-r ../requirements.txt"
     - "-r ../requirements_dev.txt"
     - "-e ../"
