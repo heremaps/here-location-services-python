@@ -60,7 +60,7 @@ $ pytest -v --cov=here_location_services tests
 
 ## Documentation
 
-Documentation is available [here](https://here-location-services-python.readthedocs.io/en/latest/).
+Documentation is available [here](https://here-location-services-python.readthedocs.io/en/stable/).
 
 Run the below commands to build the docs locally:
 
