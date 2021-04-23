@@ -238,7 +238,7 @@ def test_ls_browse():
         categories=[PLACES_CATEGORIES.restaurant],
         lang="en",
     )
-    assert len(result3.items) == 13
+    assert len(result3.items) == 12
 
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
