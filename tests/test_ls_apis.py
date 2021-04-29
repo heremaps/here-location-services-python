@@ -21,7 +21,7 @@ def test_geocoding(geo_search_api):
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
 def test_geocoding_exception():
-    """Test geocoding api. """
+    """Test geocoding api."""
     address = "Goregaon West, Mumbai 400062, India"
     api = Api()
     with pytest.raises(Exception):

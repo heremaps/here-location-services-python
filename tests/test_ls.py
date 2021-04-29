@@ -45,7 +45,7 @@ LS_API_KEY = get_apikey()
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
 def test_ls_geocoding():
-    """Test geocoding api. """
+    """Test geocoding api."""
     address = "200 S Mathilda Sunnyvale CA"
     ls = LS(api_key=LS_API_KEY)
     resp = ls.geocode(query=address, limit=2)
