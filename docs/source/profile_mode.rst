@@ -31,8 +31,9 @@ By default, the service calculates a travel times matrix, but since we want to g
 Example
 -------
 
-.. code-block:: python
+.. jupyter-execute::
 
+    import os
     from here_location_services import LS
     from here_location_services.config.matrix_routing_config import (
         BoundingBoxRegion,

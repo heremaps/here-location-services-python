@@ -2,7 +2,7 @@ Pedestrian route Example
 ========================
 Calculate pedestrian route between origin and destination.
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 

@@ -5,7 +5,7 @@ Discover
 Example
 -------
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 
@@ -18,7 +18,7 @@ Example
     disc_response = ls.discover(query="coffee", center=[52.53086, 13.38469], radius=1000)
 
     data = disc_response.to_geojson()
-    geo_layer = GeoJSON(data=data)
+    geo_layer = GeoJSON(data=data, show_bubble=True, point_style={"radius": 6})
 
     m = Map(api_key=LS_API_KEY, center=[52.53086, 13.38469], zoom=15)
     m.add_layer(geo_layer)

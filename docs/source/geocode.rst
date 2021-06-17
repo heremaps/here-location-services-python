@@ -5,7 +5,7 @@ Geocode
 Example
 -------
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 

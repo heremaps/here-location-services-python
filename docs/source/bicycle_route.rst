@@ -2,7 +2,7 @@ Bicycle route Example
 =====================
 Calculate bicycle route between origin and destination.
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 

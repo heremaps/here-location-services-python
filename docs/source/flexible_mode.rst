@@ -30,7 +30,7 @@ Below is an example of a 3x3 matrix request with the following origins and desti
 Example
 -------
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 
@@ -40,6 +40,7 @@ Example
         MATRIX_ATTRIBUTES,
     )
 
+    LS_API_KEY = os.environ.get("LS_API_KEY")  # Get API KEY from environment.
     ls = LS(api_key=LS_API_KEY)
 
     origins = [

@@ -31,6 +31,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .mypy_cache
 	rm -fr .pytest_cache
 	find . -name '.ipynb_checkpoints' -exec rm -fr {} +
+	rm -fr docs/source/_build
 
 install:
 	python3 -m pip install -e .
