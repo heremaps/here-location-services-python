@@ -5,7 +5,7 @@ Isoline Routing
 Example
 -------
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 

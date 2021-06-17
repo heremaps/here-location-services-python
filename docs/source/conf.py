@@ -35,8 +35,12 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.todo',
     'sphinx.ext.autodoc.typehints',
-    'sphinx_rtd_theme'
+    'sphinx_rtd_theme',
+    'jupyter_sphinx'
 ]
+
+def setup(app):
+    app.add_css_file("main_stylesheet.css")
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

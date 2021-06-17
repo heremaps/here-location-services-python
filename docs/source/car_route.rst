@@ -2,7 +2,7 @@ Car route Example
 =================
 Calculate car route between origin and destination.
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 

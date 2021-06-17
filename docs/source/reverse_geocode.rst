@@ -5,7 +5,7 @@ To find the nearest address to specific geocoordinates, you can use `Reverse Geo
 Example
 -------
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 

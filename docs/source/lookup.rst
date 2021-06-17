@@ -5,7 +5,7 @@ Every place or location object known by HERE has a location identifier or "ID". 
 Example
 -------
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 

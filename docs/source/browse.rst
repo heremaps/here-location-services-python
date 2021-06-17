@@ -5,12 +5,12 @@ Browse
 Example
 -------
 
-.. code-block:: python
+.. jupyter-execute::
 
     import os
 
     from here_location_services import LS
-    from here_location_services.config.search_config import CATEGORIES
+    from here_location_services.config.search_config import PLACES_CATEGORIES
     from here_map_widget import Map, GeoJSON
 
     LS_API_KEY = os.environ.get("LS_API_KEY")  # Get API KEY from environment.
@@ -19,11 +19,11 @@ Example
     browse_response = ls.browse(
         center=[52.53086, 13.38469],
         bounding_box=[13.08836, 52.33812, 13.761, 52.6755],
-        categories=[CATEGORIES.restaurant],
+        categories=[PLACES_CATEGORIES.restaurant],
     )
 
     data = browse_response.to_geojson()
-    geo_layer = GeoJSON(data=data)
+    geo_layer = GeoJSON(data=data, show_bubble=True, point_style={"radius": 6})
 
     m = Map(api_key=LS_API_KEY, center=[52.53086, 13.38469], zoom=15)
     m.add_layer(geo_layer)
