@@ -1,10 +1,15 @@
 # Copyright (C) 2019-2021 HERE Europe B.V.
 # SPDX-License-Identifier: Apache-2.0
 
+from argparse import Namespace
+
 import pytest
 import requests
 
 from here_location_services.apis import Api
+from here_location_services.config.matrix_routing_config import WorldRegion
+from here_location_services.exceptions import ApiError
+from here_location_services.matrix_routing_api import MatrixRoutingApi
 from here_location_services.utils import get_apikey
 
 LS_API_KEY = get_apikey()
@@ -52,3 +57,23 @@ def test_credentials_exception():
     api = Api()
     with pytest.raises(Exception):
         _ = api.credential_params
+
+
+def test_mock_api_error(mocker):
+    """Mock Test for geocoding api."""
+    mock_response = Namespace(status_code=300)
+    mocker.patch(
+        "here_location_services.matrix_routing_api.requests.post", return_value=mock_response
+    )
+    origins = [
+        {"lat": 37.76, "lng": -122.42},
+        {"lat": 40.63, "lng": -74.09},
+        {"lat": 30.26, "lng": -97.74},
+    ]
+    region_definition = WorldRegion()
+    mat = MatrixRoutingApi(api_key="dummy")
+    with pytest.raises(ApiError):
+        _ = mat.matrix_route(
+            origins=origins,
+            region_definition=region_definition,
+        )

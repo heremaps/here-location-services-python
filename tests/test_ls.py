@@ -33,6 +33,7 @@ from here_location_services.config.routing_config import (
     ROUTING_TRANSPORT_MODE,
     PlaceOptions,
     Scooter,
+    Via,
     WayPointOptions,
 )
 from here_location_services.config.search_config import PLACES_CATEGORIES
@@ -286,10 +287,12 @@ def test_car_route():
     ls = LS(api_key=LS_API_KEY)
     avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
     avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
+    via1 = Via(lat=52.52426, lng=13.43000)
+    via2 = Via(lat=52.52624, lng=13.44012)
     result = ls.car_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
-        via=[(52.52426, 13.43000)],
+        via=[via1, via2],
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
@@ -331,20 +334,43 @@ def test_car_route_extra_options():
     via_waypoint_options = WayPointOptions(stop_duration=0, pass_through=True)
     assert json.loads(via_waypoint_options.__str__()) == {"stopDuration": 0, "passThrough": True}
     dest_waypoint_options = WayPointOptions(stop_duration=10, pass_through=False)
+    via1 = Via(
+        lat=52.52426,
+        lng=13.43000,
+        place_options=place_options,
+        waypoint_options=via_waypoint_options,
+    )
+    via2 = Via(lat=52.52426, lng=13.43000)
+    via3 = Via(
+        lat=52.52426,
+        lng=13.43000,
+        place_options=place_options,
+        waypoint_options=via_waypoint_options,
+    )
     ls = LS(api_key=LS_API_KEY)
-    _ = ls.car_route(
+    resp = ls.car_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
-        via=[(52.52426, 13.43000), (52.123, 13.22), (52.343, 13.444)],
+        via=[via1, via2, via3],
         origin_place_options=place_options,
         destination_place_options=place_options,
-        via_place_options=place_options,
-        via_waypoint_options=via_waypoint_options,
         destination_waypoint_options=dest_waypoint_options,
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
     )
+    resp = resp.response
+    assert len(resp["routes"][0]["sections"]) == 2
+    assert list(resp["routes"][0]["sections"][0].keys()) == [
+        "id",
+        "type",
+        "departure",
+        "arrival",
+        "polyline",
+        "spans",
+        "notices",
+        "transport",
+    ]
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
@@ -353,10 +379,11 @@ def test_bicycle_route():
     ls = LS(api_key=LS_API_KEY)
     avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
     avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
+    via = Via(lat=52.52426, lng=13.43000)
     _ = ls.bicycle_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
-        via=[(52.52426, 13.43000)],
+        via=[via],
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
@@ -382,10 +409,11 @@ def test_truck_route():
     )
     avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
     avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
+    via = Via(lat=52.52426, lng=13.43000)
     _ = ls.truck_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
-        via=[(52.52426, 13.43000)],
+        via=[via],
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
@@ -401,10 +429,12 @@ def test_scooter_route():
     """Test routing API for scooter route."""
     ls = LS(api_key=LS_API_KEY)
     scooter = Scooter(allow_highway=True)
+    assert json.loads(scooter.__str__()) == {"allowHighway": True}
+    via = Via(lat=52.52426, lng=13.43000)
     _ = ls.scooter_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
-        via=[(52.52426, 13.43000)],
+        via=[via],
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],
@@ -417,10 +447,11 @@ def test_scooter_route():
 def test_pedestrian_route():
     """Test routing API for pedestrian route."""
     ls = LS(api_key=LS_API_KEY)
+    via = Via(lat=52.52426, lng=13.43000)
     _ = ls.pedestrian_route(
         origin=[52.51375, 13.42462],
         destination=[52.52332, 13.42800],
-        via=[(52.52426, 13.43000)],
+        via=[via],
         return_results=[ROUTING_RETURN.polyline, ROUTING_RETURN.elevation],
         departure_time=datetime.now(),
         spans=[ROUTING_SPANS.names],

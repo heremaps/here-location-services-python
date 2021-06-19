@@ -5,12 +5,17 @@
 """  # noqa E501
 
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import requests
 
 from here_location_services.config.matrix_routing_config import AvoidBoundingBox, Truck
-from here_location_services.config.routing_config import PlaceOptions, Scooter, WayPointOptions
+from here_location_services.config.routing_config import (
+    PlaceOptions,
+    Scooter,
+    Via,
+    WayPointOptions,
+)
 
 from .apis import Api
 from .exceptions import ApiError
@@ -33,12 +38,10 @@ class RoutingApi(Api):
         transport_mode: str,
         origin: List,
         destination: List,
-        via: Optional[List[Tuple]] = None,
+        via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
-        via_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
-        via_waypoint_options: Optional[WayPointOptions] = None,
         scooter: Optional[Scooter] = None,
         departure_time: Optional[datetime] = None,
         routing_mode: str = "fast",
@@ -63,10 +66,8 @@ class RoutingApi(Api):
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
-        :param via_place_options: :class:`PlaceOptions` optinal place options for ``via``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
             for ``destination``.
-        :param via_waypoint_options: :class:`WayPointOptions` optional waypoint options for ``via``.
         :param scooter: Additional attributes for scooter route.
         :param departure_time: :class:`datetime.datetime` object.
         :param routing_mode: A string to represent routing mode.
@@ -98,27 +99,25 @@ class RoutingApi(Api):
             "transportMode": transport_mode,
         }
         if via:
-            lat, lng = via[0]
-            via_str = f"?via={lat},{lng}"
-            if len(via) > 1:
-                vias = "&".join("via=" + str(item[0]) + "," + str(item[1]) for item in via[1:])
-                via_str = via_str + "&" + vias
-            if via_place_options:
-                via_place_opt = ";".join(
-                    key + "=" + str(val)
-                    for key, val in vars(via_place_options).items()
-                    if val is not None
-                )
-                via_str = via_str + ";" + via_place_opt
-            if via_waypoint_options:
-                via_way_opt = "!".join(
-                    key + "=" + str(val)
-                    for key, val in vars(via_waypoint_options).items()
-                    if val is not None
-                )
-                via_str = via_str + "!" + via_way_opt
-            url += via_str
-
+            vias = []
+            for v in via:
+                via_str = f"via={v.lat},{v.lng}"
+                if v.place_options:
+                    place_optns_str = ";".join(
+                        key + "=" + str(val)
+                        for key, val in vars(v.place_options).items()
+                        if val is not None
+                    )
+                    via_str = via_str + ";" + place_optns_str
+                if v.waypoint_options:
+                    waypoint_optns_str = "!".join(
+                        key + "=" + str(val)
+                        for key, val in vars(v.waypoint_options).items()
+                        if val is not None
+                    )
+                    via_str = via_str + "!" + waypoint_optns_str
+                vias.append(via_str)
+            url = url + "?" + "&".join(vias)
         if departure_time:
             params["departureTime"] = departure_time.isoformat(timespec="seconds")
         params["routingMode"] = routing_mode

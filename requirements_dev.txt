@@ -6,15 +6,15 @@ proxy.py
 pytest
 pytest-cov
 pytest-mypy
-Sphinx>=2.4.0
-sphinx-rtd-theme
 twine
 pytest-flake8
 isort
 darglint
-requests-mock
-jupyter-sphinx==0.2.4a1
+pytest-mock
 # mypy new version requires below
 types-requests
 # required for building docs
+Sphinx>=2.4.0
+sphinx-rtd-theme
+jupyter-sphinx==0.2.4a1
 here-map-widget-for-jupyter>=1.1.1
