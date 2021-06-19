@@ -298,3 +298,23 @@ class Scooter:
     def __repr__(self):
         """Return string representation of this instance."""
         return json.dumps(self.__dict__)
+
+
+class Via:
+    """A class to define ``via`` waypoint.
+
+    A via waypoint is a location between origin and destination. The route will do a stop at the
+    via waypoint.
+    """
+
+    def __init__(
+        self,
+        lat: float,
+        lng: float,
+        place_options: Optional[PlaceOptions] = None,
+        waypoint_options: Optional[WayPointOptions] = None,
+    ):
+        self.lat = lat
+        self.lng = lng
+        self.place_options = place_options
+        self.waypoint_options = waypoint_options
