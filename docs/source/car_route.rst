@@ -44,12 +44,10 @@ Attribute                       Type                                            
 ============================    =======================================================================================    ===
 origin                          list                                                                                       A list of ``latitude`` and ``longitude`` of ``origin`` point of route.
 destination                     list                                                                                       A list of ``latitude`` and ``longitude`` of ``destination`` point of route.
-via                             list                                                                                       A list of tuples of ``latitude`` and ``longitude`` of ``via`` points.
+via                             list                                                                                       A list of :class:`here_location_services.config.routing_config.Via` objects.
 origin_place_options            :class:`PlaceOptions <here_location_services.config.routing_config.PlaceOptions>`          optinal place options for ``origin``.
 destination_place_options       :class:`PlaceOptions <here_location_services.config.routing_config.PlaceOptions>`          optional place options for ``destination``.
-via_place_options               :class:`PlaceOptions <here_location_services.config.routing_config.PlaceOptions>`          optinal place options for ``via``.
 destination_waypoint_options    :class:`WayPointOptions <here_location_services.config.routing_config.WayPointOptions>`    optional way point options for ``destination``.
-via_waypoint_options            :class:`WayPointOptions <here_location_services.config.routing_config.WayPointOptions>`    optional way point options for ``via``.
 departure_time                  :func:`datetime.datetime`                                                                  optional departure time.
 routing_mode                    string                                                                                     optional routing mode is defined in  :attr:`ROUTING_MODE <here_location_services.config.routing_config.ROUTING_MODE>`
 alternatives                    int                                                                                        optional number of alternative routes to return aside from the optimal route. default value is ``0`` and maximum is ``6``.
