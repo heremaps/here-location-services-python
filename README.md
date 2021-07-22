@@ -1,7 +1,7 @@
 # HERE Location Services for Python
 
 [![Tests](https://github.com/heremaps/here-location-services-python/workflows/Tests/badge.svg)](https://github.com/heremaps/here-location-services-python/actions)
-[![Documentation Status](https://readthedocs.org/projects/here-location-services-python/badge/?version=latest)](https://here-location-services-python.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/here-location-services-python/badge/?version=stable)](https://here-location-services-python.readthedocs.io/en/stable/?badge=stable)
 [![codecov](https://codecov.io/gh/heremaps/here-location-services-python/branch/master/graph/badge.svg?token=G7Q1DWFI3W)](https://codecov.io/gh/heremaps/here-location-services-python)
 [![PyPI - Status](https://img.shields.io/pypi/status/here-location-services)](https://pypi.org/project/here-location-services/)
 [![PyPI - Python Version](https://img.shields.io/pypi/v/here-location-services.svg?logo=pypi)](https://pypi.org/project/here-location-services/)
