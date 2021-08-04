@@ -57,6 +57,15 @@ class Api:
                 f"api_key: {self.credentials['api_key']} is not present in credentials."
             )
 
+    def __add_credentials_in_params(self, params: Dict) -> Dict:
+        """
+        Add credentials in params dictionary.
+
+        :return: Dict.
+        """
+        params.update(self.credential_params)
+        return params
+
     def get(self, url: str, params: Optional[Dict] = None, **kwargs):
         """Send HTTP GET request.
 
@@ -65,12 +74,10 @@ class Api:
         :param kwargs: An optional extra arguments.
         :return: :class:`requests.Response` object.
         """
+        q_params = params if params is not None else {}
         if self.credential_params:
-            if not params:
-                params = self.credential_params
-            else:
-                params.update(self.credential_params)
-        resp = requests.get(url, params=params, **kwargs)
+            q_params = self.__add_credentials_in_params(q_params)
+        resp = requests.get(url, params=q_params, **kwargs)
         return resp
 
     def post(self, url: str, data: Dict, params: Optional[Dict] = None):
@@ -83,7 +90,10 @@ class Api:
         :return: :class:`requests.Response` object.
         """
         self.headers.update({"Content-Type": "application/json"})
+        q_params = params if params is not None else {}
+        if self.credential_params:
+            q_params = self.__add_credentials_in_params(q_params)
         resp = requests.post(
-            url, params=params, json=data, proxies=self.proxies, headers=self.headers
+            url, params=q_params, json=data, proxies=self.proxies, headers=self.headers
         )
         return resp

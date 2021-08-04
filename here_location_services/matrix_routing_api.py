@@ -51,8 +51,6 @@ class MatrixRoutingApi(Api):
         path = "v8/matrix"
         url = f"{self._base_url}/{path}"
         params = {"async": async_req}
-        if self.credential_params:
-            params.update(self.credential_params)
         data: Dict[Any, Any] = {
             "origins": origins,
         }
