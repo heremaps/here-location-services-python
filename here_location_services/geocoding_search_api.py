@@ -8,6 +8,8 @@ from typing import Dict, List, Optional
 
 import requests
 
+from here_location_services.platform.auth import Auth
+
 from .apis import Api
 from .exceptions import ApiError
 
@@ -18,10 +20,11 @@ class GeocodingSearchApi(Api):
     def __init__(
         self,
         api_key: Optional[str] = None,
+        auth: Optional[Auth] = None,
         proxies: Optional[dict] = None,
         country: str = "row",
     ):
-        super().__init__(api_key, proxies, country)
+        super().__init__(api_key, auth=auth, proxies=proxies, country=country)
         self._base_url = "https://{0}.search.{1}"
 
     def get_geocoding(self, query: str, limit: int = 20, lang: str = "en-US") -> requests.Response:
@@ -46,9 +49,7 @@ class GeocodingSearchApi(Api):
         path = "/v1/geocode"
         url = self._base_url.format("geocode", self._get_url_string()) + path
         params: dict = dict(q=query, limit=limit, lang=lang)
-        if self.credential_params:
-            params.update(self.credential_params)
-        resp = requests.get(url, params=params, proxies=self.proxies)
+        resp = self.get(url, params=params, proxies=self.proxies)
         if resp.status_code == 200:
             return resp
         else:
@@ -78,9 +79,7 @@ class GeocodingSearchApi(Api):
         path = "/v1/revgeocode"
         url = self._base_url.format("geocode", self._get_url_string()) + path
         params: dict = dict(at=f"{lat},{lng}", limit=limit, lang=lang)
-        if self.credential_params:
-            params.update(self.credential_params)
-        resp = requests.get(url, params=params, proxies=self.proxies)
+        resp = self.get(url, params=params, proxies=self.proxies)
         if resp.status_code == 200:
             return resp
         else:
@@ -129,11 +128,7 @@ class GeocodingSearchApi(Api):
             params["lang"] = lang
         if limit:
             params["limit"] = str(limit)
-
-        if self.credential_params:
-            params.update(self.credential_params)
-
-        resp = requests.get(url, params=params, proxies=self.proxies)
+        resp = self.get(url, params=params, proxies=self.proxies)
         if resp.status_code == 200:
             return resp
         else:
@@ -184,11 +179,7 @@ class GeocodingSearchApi(Api):
             params["limit"] = str(limit)
         if lang:
             params["lang"] = lang
-
-        if self.credential_params:
-            params.update(self.credential_params)
-
-        resp = requests.get(url, params=params, proxies=self.proxies)
+        resp = self.get(url, params=params, proxies=self.proxies)
         if resp.status_code == 200:
             return resp
         else:
@@ -210,10 +201,7 @@ class GeocodingSearchApi(Api):
         if lang:
             params["lang"] = lang
 
-        if self.credential_params:
-            params.update(self.credential_params)
-
-        resp = requests.get(url, params=params, proxies=self.proxies)
+        resp = self.get(url, params=params, proxies=self.proxies)
         if resp.status_code == 200:
             return resp
         else:

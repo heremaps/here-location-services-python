@@ -16,6 +16,9 @@ from here_location_services.config.routing_config import (
     Via,
     WayPointOptions,
 )
+from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
+from here_location_services.platform.auth import Auth
+from here_location_services.platform.credentials import PlatformCredentials
 
 from .config.matrix_routing_config import (
     AutoCircleRegion,
@@ -52,29 +55,44 @@ class LS:
     def __init__(
         self,
         api_key: Optional[str] = None,
+        platfrom_credentials: Optional[PlatformCredentials] = None,
         proxies: Optional[dict] = None,
         country: str = "row",
     ):
         api_key = api_key or os.environ.get("LS_API_KEY")
-        self.credentials = dict(api_key=api_key)
+        credentials = platfrom_credentials or PlatformCredentials.from_default()
+        if not (api_key or credentials):
+            raise ValueError("Please provide either api_key or platfrom_credentials")
+        if platfrom_credentials:
+            aaa_oauth2_api = AAAOauth2Api(
+                base_url=credentials.cred_properties["endpoint"], proxies={}
+            )
+            auth = Auth(credentials=credentials, aaa_oauth2_api=aaa_oauth2_api)
+        else:
+            auth = None
+        if platfrom_credentials:
+            pass
         self.proxies = proxies or urllib.request.getproxies()
         self.geo_search_api = GeocodingSearchApi(
             api_key=api_key,
+            auth=auth,
             proxies=proxies,
             country=country,
         )
         self.isoline_routing_api = IsolineRoutingApi(
             api_key=api_key,
+            auth=auth,
             proxies=proxies,
             country=country,
         )
         self.routing_api = RoutingApi(
             api_key=api_key,
+            auth=auth,
             proxies=proxies,
             country=country,
         )
         self.matrix_routing_api = MatrixRoutingApi(
-            api_key=api_key, proxies=proxies, country=country
+            api_key=api_key, auth=auth, proxies=proxies, country=country
         )
 
     def geocode(self, query: str, limit: int = 20, lang: str = "en-US") -> GeocoderResponse:

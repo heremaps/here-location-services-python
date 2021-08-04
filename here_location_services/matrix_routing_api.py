@@ -6,6 +6,8 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 
+from here_location_services.platform.auth import Auth
+
 from .apis import Api
 from .config.matrix_routing_config import (
     AutoCircleRegion,
@@ -25,10 +27,11 @@ class MatrixRoutingApi(Api):
     def __init__(
         self,
         api_key: Optional[str] = None,
+        auth: Optional[Auth] = None,
         proxies: Optional[dict] = None,
         country: str = "row",
     ):
-        super().__init__(api_key, proxies, country)
+        super().__init__(api_key, auth=auth, proxies=proxies, country=country)
         self._base_url = f"https://matrix.router.{self._get_url_string()}"
 
     def __send_post_request(
