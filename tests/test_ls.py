@@ -5,6 +5,7 @@ import json
 import os
 from datetime import datetime
 
+import pandas as pd
 import pytest
 import pytz
 from geojson import FeatureCollection
@@ -230,7 +231,7 @@ def test_ls_browse():
         categories=[PLACES_CATEGORIES.restaurant],
         lang="en",
     )
-    assert len(result2.items) == 10
+    assert len(result2.items) <= 10
 
     result3 = ls.browse(
         center=[19.1663, 72.8526],
@@ -239,7 +240,7 @@ def test_ls_browse():
         categories=[PLACES_CATEGORIES.restaurant],
         lang="en",
     )
-    assert len(result3.items) >= 10
+    assert len(result3.items) <= 10
 
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
@@ -558,6 +559,8 @@ def test_matrix_route():
     assert mat2["numDestinations"] == 3
     with pytest.raises(NotImplementedError):
         result2.to_geojson()
+    assert isinstance(result2.to_distnaces_matrix(), pd.DataFrame)
+    assert isinstance(result2.to_travel_times_matrix(), pd.DataFrame)
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
