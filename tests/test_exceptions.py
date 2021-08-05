@@ -32,8 +32,12 @@ def test_raise_response_exception():
     reason = "This is mock reason"
     text = "This is mock text"
     mock_response = get_mock_response(401, reason, text)
-    with pytest.raises(AuthenticationException):
+    with pytest.raises(AuthenticationException) as execinfo:
         Api.raise_response_exception(mock_response)
+    resp = execinfo.value.args[0]
+    assert resp.status_code == 401
+    assert resp.reason == "This is mock reason"
+    assert "This is mock text" in (str(execinfo.value))
     mock_response = get_mock_response(429, reason, text)
     with pytest.raises(TooManyRequestsException) as execinfo:
         Api.raise_response_exception(mock_response)
