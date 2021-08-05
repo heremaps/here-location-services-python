@@ -4,7 +4,7 @@
 This module implements base class for low level api client.
 """
 import urllib.request
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 import requests
 
