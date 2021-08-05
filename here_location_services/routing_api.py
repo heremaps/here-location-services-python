@@ -7,8 +7,6 @@
 from datetime import datetime
 from typing import Dict, List, Optional
 
-import requests
-
 from here_location_services.config.matrix_routing_config import AvoidBoundingBox, Truck
 from here_location_services.config.routing_config import (
     PlaceOptions,
@@ -16,6 +14,7 @@ from here_location_services.config.routing_config import (
     Via,
     WayPointOptions,
 )
+from here_location_services.platform.auth import Auth
 
 from .apis import Api
 from .exceptions import ApiError
@@ -27,10 +26,11 @@ class RoutingApi(Api):
     def __init__(
         self,
         api_key: Optional[str] = None,
+        auth: Optional[Auth] = None,
         proxies: Optional[dict] = None,
         country: str = "row",
     ):
-        super().__init__(api_key, proxies, country)
+        super().__init__(api_key, auth=auth, proxies=proxies, country=country)
         self._base_url = f"https://router.{self._get_url_string()}"
 
     def route(
@@ -185,11 +185,7 @@ class RoutingApi(Api):
 
         if exclude:
             params["exclude"] = ",".join(exclude)
-
-        if self.credential_params:
-            params.update(self.credential_params)
-
-        resp = requests.get(url, params=params, proxies=self.proxies)
+        resp = self.get(url, params=params, proxies=self.proxies)
         if resp.status_code == 200:
             return resp
         else:

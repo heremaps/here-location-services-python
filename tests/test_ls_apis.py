@@ -52,13 +52,6 @@ def test_isonline_routing(isoline_routing_api):
     assert coordinates[0]
 
 
-def test_credentials_exception():
-    """Test exception for credentials."""
-    api = Api()
-    with pytest.raises(Exception):
-        _ = api.credential_params
-
-
 def test_mock_api_error(mocker):
     """Mock Test for geocoding api."""
     mock_response = Namespace(status_code=300)

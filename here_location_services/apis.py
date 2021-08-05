@@ -12,6 +12,7 @@ from typing import Dict, Optional
 import requests
 
 from here_location_services.config.url_config import conf
+from here_location_services.platform.auth import Auth
 
 
 class Api:
@@ -20,25 +21,17 @@ class Api:
     def __init__(
         self,
         api_key: Optional[str] = None,
+        auth: Optional[Auth] = None,
         proxies: Optional[dict] = None,
         country: str = "row",
     ):
-        self.credentials = dict(api_key=api_key)
+        self.auth = auth
+        self.credentials = dict(
+            api_key=api_key, access_token=self.auth.token if self.auth else None
+        )
         self.proxies = proxies or urllib.request.getproxies()
         self.headers: Dict[str, str] = {}
         self.country = country
-
-    @property
-    def credential_params(self) -> dict:
-        """
-        Return dict. with credentials info to be used as query parameters.
-        """
-        if self.credentials["api_key"]:
-            return dict(apiKey=self.credentials["api_key"])
-        else:
-            raise Exception(
-                f"api_key: {self.credentials['api_key']} is not present in credentials."
-            )
 
     def _get_url_string(self) -> str:
         """
@@ -49,7 +42,7 @@ class Api:
 
         :raises Exception: If ``api_key`` not found in credentials.
         """
-        if self.credentials["api_key"]:
+        if self.credentials["api_key"] or self.credentials["access_token"]:
             url = conf[self.country]["here_api"]
             return url
         else:
@@ -57,13 +50,13 @@ class Api:
                 f"api_key: {self.credentials['api_key']} is not present in credentials."
             )
 
-    def __add_credentials_in_params(self, params: Dict) -> Dict:
+    def __add_api_key_in_params(self, params: Dict) -> Dict:
         """
-        Add credentials in params dictionary.
+        Add api_key in query params dictionary.
 
         :return: Dict.
         """
-        params.update(self.credential_params)
+        params.update({"apiKey": self.credentials["api_key"]})
         return params
 
     def get(self, url: str, params: Optional[Dict] = None, **kwargs):
@@ -75,9 +68,12 @@ class Api:
         :return: :class:`requests.Response` object.
         """
         q_params = params if params is not None else {}
-        if self.credential_params:
-            q_params = self.__add_credentials_in_params(q_params)
-        resp = requests.get(url, params=q_params, **kwargs)
+        if self.credentials["api_key"]:
+            q_params = self.__add_api_key_in_params(q_params)
+        elif self.credentials["access_token"]:
+            auth_token = {"Authorization": f"Bearer {self.credentials['access_token']}"}
+            self.headers.update(auth_token)
+        resp = requests.get(url, params=q_params, headers=self.headers, **kwargs)
         return resp
 
     def post(self, url: str, data: Dict, params: Optional[Dict] = None):
@@ -91,8 +87,11 @@ class Api:
         """
         self.headers.update({"Content-Type": "application/json"})
         q_params = params if params is not None else {}
-        if self.credential_params:
-            q_params = self.__add_credentials_in_params(q_params)
+        if self.credentials["api_key"]:
+            q_params = self.__add_api_key_in_params(q_params)
+        elif self.credentials["access_token"]:
+            auth_token = {"Authorization": f"Bearer {self.credentials['access_token']}"}
+            self.headers.update(auth_token)
         resp = requests.post(
             url, params=q_params, json=data, proxies=self.proxies, headers=self.headers
         )
