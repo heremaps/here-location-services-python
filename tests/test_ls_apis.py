@@ -35,10 +35,10 @@ def test_reverse_geocoding(geo_search_api):
 def test_isonline_routing(isoline_routing_api):
     """Test isonline routing api."""
     result = isoline_routing_api.get_isoline_routing(
-        start=[52.5, 13.4], range="900", range_type="time", mode="fastest;car;"
+        origin=[52.5, 13.4], range="3000", range_type="distance", transportMode="car"
     )
 
-    coordinates = result.json()["response"]["isoline"][0]["component"][0]["shape"]
+    coordinates = result.json()["isolines"][0]["polygons"][0]["outer"]
     assert coordinates[0]
 
 
@@ -46,7 +46,8 @@ def test_mock_api_error(mocker):
     """Mock Test for geocoding api."""
     mock_response = Namespace(status_code=300)
     mocker.patch(
-        "here_location_services.matrix_routing_api.requests.post", return_value=mock_response
+        "here_location_services.matrix_routing_api.requests.post",
+        return_value=mock_response,
     )
     origins = [
         {"lat": 37.76, "lng": -122.42},

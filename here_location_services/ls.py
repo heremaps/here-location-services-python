@@ -91,7 +91,9 @@ class LS:
             api_key=api_key, auth=auth, proxies=proxies, country=country
         )
 
-    def geocode(self, query: str, limit: int = 20, lang: str = "en-US") -> GeocoderResponse:
+    def geocode(
+        self, query: str, limit: int = 20, lang: str = "en-US"
+    ) -> GeocoderResponse:
         """Calculate coordinates as result of geocoding for the given ``query``.
 
         :param query: A string containing the input query.
@@ -130,18 +132,20 @@ class LS:
         if not -180 <= lng <= 180:
             raise ValueError("Longitude must be in range -180 to 180.")
 
-        resp = self.geo_search_api.get_reverse_geocoding(lat=lat, lng=lng, limit=limit, lang=lang)
+        resp = self.geo_search_api.get_reverse_geocoding(
+            lat=lat, lng=lng, limit=limit, lang=lang
+        )
         return ReverseGeocoderResponse.new(resp.json())
 
     def calculate_isoline(
         self,
-        mode: str,
+        transportMode: str,
         range: str,
         range_type: str,
-        start: Optional[List[float]] = None,
+        origin: Optional[List[float]] = None,
         destination: Optional[List[float]] = None,
         arrival: Optional[str] = None,
-        departure: Optional[str] = None,
+        departureTime: Optional[str] = None,
     ) -> IsolineResponse:
         """Calculate isoline routing.
 
@@ -176,25 +180,25 @@ class LS:
         :return: :class:`IsolineResponse` object.
         """
 
-        if start and destination:
-            raise ValueError("`start` and `destination` can not be provided together.")
-        if start is None and destination is None:
-            raise ValueError("please provide either `start` or `destination`.")
-        if departure and start is None:
-            raise ValueError("`departure` must be provided with `start`")
+        if origin and destination:
+            raise ValueError("`origin` and `destination` can not be provided together.")
+        if origin is None and destination is None:
+            raise ValueError("please provide either `origin` or `destination`.")
+        if departureTime and origin is None:
+            raise ValueError("`departureTime` must be provided with `origin`")
         if arrival and destination is None:
             raise ValueError("`arrival` must be provided with `destination`")
 
         resp = self.isoline_routing_api.get_isoline_routing(
-            mode=mode,
+            transportMode=transportMode,
             range=range,
             range_type=range_type,
-            start=start,
+            origin=origin,
             destination=destination,
             arrival=arrival,
-            departure=departure,
+            departureTime=departureTime,
         )
-        response = resp.json()["response"]
+        response = resp.json()
         return IsolineResponse.new(response)
 
     def discover(
@@ -650,7 +654,11 @@ class LS:
         self,
         origins: List[Dict],
         region_definition: Union[
-            CircleRegion, BoundingBoxRegion, PolygonRegion, AutoCircleRegion, WorldRegion
+            CircleRegion,
+            BoundingBoxRegion,
+            PolygonRegion,
+            AutoCircleRegion,
+            WorldRegion,
         ],
         async_req: bool = False,
         destinations: Optional[List[Dict]] = None,
@@ -737,7 +745,9 @@ class LS:
             )
             status_url = resp["statusUrl"]
             while True:
-                resp_status = self.matrix_routing_api.get_async_matrix_route_status(status_url)
+                resp_status = self.matrix_routing_api.get_async_matrix_route_status(
+                    status_url
+                )
                 if resp_status.status_code == 200 and resp_status.json().get("error"):
                     raise ApiError(resp_status)
                 elif resp_status.status_code == 303:

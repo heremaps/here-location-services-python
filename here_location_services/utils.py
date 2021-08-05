@@ -16,6 +16,8 @@ def get_apikey() -> str:
     :return: The string value of the environment variable or an empty string
         if no such variable could be found.
     """
+    os.environ["LS_API_KEY"] = "TKURWbpJHcbzmWMrmTZwGAdSTLrX8WY1oddj4S4U-EM"
+
     api_key = os.environ.get("LS_API_KEY")
     if api_key is None:
         warnings.warn("No token found in environment variable LS_API_KEY.")

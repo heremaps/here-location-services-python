@@ -23,7 +23,9 @@ from here_location_services.config.matrix_routing_config import (
     Truck,
     WorldRegion,
 )
-from here_location_services.config.routing_config import AVOID_FEATURES as ROUTING_AVOID_FEATURES
+from here_location_services.config.routing_config import (
+    AVOID_FEATURES as ROUTING_AVOID_FEATURES,
+)
 from here_location_services.config.routing_config import (
     ROUTE_COURSE,
     ROUTE_MATCH_SIDEOF_STREET,
@@ -103,14 +105,16 @@ def test_isonline_routing():
     """Test isonline routing api."""
     ls = LS(api_key=LS_API_KEY)
     result = ls.calculate_isoline(
-        start=[52.5, 13.4],
-        range="900",
+        origin=[52.5, 13.4],
+        range="3000",
         range_type="time",
-        mode="fastest;car;",
-        departure="2020-05-04T17:00:00+02",
+        transportMode="car",
+        departureTime="2021-08-05T18:53:27+00:00",
     )
-
+    print(result.as_json_string())
+    print(json.loads(result.as_json_string))
     coordinates = result.isoline[0]["component"][0]["shape"]
+
     assert coordinates[0]
     geo_json = result.to_geojson()
     assert geo_json.type == "Feature"
@@ -120,7 +124,7 @@ def test_isonline_routing():
         destination=[52.5, 13.4],
         range="900",
         range_type="time",
-        mode="fastest;car;",
+        transportMode="car",
         arrival="2020-05-04T17:00:00+02",
     )
     coordinates = result2.isoline[0]["component"][0]["shape"]
@@ -128,19 +132,19 @@ def test_isonline_routing():
 
     with pytest.raises(ValueError):
         ls.calculate_isoline(
-            start=[52.5, 13.4],
+            origin=[52.5, 13.4],
             range="900",
             range_type="time",
-            mode="fastest;car;",
+            transportMode="car",
             destination=[52.5, 13.4],
         )
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
         ls2.calculate_isoline(
-            start=[52.5, 13.4],
+            origin=[52.5, 13.4],
             range="900",
             range_type="time",
-            mode="fastest;car;",
+            transportMode="car",
         )
 
 
@@ -152,22 +156,22 @@ def test_isonline_routing_exception():
         ls.calculate_isoline(
             range="900",
             range_type="time",
-            mode="fastest;car;",
+            transportMode="car",
         )
     with pytest.raises(ValueError):
         ls.calculate_isoline(
             range="900",
             range_type="time",
-            mode="fastest;car;",
+            transportMode="car",
             arrival="2020-05-04T17:00:00+02",
-            start=[52.5, 13.4],
+            origin=[52.5, 13.4],
         )
     with pytest.raises(ValueError):
         ls.calculate_isoline(
             range="900",
             range_type="time",
-            mode="fastest;car;",
-            departure="2020-05-04T17:00:00+02",
+            transportMode="car",
+            departureTime="2020-05-04T17:00:00+02",
             destination=[52.5, 13.4],
         )
 
@@ -175,7 +179,9 @@ def test_isonline_routing_exception():
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
 def test_ls_discover():
     ls = LS(api_key=LS_API_KEY)
-    result = ls.discover(query="starbucks", center=[19.1663, 72.8526], radius=10000, lang="en")
+    result = ls.discover(
+        query="starbucks", center=[19.1663, 72.8526], radius=10000, lang="en"
+    )
     assert len(result.items) == 20
 
     result2 = ls.discover(
@@ -201,7 +207,9 @@ def test_ls_discover():
 
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
-        ls2.discover(query="starbucks", center=[19.1663, 72.8526], radius=10000, limit=10)
+        ls2.discover(
+            query="starbucks", center=[19.1663, 72.8526], radius=10000, limit=10
+        )
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
@@ -268,14 +276,18 @@ def test_ls_lookup():
 
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
-        ls2.lookup(location_id="here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2")
+        ls2.lookup(
+            location_id="here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2"
+        )
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
 def test_car_route():
     """Test routing API for car route."""
     ls = LS(api_key=LS_API_KEY)
-    avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
+    avoid_areas = [
+        AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
+    ]
     avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
     via1 = Via(lat=52.52426, lng=13.43000)
     via2 = Via(lat=52.52624, lng=13.44012)
@@ -290,12 +302,16 @@ def test_car_route():
         avoid_features=avoid_features,
         exclude=["IND", "NZL", "AUS"],
     )
-    assert result.response["routes"][0]["sections"][0]["departure"]["place"]["location"] == {
+    assert result.response["routes"][0]["sections"][0]["departure"]["place"][
+        "location"
+    ] == {
         "lat": 52.5137479,
         "lng": 13.4246242,
         "elv": 76.0,
     }
-    assert result.response["routes"][0]["sections"][1]["departure"]["place"]["location"] == {
+    assert result.response["routes"][0]["sections"][1]["departure"]["place"][
+        "location"
+    ] == {
         "lat": 52.5242323,
         "lng": 13.4301462,
         "elv": 80.0,
@@ -322,7 +338,10 @@ def test_car_route_extra_options():
         "minCourseDistance": 10,
     }
     via_waypoint_options = WayPointOptions(stop_duration=0, pass_through=True)
-    assert json.loads(via_waypoint_options.__str__()) == {"stopDuration": 0, "passThrough": True}
+    assert json.loads(via_waypoint_options.__str__()) == {
+        "stopDuration": 0,
+        "passThrough": True,
+    }
     dest_waypoint_options = WayPointOptions(stop_duration=10, pass_through=False)
     via1 = Via(
         lat=52.52426,
@@ -367,7 +386,9 @@ def test_car_route_extra_options():
 def test_bicycle_route():
     """Test routing API for car route."""
     ls = LS(api_key=LS_API_KEY)
-    avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
+    avoid_areas = [
+        AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
+    ]
     avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
     via = Via(lat=52.52426, lng=13.43000)
     _ = ls.bicycle_route(
@@ -397,7 +418,9 @@ def test_truck_route():
         tunnel_category="B",
         axle_count=4,
     )
-    avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
+    avoid_areas = [
+        AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
+    ]
     avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
     via = Via(lat=52.52426, lng=13.43000)
     _ = ls.truck_route(
@@ -501,7 +524,9 @@ def test_matrix_route():
     ]
     region_definition = WorldRegion()
     matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
-    avoid_areas = AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
+    avoid_areas = AvoidBoundingBox(
+        68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078
+    )
     assert json.loads(avoid_areas.__str__()) == {
         "type": "boundingBox",
         "north": 68.1766451354,
@@ -563,7 +588,9 @@ def test_matrix_route_async():
     ]
     region_definition = WorldRegion()
     matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
-    avoid_areas = AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
+    avoid_areas = AvoidBoundingBox(
+        68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078
+    )
     truck = Truck(
         shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
         gross_weight=100,
@@ -612,7 +639,10 @@ def test_matrix_routing_config():
     }
 
     poly = PolygonRegion(outer=[1, 1, 1, 1, 1, 1])
-    assert json.loads(poly.__str__()) == {"type": "polygon", "outer": [1, 1, 1, 1, 1, 1]}
+    assert json.loads(poly.__str__()) == {
+        "type": "polygon",
+        "outer": [1, 1, 1, 1, 1, 1],
+    }
 
     autocircle = AutoCircleRegion(margin=100)
     assert json.loads(autocircle.__str__()) == {"type": "autoCircle", "margin": 100}

@@ -25,17 +25,17 @@ class IsolineRoutingApi(Api):
         country: str = "row",
     ):
         super().__init__(api_key, auth=auth, proxies=proxies, country=country)
-        self._base_url = f"https://isoline.route.ls.{self._get_url_string()}"
+        self._base_url = f"https://isoline.router.{self._get_url_string()}"
 
     def get_isoline_routing(
         self,
-        mode: str,
+        transportMode: str,
         range: str,
         range_type: str,
-        start: Optional[List[float]] = None,
+        origin: Optional[List[float]] = None,
         destination: Optional[List[float]] = None,
         arrival: Optional[str] = None,
-        departure: Optional[str] = None,
+        departureTime: Optional[str] = None,
     ) -> requests.Response:
         """Get isoline routing.
 
@@ -69,21 +69,27 @@ class IsolineRoutingApi(Api):
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200.
         """
-        path = "routing/7.2/calculateisoline.json"
+        path = "v8/isolines"
         url = f"{self._base_url}/{path}"
         params: Dict[str, str] = {
-            "range": range,
-            "rangetype": range_type,
-            "mode": mode,
+            # "range": range,
+            # "rangetype": range_type,
+            # "range": {
+            #     "type": range_type,
+            #     "values": range,
+            # }
+            "range[type]": range_type,
+            "range[values]": range,
+            "transportMode": transportMode,
         }
-        if start:
-            params["start"] = f"geo!{start[0]},{start[1]}"
+        if origin:
+            params["origin"] = f"{origin[0]},{origin[1]}"
         if destination:
-            params["destination"] = f"geo!{destination[0]},{destination[1]}"
+            params["destination"] = f"{destination[0]},{destination[1]}"
         if arrival:
-            params["arrival"] = arrival
-        if departure:
-            params["departure"] = departure
+            params["arrivalTime"] = arrival
+        if departureTime:
+            params["departureTime"] = departureTime
         resp = self.get(url, params=params, proxies=self.proxies)
         if resp.status_code == 200:
             return resp
