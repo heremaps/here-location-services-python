@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import os
 from datetime import datetime
 
 import pandas as pd
@@ -270,16 +269,6 @@ def test_ls_lookup():
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
         ls2.lookup(location_id="here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2")
-
-
-@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
-def test_credentials_exception():
-    """Test exception if environment variable ``LS_API_KEY`` is not present."""
-    api_key = os.environ.get("LS_API_KEY")
-    del os.environ["LS_API_KEY"]
-    with pytest.raises(Exception):
-        _ = LS()
-    os.environ["LS_API_KEY"] = api_key
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")

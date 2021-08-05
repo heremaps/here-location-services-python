@@ -60,7 +60,7 @@ class LS:
         country: str = "row",
     ):
         api_key = api_key or os.environ.get("LS_API_KEY")
-        if platfrom_credentials:
+        if not api_key:
             credentials = platfrom_credentials or PlatformCredentials.from_default()
             aaa_oauth2_api = AAAOauth2Api(
                 base_url=credentials.cred_properties["endpoint"], proxies={}
