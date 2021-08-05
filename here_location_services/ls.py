@@ -60,18 +60,14 @@ class LS:
         country: str = "row",
     ):
         api_key = api_key or os.environ.get("LS_API_KEY")
-        credentials = platfrom_credentials or PlatformCredentials.from_default()
-        if not (api_key or credentials):
-            raise ValueError("Please provide either api_key or platfrom_credentials")
         if platfrom_credentials:
+            credentials = platfrom_credentials or PlatformCredentials.from_default()
             aaa_oauth2_api = AAAOauth2Api(
                 base_url=credentials.cred_properties["endpoint"], proxies={}
             )
             auth = Auth(credentials=credentials, aaa_oauth2_api=aaa_oauth2_api)
         else:
             auth = None
-        if platfrom_credentials:
-            pass
         self.proxies = proxies or urllib.request.getproxies()
         self.geo_search_api = GeocodingSearchApi(
             api_key=api_key,
