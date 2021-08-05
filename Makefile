@@ -1,6 +1,6 @@
-.PHONY: all build install typing lint test
+.PHONY: all build install typing lint test docs
 
-all: black build install typing lint test
+all: black build install typing lint test docs
 
 black:
 	black -l 99 here_location_services tests
@@ -47,4 +47,6 @@ lint:
 test:
 	pytest -v -s --cov=here_location_services tests
 	coverage html
+
+docs:
 	sh scripts/build_docs.sh

@@ -4,7 +4,8 @@
 """This module defines classes to manage Platform credentials."""
 from os import getenv
 from os.path import expanduser, expandvars
-from typing import List
+from pathlib import Path
+from typing import List, Union
 
 from pyhocon import ConfigFactory, ConfigMissingException, ConfigTree
 
@@ -59,7 +60,7 @@ class PlatformCredentials:
         return credentials
 
     @classmethod
-    def from_credentials_file(cls, path: str) -> "PlatformCredentials":
+    def from_credentials_file(cls, path: Union[str, Path]) -> "PlatformCredentials":
         """
         Return the credentials object from a specified credentials path.
 

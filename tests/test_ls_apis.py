@@ -6,7 +6,6 @@ from argparse import Namespace
 import pytest
 import requests
 
-from here_location_services.apis import Api
 from here_location_services.config.matrix_routing_config import WorldRegion
 from here_location_services.exceptions import ApiError
 from here_location_services.matrix_routing_api import MatrixRoutingApi
@@ -22,15 +21,6 @@ def test_geocoding(geo_search_api):
     resp = geo_search_api.get_geocoding(query=address)
     assert type(resp) == requests.Response
     assert resp.status_code == 200
-
-
-@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
-def test_geocoding_exception():
-    """Test geocoding api."""
-    address = "Goregaon West, Mumbai 400062, India"
-    api = Api()
-    with pytest.raises(Exception):
-        api.get_geocoding(query=address)
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
