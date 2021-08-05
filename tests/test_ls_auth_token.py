@@ -30,7 +30,7 @@ def test_ls_geocoding_auth_token():
         del os.environ["LS_API_KEY"]
         address = "200 S Mathilda Sunnyvale CA"
         credentials = PlatformCredentials.from_default()
-        ls = LS(platfrom_credentials=credentials)
+        ls = LS(platform_credentials=credentials)
         resp = ls.geocode(query=address, limit=2)
         assert isinstance(resp, GeocoderResponse)
         assert resp.__str__()
@@ -49,7 +49,7 @@ def test_ls_geocoding_auth_token():
 def test_matrix_route_auth_token():
     """Test Matrix routing using auth token."""
     platform_credentials = PlatformCredentials.from_default()
-    ls = LS(platfrom_credentials=platform_credentials)
+    ls = LS(platform_credentials=platform_credentials)
     origins = [
         {"lat": 37.76, "lng": -122.42},
         {"lat": 40.63, "lng": -74.09},

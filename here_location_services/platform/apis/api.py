@@ -17,7 +17,7 @@ class Api:
     def __init__(self, access_token, proxies: Optional[dict] = None):
         self.access_token = access_token
         self._user_agent = "dhpy"
-        self.proxies = proxies or urllib.request.getproxies()
+        self.proxies: Optional[dict] = proxies or urllib.request.getproxies()
 
     @property
     def headers(self) -> dict:
