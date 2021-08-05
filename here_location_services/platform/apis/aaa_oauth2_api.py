@@ -28,14 +28,8 @@ class AAAOauth2Api(Api):
         base_url: str,
         proxies: Optional[dict] = None,
     ):
-        """
-        Instantiate API with auth token.
-
-        :param proxies: an optional proxy configuration. Defaults to the environment proxy
-        configuration.
-        """
         self.base_url = base_url
-        self.proxies = proxies
+        self.proxies: Optional[Dict] = proxies
         super().__init__(
             access_token=None,
             proxies=self.proxies,

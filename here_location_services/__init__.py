@@ -7,3 +7,4 @@ This module contains top level imports for ``here_location_services`` package.
 
 from .__version__ import __version__  # noqa: F401
 from .ls import LS  # noqa: F401
+from .platform.credentials import PlatformCredentials  # noqa: F401

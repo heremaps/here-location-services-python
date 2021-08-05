@@ -29,3 +29,4 @@ Submodules
    here_location_services.responses
    here_location_services.routing_api.rst
    here_location_services.utils
+   here_location_services.platform

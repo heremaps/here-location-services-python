@@ -55,40 +55,40 @@ class LS:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        platfrom_credentials: Optional[PlatformCredentials] = None,
+        platform_credentials: Optional[PlatformCredentials] = None,
         proxies: Optional[dict] = None,
         country: str = "row",
     ):
         api_key = api_key or os.environ.get("LS_API_KEY")
+        self.auth: Optional[Auth] = None
         if not api_key:
-            credentials = platfrom_credentials or PlatformCredentials.from_default()
+            credentials = platform_credentials or PlatformCredentials.from_default()
             aaa_oauth2_api = AAAOauth2Api(
                 base_url=credentials.cred_properties["endpoint"], proxies={}
             )
-            auth = Auth(credentials=credentials, aaa_oauth2_api=aaa_oauth2_api)
-        else:
-            auth = None
+            self.auth = Auth(credentials=credentials, aaa_oauth2_api=aaa_oauth2_api)
+
         self.proxies = proxies or urllib.request.getproxies()
         self.geo_search_api = GeocodingSearchApi(
             api_key=api_key,
-            auth=auth,
+            auth=self.auth,
             proxies=proxies,
             country=country,
         )
         self.isoline_routing_api = IsolineRoutingApi(
             api_key=api_key,
-            auth=auth,
+            auth=self.auth,
             proxies=proxies,
             country=country,
         )
         self.routing_api = RoutingApi(
             api_key=api_key,
-            auth=auth,
+            auth=self.auth,
             proxies=proxies,
             country=country,
         )
         self.matrix_routing_api = MatrixRoutingApi(
-            api_key=api_key, auth=auth, proxies=proxies, country=country
+            api_key=api_key, auth=self.auth, proxies=proxies, country=country
         )
 
     def geocode(self, query: str, limit: int = 20, lang: str = "en-US") -> GeocoderResponse:
