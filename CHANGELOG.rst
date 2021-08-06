@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+here-location-services 0.3.0 (2021-07-22)
+-----------------------------------------
+
+- Fixed Via waypoint and place options for routing.
+- Added interactive examples in the documentation.
+
 here-location-services 0.2.0 (2021-04-19)
 -----------------------------------------
 
