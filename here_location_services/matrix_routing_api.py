@@ -9,13 +9,14 @@ import requests
 from here_location_services.platform.auth import Auth
 
 from .apis import Api
+
+from .config.base_config import Truck
 from .config.matrix_routing_config import (
     AutoCircleRegion,
     AvoidBoundingBox,
     BoundingBoxRegion,
     CircleRegion,
     PolygonRegion,
-    Truck,
     WorldRegion,
 )
 from .exceptions import ApiError
@@ -39,7 +40,11 @@ class MatrixRoutingApi(Api):
         async_req: str,
         origins: List[Dict],
         region_definition: Union[
-            CircleRegion, BoundingBoxRegion, PolygonRegion, AutoCircleRegion, WorldRegion
+            CircleRegion,
+            BoundingBoxRegion,
+            PolygonRegion,
+            AutoCircleRegion,
+            WorldRegion,
         ],
         destinations: Optional[List[Dict]] = None,
         profile: Optional[str] = None,
@@ -92,7 +97,11 @@ class MatrixRoutingApi(Api):
         self,
         origins: List[Dict],
         region_definition: Union[
-            CircleRegion, BoundingBoxRegion, PolygonRegion, AutoCircleRegion, WorldRegion
+            CircleRegion,
+            BoundingBoxRegion,
+            PolygonRegion,
+            AutoCircleRegion,
+            WorldRegion,
         ],
         destinations: Optional[List[Dict]] = None,
         profile: Optional[str] = None,
@@ -156,7 +165,11 @@ class MatrixRoutingApi(Api):
         self,
         origins: List[Dict],
         region_definition: Union[
-            CircleRegion, BoundingBoxRegion, PolygonRegion, AutoCircleRegion, WorldRegion
+            CircleRegion,
+            BoundingBoxRegion,
+            PolygonRegion,
+            AutoCircleRegion,
+            WorldRegion,
         ],
         destinations: Optional[List[Dict]] = None,
         profile: Optional[str] = None,

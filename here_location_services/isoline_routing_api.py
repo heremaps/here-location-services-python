@@ -3,12 +3,13 @@
 
 """This module contains classes for accessing `HERE Routing API <https://developer.here.com/documentation/routing/dev_guide/topics/request-isoline.html>`_.
 """  # noqa E501
-
-from typing import Dict, List, Optional
+from datetime import datetime
+from typing import Dict, List, Optional, Any
 
 import requests
 
 from here_location_services.platform.auth import Auth
+from .config.base_config import Truck
 
 from .apis import Api
 from .exceptions import ApiError
@@ -29,13 +30,17 @@ class IsolineRoutingApi(Api):
 
     def get_isoline_routing(
         self,
-        transportMode: str,
         range: str,
         range_type: str,
-        origin: Optional[List[float]] = None,
-        destination: Optional[List[float]] = None,
-        arrival: Optional[str] = None,
-        departureTime: Optional[str] = None,
+        transportMode: str,
+        origin: Optional[List] = None,
+        departureTime: Optional[datetime] = None,
+        destination: Optional[List] = None,
+        arrivalTime: Optional[datetime] = None,
+        routing_mode: Optional[str] = "fast",
+        optimised_for: Optional[str] = "balanced",
+        avoid_features: Optional[List[str]] = None,
+        truck: Optional[Truck] = None,
     ) -> requests.Response:
         """Get isoline routing.
 
@@ -43,29 +48,31 @@ class IsolineRoutingApi(Api):
         leaving from one defined center with either a specified length
         or specified travel time.
 
-        :param mode: A string representing how the route is calculated.
-            Example: ``Type;TransportModes;TrafficMode;Feature``.
-            ``fastest;car;traffic:disabled;motorway:-3``
         :param range: A string representing a range of isoline, unit is defined by
             parameter range type. Example: range='1000' or range='1000,2000,3000'
         :param range_type: A string representing a type of ``range``. Possible values are
             ``distance``, ``time`` and ``consumption``. For distance the unit meters. For a
-            time the unit is seconds.For consumption, it is defined by the consumption
+            time the unit is seconds. For consumption, it is defined by the consumption
             model.
-        :param start: A list of latitude and longitude representing the center of isoline
-            request. Isoline will cover all the roads which can be reached from this
-            point within a given range. It can not be used in combination with the
-            ``destination`` parameter.
-        :param destination: A list of latitude and longitude representing the center of
-            isoline request. Isoline will cover all roads from which this point can be
-            reached within a given range. It can not be used in combination with the
-            ``start`` parameter.
-        :param arrival: A string representing the time when travel is expected to end.
-            It can be used only if the parameter ``destination`` is also used.
-            Example: arrival= '2013-07-04T17:00:00+02'.
-        :param departure: A string representing the time when travel is expected to
-            start. It can be used only if the parameter ``start`` is also used.
-            Example: departure= '2013-07-04T17:00:00+02'
+        :param transportMode: A string representing Mode of transport to be used for the calculation of the isolines.
+            Example: ``car``.
+        :param origin: Center of the isoline request. The Isoline(s) will cover the region
+            which can be reached from this point within given range. It cannot be used in
+            combination with ``destination`` parameter.
+        :param departureTime: Specifies the time of departure as defined by either date-time
+            or full-date T partial-time in RFC 3339, section 5.6 (for example, 2019-06-24T01:23:45).
+            The requested time is converted to the local time at origin. When the optional timezone
+            offset is not specified, time is assumed to be local. If neither departureTime or
+            arrivalTime are specified, current time at departure location will be used. All Time
+            values in the response are returned in the timezone of each location.
+        :param destination: Center of the isoline request. The Isoline(s) will cover the
+            region within the specified range that can reach this point. It cannot be used
+            in combination with ``origin`` parameter.
+        :param arrivalTime: Specifies the time of arrival as defined by either date-time or
+            full-date T partial-time in RFC 3339, section 5.6 (for example, 2019-06-24T01:23:45).
+            The requested time is converted to the local time at destination. When the optional
+            timezone offset is not specified, time is assumed to be local. All Time values in
+            the response are returned in the timezone of each location.
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200.
         """
@@ -77,13 +84,22 @@ class IsolineRoutingApi(Api):
             "transportMode": transportMode,
         }
         if origin:
-            params["origin"] = f"{origin[0]},{origin[1]}"
+            params["origin"] = (",".join([str(i) for i in origin]),)
         if destination:
-            params["destination"] = f"{destination[0]},{destination[1]}"
-        if arrival:
-            params["arrivalTime"] = arrival
+            params["destination"] = (",".join([str(i) for i in destination]),)
+        if arrivalTime:
+            params["arrivalTime"] = arrivalTime.isoformat(timespec="seconds")
         if departureTime:
-            params["departureTime"] = departureTime
+            params["departureTime"] = departureTime.isoformat(timespec="seconds")
+        if routing_mode:
+            params["routingMode"] = routing_mode
+        if optimised_for:
+            params["optimizeFor"] = optimised_for
+        if avoid_features:
+            avoid: Dict[str, Any] = {"features": avoid_features}
+            params["avoid"] = avoid
+        if truck:
+            params["truck"] = {k: v for k, v in vars(truck).items() if v is not None}
         resp = self.get(url, params=params, proxies=self.proxies)
         if resp.status_code == 200:
             return resp

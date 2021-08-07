@@ -4,32 +4,9 @@
 """This module defines all the configs which will be required as inputs to routing APIs."""
 
 import json
-from typing import List, Optional
+from typing import Optional
 
-from .base_config import Bunch
-
-
-class RoutingMode(Bunch):
-    """A Class to define constant values for Routing Modes.
-
-    ``fast``:
-    Route calculation from start to destination optimized by travel time. In many cases, the route
-    returned by the fast mode may not be the route with the fastest possible travel time.
-    For example, the routing service may favor a route that remains on a highway, even
-    if a faster travel time can be achieved by taking a detour or shortcut through
-    an inconvenient side road.
-
-    ``short``:
-    Route calculation from start to destination disregarding any speed information. In this mode,
-    the distance of the route is minimized, while keeping the route sensible. This includes,
-    for example, penalizing turns. Because of that, the resulting route will not necessarily be
-    the one with minimal distance.
-    """
-
-
-#: Use this config for routing_mode of routing API.
-#: Example: for ``fast`` routing_mode use ``ROUTING_MODE.fast``.
-ROUTING_MODE = RoutingMode(**{"fast": "fast", "short": "short"})
+from .base_config import Bunch, PlaceOptions, WayPointOptions
 
 
 class RoutingReturn(Bunch):
@@ -195,86 +172,6 @@ AVOID_FEATURES = AvoidFeatures(
         "difficultTurns": "difficultTurns",
     }
 )
-
-
-class PlaceOptions:
-    """A class to define ``PlaceOptions`` for ``origin``/ ``via``/ ``destination``.
-
-    Various options can be found here:
-
-    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>`_.
-    """  # noqa E501
-
-    def __init__(
-        self,
-        course: Optional[int] = None,
-        sideof_street_hint: Optional[List[float]] = None,
-        match_sideof_street: Optional[str] = None,
-        namehint: Optional[str] = None,
-        radius: Optional[int] = None,
-        min_course_distance: Optional[int] = None,
-    ):
-        """Object Initializer.
-
-        :param course: An int representing degrees clock-wise from north.
-            Indicating the desired direction at the place. E.g. 90 indicating ``east``.
-            This is defined in constant ``ROUTE_COURSE``.
-        :param sideof_street_hint: A list of latitude and longitude.Indicating the side of the
-            street that should be used.
-        :param match_sideof_street: Specifies how the location set by ``sideof_street_hint`` should
-            be handled. If this is set then sideof_street_hint should also be set. There are two
-            valid values for match_sideof_street:
-
-            ``always``:
-            Always prefer the given side of street.
-
-            ``onlyIfDivided``:
-            Only prefer using side of street set by ``sideof_street_hint`` in case the street
-            has dividers. This is the default behavior.
-
-            These values are mainted as config in:
-            :attr:`ROUTE_MATCH_SIDEOF_STREET <here_location_services.config.routing_config.ROUTE_MATCH_SIDEOF_STREET>`
-        :param namehint: A string for the router to look for the place with the most similar name.
-            This can e.g. include things like: North being used to differentiate between
-            interstates I66 North and I66 South, Downtown Avenue being used to correctly
-            select a residential street.
-        :param radius: In meters Asks the router to consider all places within the given radius as
-            potential candidates for route calculation. This can be either because it is not
-            important which place is used, or because it is unknown. Radius more than 200 meters
-            are not supported.
-        :param min_course_distance: In meters Asks the routing service to try to find a route that
-            avoids actions for the indicated distance. E.g. if the origin is determined by a moving
-            vehicle, the user might not have time to react to early actions.
-        """  # noqa E501
-        self.course = course
-        self.sideOfStreetHint: Optional[str] = None
-        if sideof_street_hint is not None:
-            self.sideOfStreetHint = ",".join([str(point) for point in sideof_street_hint])
-        self.matchSideOfStreet = match_sideof_street
-        self.namehint = namehint
-        self.radius = radius
-        self.minCourseDistance = min_course_distance
-
-    def __repr__(self):
-        """Return string representation of this instance."""
-        return json.dumps(self.__dict__)
-
-
-class WayPointOptions:
-    """A class to define ``PlaceOptions`` for ``via``/ ``destination``.
-
-    Various options can be found here:
-
-    `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>`_.
-    """  # noqa E501
-
-    def __init__(self, stop_duration: Optional[int] = None, pass_through: Optional[bool] = None):
-        self.stopDuration = stop_duration
-        self.passThrough = pass_through
-
-    def __repr__(self):
-        """Return string representation of this instance."""
-        return json.dumps(self.__dict__)
 
 
 class Scooter:

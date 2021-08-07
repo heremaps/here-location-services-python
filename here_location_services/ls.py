@@ -11,14 +11,14 @@ from time import sleep
 from typing import Dict, List, Optional, Union
 
 from here_location_services.config.routing_config import (
-    PlaceOptions,
     Scooter,
     Via,
-    WayPointOptions,
 )
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
 from here_location_services.platform.auth import Auth
 from here_location_services.platform.credentials import PlatformCredentials
+
+from .config.base_config import Truck, PlaceOptions, WayPointOptions
 
 from .config.matrix_routing_config import (
     AutoCircleRegion,
@@ -26,7 +26,6 @@ from .config.matrix_routing_config import (
     BoundingBoxRegion,
     CircleRegion,
     PolygonRegion,
-    Truck,
     WorldRegion,
 )
 from .exceptions import ApiError
@@ -139,13 +138,17 @@ class LS:
 
     def calculate_isoline(
         self,
-        transportMode: str,
         range: str,
         range_type: str,
-        origin: Optional[List[float]] = None,
-        destination: Optional[List[float]] = None,
-        arrival: Optional[str] = None,
-        departureTime: Optional[str] = None,
+        transportMode: str,
+        origin: Optional[List] = None,
+        departureTime: Optional[datetime] = None,
+        destination: Optional[List] = None,
+        arrivalTime: Optional[datetime] = None,
+        routing_mode: Optional[str] = "fast",
+        optimised_for: Optional[str] = "balanced",
+        avoid_features: Optional[List[str]] = None,
+        truck: Optional[Truck] = None,
     ) -> IsolineResponse:
         """Calculate isoline routing.
 
@@ -186,20 +189,27 @@ class LS:
             raise ValueError("please provide either `origin` or `destination`.")
         if departureTime and origin is None:
             raise ValueError("`departureTime` must be provided with `origin`")
-        if arrival and destination is None:
+        if arrivalTime and destination is None:
             raise ValueError("`arrival` must be provided with `destination`")
 
         resp = self.isoline_routing_api.get_isoline_routing(
-            transportMode=transportMode,
             range=range,
             range_type=range_type,
+            transportMode=transportMode,
             origin=origin,
-            destination=destination,
-            arrival=arrival,
             departureTime=departureTime,
+            destination=destination,
+            arrivalTime=arrivalTime,
+            routing_mode=routing_mode,
+            optimised_for=optimised_for,
+            avoid_features=avoid_features,
+            truck=truck,
         )
-        response = resp.json()
-        return IsolineResponse.new(response)
+        response = IsolineResponse.new(resp.json())
+
+        if response.notices:
+            raise ValueError("Isolines could not be calculated.")
+        return response
 
     def discover(
         self,

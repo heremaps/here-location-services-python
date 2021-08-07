@@ -7,12 +7,15 @@
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from here_location_services.config.matrix_routing_config import AvoidBoundingBox, Truck
-from here_location_services.config.routing_config import (
+from here_location_services.config.base_config import (
+    Truck,
     PlaceOptions,
+    WayPointOptions,
+)
+from here_location_services.config.matrix_routing_config import AvoidBoundingBox
+from here_location_services.config.routing_config import (
     Scooter,
     Via,
-    WayPointOptions,
 )
 from here_location_services.platform.auth import Auth
 

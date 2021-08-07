@@ -74,7 +74,7 @@ class IsolineResponse(ApiResponse):
 
     def __init__(self, **kwargs):
         super().__init__()
-        self._filters = {"departure": None, "isolines": None}
+        self._filters = {"departure": None, "isolines": None, "notices": None}
         for param, default in self._filters.items():
             setattr(self, param, kwargs.get(param, default))
 
@@ -88,7 +88,6 @@ class IsolineResponse(ApiResponse):
                 lstring = [(coord[1], coord[0]) for coord in lstring]
                 f = Feature(geometry=LineString(lstring), properties=polygon)
                 feature_collection.features.append(f)
-        print(feature_collection)
         return feature_collection
 
 

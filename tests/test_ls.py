@@ -10,17 +10,23 @@ import pytz
 from geojson import FeatureCollection
 
 from here_location_services import LS
+
+from here_location_services.config.base_config import (
+    ROUTING_MODE,
+    SHIPPED_HAZARDOUS_GOODS,
+    Truck,
+    PlaceOptions,
+    WayPointOptions,
+)
 from here_location_services.config.matrix_routing_config import (
     AVOID_FEATURES,
     MATRIX_ATTRIBUTES,
     PROFILE,
-    SHIPPED_HAZARDOUS_GOODS,
     AutoCircleRegion,
     AvoidBoundingBox,
     BoundingBoxRegion,
     CircleRegion,
     PolygonRegion,
-    Truck,
     WorldRegion,
 )
 from here_location_services.config.routing_config import (
@@ -29,15 +35,17 @@ from here_location_services.config.routing_config import (
 from here_location_services.config.routing_config import (
     ROUTE_COURSE,
     ROUTE_MATCH_SIDEOF_STREET,
-    ROUTING_MODE,
     ROUTING_RETURN,
     ROUTING_SPANS,
     ROUTING_TRANSPORT_MODE,
-    PlaceOptions,
     Scooter,
     Via,
-    WayPointOptions,
 )
+from here_location_services.config.isoline_routing_config import (
+    ISOLINE_ROUTING_TRANSPORT_MODE,
+    OPTIMISED_FOR,
+)
+
 from here_location_services.config.search_config import PLACES_CATEGORIES
 from here_location_services.exceptions import ApiError
 from here_location_services.responses import GeocoderResponse
@@ -108,11 +116,10 @@ def test_isonline_routing():
         origin=[52.5, 13.4],
         range="3000",
         range_type="time",
-        transportMode="car",
-        departureTime="2021-08-05T18:53:27+00:00",
+        transportMode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+        departureTime=datetime.now(),
     )
 
-    print(result)
     assert result.isolines
     assert result.departure
     coordinates = result.isolines[0]["polygons"][0]["outer"]
@@ -121,32 +128,30 @@ def test_isonline_routing():
     geo_json = result.to_geojson()
     assert geo_json.type == "FeatureCollection"
 
-    # result2 = ls.calculate_isoline(
-    #     destination=[52.5, 13.4],
-    #     range="900",
-    #     range_type="time",
-    #     transportMode="car",
-    #     arrival="2021-08-05T18:53:27+00:00",
-    # )
-    # coordinates = result2.isoline[0]["component"][0]["shape"]
-    # assert coordinates[0]
-
-    # with pytest.raises(ValueError):
-    #     ls.calculate_isoline(
-    #         origin=[52.5, 13.4],
-    #         range="900",
-    #         range_type="time",
-    #         transportMode="car",
-    #         destination=[52.5, 13.4],
-    #     )
-    # with pytest.raises(ApiError):
-    #     ls2 = LS(api_key="dummy")
-    #     ls2.calculate_isoline(
-    #         origin=[52.5, 13.4],
-    #         range="900",
-    #         range_type="time",
-    #         transportMode="car",
-    #     )
+    with pytest.raises(ValueError):
+        ls.calculate_isoline(
+            destination=[82.8628, 135.00],
+            range="3000",
+            range_type="distance",
+            transportMode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+            arrivalTime=datetime.now(),
+        )
+    with pytest.raises(ValueError):
+        ls.calculate_isoline(
+            origin=[52.5, 13.4],
+            range="900",
+            range_type="time",
+            transportMode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+            destination=[52.5, 13.4],
+        )
+    with pytest.raises(ApiError):
+        ls2 = LS(api_key="dummy")
+        ls2.calculate_isoline(
+            origin=[52.5, 13.4],
+            range="900",
+            range_type="time",
+            transportMode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+        )
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
@@ -164,7 +169,7 @@ def test_isonline_routing_exception():
             range="900",
             range_type="time",
             transportMode="car",
-            arrival="2021-08-05T18:53:27+00:00",
+            arrivalTime=datetime.now(),
             origin=[52.5, 13.4],
         )
     with pytest.raises(ValueError):
@@ -172,7 +177,7 @@ def test_isonline_routing_exception():
             range="900",
             range_type="time",
             transportMode="car",
-            departureTime="2021-08-05T18:53:27+00:00",
+            departureTime=datetime.now(),
             destination=[52.5, 13.4],
         )
 
