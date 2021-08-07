@@ -24,9 +24,9 @@ class ApiResponse:
 
     def as_json_string(self, encoding: str = "utf8"):
         """Return API response as json string."""
-        json_string = json.dumps(self.response, sort_keys=True, ensure_ascii=False).encode(
-            encoding
-        )
+        json_string = json.dumps(
+            self.response, sort_keys=True, ensure_ascii=False
+        ).encode(encoding)
         return json_string.decode()
 
     def to_geojson(self):
@@ -34,7 +34,8 @@ class ApiResponse:
         feature_collection = FeatureCollection([])
         for item in self.response["items"]:
             f = Feature(
-                geometry=Point((item["position"]["lng"], item["position"]["lat"])), properties=item
+                geometry=Point((item["position"]["lng"], item["position"]["lat"])),
+                properties=item,
             )
             feature_collection.features.append(f)
         return feature_collection
@@ -73,18 +74,22 @@ class IsolineResponse(ApiResponse):
 
     def __init__(self, **kwargs):
         super().__init__()
-        self._filters = {"metaInfo": None, "center": None, "isoline": None, "start": None}
+        self._filters = {"departure": None, "isolines": None}
         for param, default in self._filters.items():
             setattr(self, param, kwargs.get(param, default))
 
     def to_geojson(self):
         """Return API response as GeoJSON."""
-        points = []
-        for latlons in self.isoline[0]["component"][0]["shape"]:
-            latlon = [float(i) for i in latlons.split(",")]
-            points.append((latlon[1], latlon[0]))
-        feature = Feature(geometry=Polygon([points]))
-        return feature
+        feature_collection = FeatureCollection([])
+        for isoline in self.response["isolines"]:
+            for polygon in isoline["polygons"]:
+                polyline = polygon["outer"]
+                lstring = fp.decode(polyline)
+                lstring = [(coord[1], coord[0]) for coord in lstring]
+                f = Feature(geometry=LineString(lstring), properties=polygon)
+                feature_collection.features.append(f)
+        print(feature_collection)
+        return feature_collection
 
 
 class DiscoverResponse(ApiResponse):
@@ -158,7 +163,8 @@ class MatrixRoutingResponse(ApiResponse):
             distances = self.matrix.get("distances")
             dest_count = self.matrix.get("numDestinations")
             nested_distances = [
-                distances[i : i + dest_count] for i in range(0, len(distances), dest_count)
+                distances[i : i + dest_count]
+                for i in range(0, len(distances), dest_count)
             ]
             return DataFrame(nested_distances, columns=range(dest_count))
 
@@ -168,6 +174,7 @@ class MatrixRoutingResponse(ApiResponse):
             distances = self.matrix.get("travelTimes")
             dest_count = self.matrix.get("numDestinations")
             nested_distances = [
-                distances[i : i + dest_count] for i in range(0, len(distances), dest_count)
+                distances[i : i + dest_count]
+                for i in range(0, len(distances), dest_count)
             ]
             return DataFrame(nested_distances, columns=range(dest_count))

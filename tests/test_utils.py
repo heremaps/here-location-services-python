@@ -10,7 +10,6 @@ def test_get_apikey():
     """Test ``get_apikey`` returns empty string when
     environment variable ``LS_API_KEY`` is not set.
     """
-    os.environ["LS_API_KEY"] = "TKURWbpJHcbzmWMrmTZwGAdSTLrX8WY1oddj4S4U-EM"
     api_key = os.environ.get("LS_API_KEY")
     del os.environ["LS_API_KEY"]
     key = get_apikey()

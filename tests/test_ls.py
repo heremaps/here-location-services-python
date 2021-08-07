@@ -111,21 +111,21 @@ def test_isonline_routing():
         transportMode="car",
         departureTime="2021-08-05T18:53:27+00:00",
     )
-    print(result.as_json_string())
-    print(json.loads(result.as_json_string))
-    coordinates = result.isoline[0]["component"][0]["shape"]
 
-    assert coordinates[0]
+    print(result)
+    # print(result.isolines[0]["polygons"][0]["outer"])
+    coordinates = result.isolines[0]["polygons"][0]["outer"]
+
+    assert coordinates
     geo_json = result.to_geojson()
-    assert geo_json.type == "Feature"
-    assert geo_json.geometry.type == "Polygon"
+    assert geo_json.type == "FeatureCollection"
 
     result2 = ls.calculate_isoline(
         destination=[52.5, 13.4],
         range="900",
         range_type="time",
         transportMode="car",
-        arrival="2020-05-04T17:00:00+02",
+        arrival="2021-08-05T18:53:27+00:00",
     )
     coordinates = result2.isoline[0]["component"][0]["shape"]
     assert coordinates[0]
@@ -163,7 +163,7 @@ def test_isonline_routing_exception():
             range="900",
             range_type="time",
             transportMode="car",
-            arrival="2020-05-04T17:00:00+02",
+            arrival="2021-08-05T18:53:27+00:00",
             origin=[52.5, 13.4],
         )
     with pytest.raises(ValueError):
@@ -171,7 +171,7 @@ def test_isonline_routing_exception():
             range="900",
             range_type="time",
             transportMode="car",
-            departureTime="2020-05-04T17:00:00+02",
+            departureTime="2021-08-05T18:53:27+00:00",
             destination=[52.5, 13.4],
         )
 

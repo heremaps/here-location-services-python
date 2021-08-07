@@ -72,12 +72,6 @@ class IsolineRoutingApi(Api):
         path = "v8/isolines"
         url = f"{self._base_url}/{path}"
         params: Dict[str, str] = {
-            # "range": range,
-            # "rangetype": range_type,
-            # "range": {
-            #     "type": range_type,
-            #     "values": range,
-            # }
             "range[type]": range_type,
             "range[values]": range,
             "transportMode": transportMode,
