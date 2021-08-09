@@ -9,7 +9,6 @@ import requests
 from here_location_services.platform.auth import Auth
 
 from .apis import Api
-
 from .config.base_config import Truck
 from .config.matrix_routing_config import (
     AutoCircleRegion,
@@ -140,7 +139,7 @@ class MatrixRoutingApi(Api):
         :param avoid_areas: A list of areas to avoid during route calculation. To define avoid area
             use object of :class:`AvoidBoundingBox here_location_services.config.matrix_routing_config.AvoidBoundingBox>`
         :param truck: Different truck options to use during route calculation when
-            transportMode = truck. use object of :class:`Truck here_location_services.config.matrix_routing_config.Truck>`
+            transportMode = truck. use object of :class:`Truck here_location_services.config.base_config.Truck>`
         :param matrix_attributes: Defines which attributes are included in the response as part of
             the data representation of the matrix entries summaries. Matrix attributes are defined
             in :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>`

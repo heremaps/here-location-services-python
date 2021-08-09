@@ -166,9 +166,7 @@ class PlaceOptions:
         self.course = course
         self.sideOfStreetHint: Optional[str] = None
         if sideof_street_hint is not None:
-            self.sideOfStreetHint = ",".join(
-                [str(point) for point in sideof_street_hint]
-            )
+            self.sideOfStreetHint = ",".join([str(point) for point in sideof_street_hint])
         self.matchSideOfStreet = match_sideof_street
         self.namehint = namehint
         self.radius = radius
@@ -187,9 +185,7 @@ class WayPointOptions:
     `PlaceOptions <https://developer.here.com/documentation/routing-api/8.16.0/api-reference-swagger.html>`_.
     """  # noqa E501
 
-    def __init__(
-        self, stop_duration: Optional[int] = None, pass_through: Optional[bool] = None
-    ):
+    def __init__(self, stop_duration: Optional[int] = None, pass_through: Optional[bool] = None):
         self.stopDuration = stop_duration
         self.passThrough = pass_through
 

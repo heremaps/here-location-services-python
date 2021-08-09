@@ -9,7 +9,6 @@ import pytz
 
 from here_location_services import LS
 from here_location_services.config.base_config import ROUTING_MODE
-
 from here_location_services.config.matrix_routing_config import (
     AVOID_FEATURES,
     MATRIX_ATTRIBUTES,
@@ -59,9 +58,7 @@ def test_matrix_route_auth_token():
     ]
     region_definition = WorldRegion()
     matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
-    avoid_areas = AvoidBoundingBox(
-        68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078
-    )
+    avoid_areas = AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
     result = ls.matrix(
         origins=origins,
         region_definition=region_definition,

@@ -10,14 +10,14 @@ import pytz
 from geojson import FeatureCollection
 
 from here_location_services import LS
-
 from here_location_services.config.base_config import (
     ROUTING_MODE,
     SHIPPED_HAZARDOUS_GOODS,
-    Truck,
     PlaceOptions,
+    Truck,
     WayPointOptions,
 )
+from here_location_services.config.isoline_routing_config import ISOLINE_ROUTING_TRANSPORT_MODE
 from here_location_services.config.matrix_routing_config import (
     AVOID_FEATURES,
     MATRIX_ATTRIBUTES,
@@ -29,9 +29,7 @@ from here_location_services.config.matrix_routing_config import (
     PolygonRegion,
     WorldRegion,
 )
-from here_location_services.config.routing_config import (
-    AVOID_FEATURES as ROUTING_AVOID_FEATURES,
-)
+from here_location_services.config.routing_config import AVOID_FEATURES as ROUTING_AVOID_FEATURES
 from here_location_services.config.routing_config import (
     ROUTE_COURSE,
     ROUTE_MATCH_SIDEOF_STREET,
@@ -41,11 +39,6 @@ from here_location_services.config.routing_config import (
     Scooter,
     Via,
 )
-from here_location_services.config.isoline_routing_config import (
-    ISOLINE_ROUTING_TRANSPORT_MODE,
-    OPTIMISED_FOR,
-)
-
 from here_location_services.config.search_config import PLACES_CATEGORIES
 from here_location_services.exceptions import ApiError
 from here_location_services.responses import GeocoderResponse
@@ -117,7 +110,7 @@ def test_isonline_routing():
         range="3000",
         range_type="time",
         transportMode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
-        departureTime=datetime.now(),
+        departure_time=datetime.now(),
     )
 
     assert result.isolines
@@ -134,7 +127,7 @@ def test_isonline_routing():
             range="3000",
             range_type="distance",
             transportMode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
-            arrivalTime=datetime.now(),
+            arrival_time=datetime.now(),
         )
     with pytest.raises(ValueError):
         ls.calculate_isoline(
@@ -169,7 +162,7 @@ def test_isonline_routing_exception():
             range="900",
             range_type="time",
             transportMode="car",
-            arrivalTime=datetime.now(),
+            arrival_time=datetime.now(),
             origin=[52.5, 13.4],
         )
     with pytest.raises(ValueError):
@@ -177,7 +170,7 @@ def test_isonline_routing_exception():
             range="900",
             range_type="time",
             transportMode="car",
-            departureTime=datetime.now(),
+            departure_time=datetime.now(),
             destination=[52.5, 13.4],
         )
 
@@ -185,9 +178,7 @@ def test_isonline_routing_exception():
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
 def test_ls_discover():
     ls = LS(api_key=LS_API_KEY)
-    result = ls.discover(
-        query="starbucks", center=[19.1663, 72.8526], radius=10000, lang="en"
-    )
+    result = ls.discover(query="starbucks", center=[19.1663, 72.8526], radius=10000, lang="en")
     assert len(result.items) == 20
 
     result2 = ls.discover(
@@ -213,9 +204,7 @@ def test_ls_discover():
 
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
-        ls2.discover(
-            query="starbucks", center=[19.1663, 72.8526], radius=10000, limit=10
-        )
+        ls2.discover(query="starbucks", center=[19.1663, 72.8526], radius=10000, limit=10)
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
@@ -282,18 +271,14 @@ def test_ls_lookup():
 
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
-        ls2.lookup(
-            location_id="here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2"
-        )
+        ls2.lookup(location_id="here:pds:place:276u0vhj-b0bace6448ae4b0fbc1d5e323998a7d2")
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
 def test_car_route():
     """Test routing API for car route."""
     ls = LS(api_key=LS_API_KEY)
-    avoid_areas = [
-        AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
-    ]
+    avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
     avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
     via1 = Via(lat=52.52426, lng=13.43000)
     via2 = Via(lat=52.52624, lng=13.44012)
@@ -308,16 +293,12 @@ def test_car_route():
         avoid_features=avoid_features,
         exclude=["IND", "NZL", "AUS"],
     )
-    assert result.response["routes"][0]["sections"][0]["departure"]["place"][
-        "location"
-    ] == {
+    assert result.response["routes"][0]["sections"][0]["departure"]["place"]["location"] == {
         "lat": 52.5137479,
         "lng": 13.4246242,
         "elv": 76.0,
     }
-    assert result.response["routes"][0]["sections"][1]["departure"]["place"][
-        "location"
-    ] == {
+    assert result.response["routes"][0]["sections"][1]["departure"]["place"]["location"] == {
         "lat": 52.5242323,
         "lng": 13.4301462,
         "elv": 80.0,
@@ -392,9 +373,7 @@ def test_car_route_extra_options():
 def test_bicycle_route():
     """Test routing API for car route."""
     ls = LS(api_key=LS_API_KEY)
-    avoid_areas = [
-        AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
-    ]
+    avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
     avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
     via = Via(lat=52.52426, lng=13.43000)
     _ = ls.bicycle_route(
@@ -424,9 +403,7 @@ def test_truck_route():
         tunnel_category="B",
         axle_count=4,
     )
-    avoid_areas = [
-        AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
-    ]
+    avoid_areas = [AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)]
     avoid_features = [ROUTING_AVOID_FEATURES.tollRoad]
     via = Via(lat=52.52426, lng=13.43000)
     _ = ls.truck_route(
@@ -530,9 +507,7 @@ def test_matrix_route():
     ]
     region_definition = WorldRegion()
     matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
-    avoid_areas = AvoidBoundingBox(
-        68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078
-    )
+    avoid_areas = AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
     assert json.loads(avoid_areas.__str__()) == {
         "type": "boundingBox",
         "north": 68.1766451354,
@@ -594,9 +569,7 @@ def test_matrix_route_async():
     ]
     region_definition = WorldRegion()
     matrix_attributes = [MATRIX_ATTRIBUTES.distances, MATRIX_ATTRIBUTES.travelTimes]
-    avoid_areas = AvoidBoundingBox(
-        68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078
-    )
+    avoid_areas = AvoidBoundingBox(68.1766451354, 7.96553477623, 97.4025614766, 35.4940095078)
     truck = Truck(
         shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
         gross_weight=100,

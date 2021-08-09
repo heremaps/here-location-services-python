@@ -108,9 +108,7 @@ class MatrixAttributes(Bunch):
 
 #: Use this config for matrix_attributes of matrix Routing API.
 #: Example: for ``travelTimes`` matrix_attributes  use ``MATRIX_ATTRIBUTES.travelTimes``.
-MATRIX_ATTRIBUTES = MatrixAttributes(
-    **{"travelTimes": "travelTimes", "distances": "distances"}
-)
+MATRIX_ATTRIBUTES = MatrixAttributes(**{"travelTimes": "travelTimes", "distances": "distances"})
 
 
 class AvoidFeatures(Bunch):

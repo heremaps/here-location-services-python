@@ -8,7 +8,7 @@ This module contains classes for accessing the responses from Location Services 
 import json
 
 import flexpolyline as fp
-from geojson import Feature, FeatureCollection, LineString, Point, Polygon
+from geojson import Feature, FeatureCollection, LineString, Point
 from pandas import DataFrame
 
 
@@ -24,9 +24,9 @@ class ApiResponse:
 
     def as_json_string(self, encoding: str = "utf8"):
         """Return API response as json string."""
-        json_string = json.dumps(
-            self.response, sort_keys=True, ensure_ascii=False
-        ).encode(encoding)
+        json_string = json.dumps(self.response, sort_keys=True, ensure_ascii=False).encode(
+            encoding
+        )
         return json_string.decode()
 
     def to_geojson(self):
@@ -162,8 +162,7 @@ class MatrixRoutingResponse(ApiResponse):
             distances = self.matrix.get("distances")
             dest_count = self.matrix.get("numDestinations")
             nested_distances = [
-                distances[i : i + dest_count]
-                for i in range(0, len(distances), dest_count)
+                distances[i : i + dest_count] for i in range(0, len(distances), dest_count)
             ]
             return DataFrame(nested_distances, columns=range(dest_count))
 
@@ -173,7 +172,6 @@ class MatrixRoutingResponse(ApiResponse):
             distances = self.matrix.get("travelTimes")
             dest_count = self.matrix.get("numDestinations")
             nested_distances = [
-                distances[i : i + dest_count]
-                for i in range(0, len(distances), dest_count)
+                distances[i : i + dest_count] for i in range(0, len(distances), dest_count)
             ]
             return DataFrame(nested_distances, columns=range(dest_count))

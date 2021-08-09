@@ -3,9 +3,6 @@
 
 """This module defines all the configs which will be required as inputs to Isoline routing API."""
 
-import json
-from typing import List, Optional
-
 from .base_config import Bunch
 
 
@@ -34,10 +31,12 @@ class OptimisedFor(Bunch):
     """A Class to define constant values for optimising calculation for Isoline Routings Api
 
     ``quality``:
-    Calculation of isoline focuses on quality, that is, the graph used for isoline calculation has higher granularity generating an isoline that is more precise.
+    Calculation of isoline focuses on quality, that is, the graph used for isoline calculation
+    has higher granularity generating an isoline that is more precise.
 
     ``performance``:
-    Calculation of isoline is performance-centric, quality of isoline is reduced to provide better performance.
+    Calculation of isoline is performance-centric, quality of isoline is reduced to provide
+    better performance.
 
     ``balanced``:
     Calculation of isoline takes a balanced approach averaging between quality and performance.
