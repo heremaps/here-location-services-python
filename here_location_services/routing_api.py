@@ -36,6 +36,7 @@ class RoutingApi(Api):
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         scooter: Optional[Scooter] = None,
@@ -60,6 +61,8 @@ class RoutingApi(Api):
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of tuples of ``latitude`` and ``longitude`` of via points.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -132,6 +135,14 @@ class RoutingApi(Api):
                 if val is not None
             )
             params["origin"] = ";".join([params["origin"], origin_place_opt])
+
+        if origin_waypoint_options:
+            origin_way_opt = "!".join(
+                key + "=" + str(val)
+                for key, val in vars(origin_waypoint_options).items()
+                if val is not None
+            )
+            params["origin"] = "!".join([params["origin"], origin_way_opt])
 
         if destination_place_options:
             dest_place_opt = ";".join(

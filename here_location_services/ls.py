@@ -340,6 +340,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
@@ -359,6 +360,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -388,6 +391,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             departure_time=departure_time,
@@ -409,6 +413,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
@@ -428,6 +433,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -456,6 +463,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             departure_time=departure_time,
@@ -477,6 +485,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
@@ -497,6 +506,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -527,6 +538,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             departure_time=departure_time,
@@ -549,6 +561,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         scooter: Optional[Scooter] = None,
@@ -569,6 +582,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -598,6 +613,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             scooter=scooter,
@@ -620,6 +636,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
@@ -639,6 +656,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -667,6 +686,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             departure_time=departure_time,
