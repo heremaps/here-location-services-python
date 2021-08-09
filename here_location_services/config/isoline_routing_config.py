@@ -27,6 +27,27 @@ transport_mode = {
 ISOLINE_ROUTING_TRANSPORT_MODE = IsolineRoutingTransportMode(**transport_mode)
 
 
+class RangeType(Bunch):
+    """A Class to define constant values for specifying the type of range for Isoline Routings Api
+
+    ``distance``:
+    Units in meters
+
+    ``time``:
+    Units in seconds
+
+    ``consumption``:
+    Units in Wh
+    """
+
+
+#: Use this config s optimised_for of isoline routing API.
+#: Example: for optimising for ``balanced`` mode use ``OPTIMISED_FOR.balanced``.
+RANGE_TYPE = RangeType(
+    **{"distance": "distance", "time": "time", "consumption": "consumption"}
+)
+
+
 class OptimisedFor(Bunch):
     """A Class to define constant values for optimising calculation for Isoline Routings Api
 

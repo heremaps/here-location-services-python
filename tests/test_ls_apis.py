@@ -6,6 +6,10 @@ from argparse import Namespace
 import pytest
 import requests
 
+from here_location_services.config.isoline_routing_config import (
+    RANGE_TYPE,
+    ISOLINE_ROUTING_TRANSPORT_MODE,
+)
 from here_location_services.config.matrix_routing_config import WorldRegion
 from here_location_services.exceptions import ApiError
 from here_location_services.matrix_routing_api import MatrixRoutingApi
@@ -35,7 +39,10 @@ def test_reverse_geocoding(geo_search_api):
 def test_isonline_routing(isoline_routing_api):
     """Test isonline routing api."""
     result = isoline_routing_api.get_isoline_routing(
-        origin=[52.5, 13.4], range="3000", range_type="distance", transportMode="car"
+        origin=[52.5, 13.4],
+        range="3000",
+        range_type=RANGE_TYPE.distance,
+        transportMode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
     )
 
     coordinates = result.json()["isolines"][0]["polygons"][0]["outer"]
