@@ -8,7 +8,7 @@ This module contains classes for accessing the responses from Location Services 
 import json
 
 import flexpolyline as fp
-from geojson import Feature, FeatureCollection, LineString, Point
+from geojson import Feature, FeatureCollection, LineString, Point, Polygon
 from pandas import DataFrame
 
 
@@ -91,7 +91,7 @@ class IsolineResponse(ApiResponse):
                 polyline = polygon["outer"]
                 lstring = fp.decode(polyline)
                 lstring = [(coord[1], coord[0]) for coord in lstring]
-                f = Feature(geometry=LineString(lstring), properties=polygon)
+                f = Feature(geometry=Polygon([lstring]), properties={"range": isoline["range"]})
                 feature_collection.features.append(f)
         return feature_collection
 

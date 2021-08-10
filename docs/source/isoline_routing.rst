@@ -8,19 +8,21 @@ Example
 .. jupyter-execute::
 
     import os
+    from datetime import datetime
 
     from here_location_services import LS
     from here_map_widget import Map, Marker, GeoJSON
+    from here_location_services.config.isoline_routing_config import RANGE_TYPE, ISOLINE_ROUTING_TRANSPORT_MODE
 
     LS_API_KEY = os.environ.get("LS_API_KEY")  # Get API KEY from environment.
     ls = LS(api_key=LS_API_KEY)
 
     iso_response = ls.calculate_isoline(
-        start=[52.53086, 13.38469],
+        origin=[52.53086, 13.38469],
         range="1800",
-        departure="2018-07-16T19:00:00",
-        range_type="time",
-        mode="fastest;car;traffic:enabled",
+        departure_time=datetime.now(),
+        range_type=RANGE_TYPE.time,
+        transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
     )
 
     data = iso_response.to_geojson()
