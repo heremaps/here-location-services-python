@@ -10,31 +10,38 @@ import pytz
 from geojson import FeatureCollection
 
 from here_location_services import LS
+from here_location_services.config.base_config import (
+    ROUTING_MODE,
+    SHIPPED_HAZARDOUS_GOODS,
+    PlaceOptions,
+    Truck,
+    WayPointOptions,
+)
+from here_location_services.config.isoline_routing_config import (
+    ISOLINE_ROUTING_AVOID_FEATURES,
+    ISOLINE_ROUTING_TRANSPORT_MODE,
+    RANGE_TYPE,
+)
 from here_location_services.config.matrix_routing_config import (
     AVOID_FEATURES,
     MATRIX_ATTRIBUTES,
     PROFILE,
-    SHIPPED_HAZARDOUS_GOODS,
     AutoCircleRegion,
     AvoidBoundingBox,
     BoundingBoxRegion,
     CircleRegion,
     PolygonRegion,
-    Truck,
     WorldRegion,
 )
 from here_location_services.config.routing_config import AVOID_FEATURES as ROUTING_AVOID_FEATURES
 from here_location_services.config.routing_config import (
     ROUTE_COURSE,
     ROUTE_MATCH_SIDEOF_STREET,
-    ROUTING_MODE,
     ROUTING_RETURN,
     ROUTING_SPANS,
     ROUTING_TRANSPORT_MODE,
-    PlaceOptions,
     Scooter,
     Via,
-    WayPointOptions,
 )
 from here_location_services.config.search_config import PLACES_CATEGORIES
 from here_location_services.exceptions import ApiError
@@ -102,45 +109,87 @@ def test_ls_reverse_geocoding_exception():
 def test_isonline_routing():
     """Test isonline routing api."""
     ls = LS(api_key=LS_API_KEY)
+    place_options = PlaceOptions(
+        course=ROUTE_COURSE.west,
+        sideof_street_hint=[52.512149, 13.304076],
+        match_sideof_street=ROUTE_MATCH_SIDEOF_STREET.always,
+        radius=10,
+        min_course_distance=10,
+    )
+    assert json.loads(place_options.__str__()) == {
+        "course": 270,
+        "sideOfStreetHint": "52.512149,13.304076",
+        "matchSideOfStreet": "always",
+        "namehint": None,
+        "radius": 10,
+        "minCourseDistance": 10,
+    }
+    origin_waypoint_options = WayPointOptions(stop_duration=0)
+
     result = ls.calculate_isoline(
-        start=[52.5, 13.4],
-        range="900",
-        range_type="time",
-        mode="fastest;car;",
-        departure="2020-05-04T17:00:00+02",
+        origin=[52.5, 13.4],
+        range="1000,3000",
+        range_type=RANGE_TYPE.time,
+        transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+        departure_time=datetime.now(),
+        truck=Truck(
+            shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
+            gross_weight=100,
+            weight_per_axle=10,
+            height=10,
+            width=10,
+            length=10,
+            tunnel_category="B",
+            axle_count=4,
+        ),
+        shape_max_points=100,
+        avoid_features=[ISOLINE_ROUTING_AVOID_FEATURES.tollRoad],
+        origin_place_options=place_options,
+        origin_waypoint_options=origin_waypoint_options,
     )
 
-    coordinates = result.isoline[0]["component"][0]["shape"]
-    assert coordinates[0]
+    assert result.isolines
+    assert result.departure
+    coordinates = result.isolines[0]["polygons"][0]["outer"]
+    assert coordinates
     geo_json = result.to_geojson()
-    assert geo_json.type == "Feature"
-    assert geo_json.geometry.type == "Polygon"
+    assert geo_json.type == "FeatureCollection"
 
+    destination_waypoint_options = WayPointOptions(stop_duration=0)
     result2 = ls.calculate_isoline(
-        destination=[52.5, 13.4],
-        range="900",
-        range_type="time",
-        mode="fastest;car;",
-        arrival="2020-05-04T17:00:00+02",
+        destination=[52.51578, 13.37749],
+        range="600",
+        range_type=RANGE_TYPE.time,
+        transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+        destination_place_options=place_options,
+        destination_waypoint_options=destination_waypoint_options,
     )
-    coordinates = result2.isoline[0]["component"][0]["shape"]
-    assert coordinates[0]
+    assert result2.isolines
+    assert result2.arrival
 
     with pytest.raises(ValueError):
         ls.calculate_isoline(
-            start=[52.5, 13.4],
+            destination=[82.8628, 135.00],
+            range="3000",
+            range_type=RANGE_TYPE.distance,
+            transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+            arrival_time=datetime.now(),
+        )
+    with pytest.raises(ValueError):
+        ls.calculate_isoline(
+            origin=[52.5, 13.4],
             range="900",
-            range_type="time",
-            mode="fastest;car;",
+            range_type=RANGE_TYPE.time,
+            transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
             destination=[52.5, 13.4],
         )
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
         ls2.calculate_isoline(
-            start=[52.5, 13.4],
+            origin=[52.5, 13.4],
             range="900",
-            range_type="time",
-            mode="fastest;car;",
+            range_type=RANGE_TYPE.time,
+            transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
         )
 
 
@@ -151,23 +200,23 @@ def test_isonline_routing_exception():
     with pytest.raises(ValueError):
         ls.calculate_isoline(
             range="900",
-            range_type="time",
-            mode="fastest;car;",
+            range_type=RANGE_TYPE.time,
+            transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
         )
     with pytest.raises(ValueError):
         ls.calculate_isoline(
             range="900",
-            range_type="time",
-            mode="fastest;car;",
-            arrival="2020-05-04T17:00:00+02",
-            start=[52.5, 13.4],
+            range_type=RANGE_TYPE.time,
+            transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+            arrival_time=datetime.now(),
+            origin=[52.5, 13.4],
         )
     with pytest.raises(ValueError):
         ls.calculate_isoline(
             range="900",
-            range_type="time",
-            mode="fastest;car;",
-            departure="2020-05-04T17:00:00+02",
+            range_type=RANGE_TYPE.time,
+            transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+            departure_time=datetime.now(),
             destination=[52.5, 13.4],
         )
 
@@ -322,7 +371,10 @@ def test_car_route_extra_options():
         "minCourseDistance": 10,
     }
     via_waypoint_options = WayPointOptions(stop_duration=0, pass_through=True)
-    assert json.loads(via_waypoint_options.__str__()) == {"stopDuration": 0, "passThrough": True}
+    assert json.loads(via_waypoint_options.__str__()) == {
+        "stopDuration": 0,
+        "passThrough": True,
+    }
     dest_waypoint_options = WayPointOptions(stop_duration=10, pass_through=False)
     via1 = Via(
         lat=52.52426,
@@ -612,7 +664,10 @@ def test_matrix_routing_config():
     }
 
     poly = PolygonRegion(outer=[1, 1, 1, 1, 1, 1])
-    assert json.loads(poly.__str__()) == {"type": "polygon", "outer": [1, 1, 1, 1, 1, 1]}
+    assert json.loads(poly.__str__()) == {
+        "type": "polygon",
+        "outer": [1, 1, 1, 1, 1, 1],
+    }
 
     autocircle = AutoCircleRegion(margin=100)
     assert json.loads(autocircle.__str__()) == {"type": "autoCircle", "margin": 100}

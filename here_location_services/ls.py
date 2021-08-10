@@ -10,23 +10,18 @@ from datetime import datetime
 from time import sleep
 from typing import Dict, List, Optional, Union
 
-from here_location_services.config.routing_config import (
-    PlaceOptions,
-    Scooter,
-    Via,
-    WayPointOptions,
-)
+from here_location_services.config.routing_config import Scooter, Via
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
 from here_location_services.platform.auth import Auth
 from here_location_services.platform.credentials import PlatformCredentials
 
+from .config.base_config import PlaceOptions, Truck, WayPointOptions
 from .config.matrix_routing_config import (
     AutoCircleRegion,
     AvoidBoundingBox,
     BoundingBoxRegion,
     CircleRegion,
     PolygonRegion,
-    Truck,
     WorldRegion,
 )
 from .exceptions import ApiError
@@ -135,13 +130,22 @@ class LS:
 
     def calculate_isoline(
         self,
-        mode: str,
         range: str,
         range_type: str,
-        start: Optional[List[float]] = None,
-        destination: Optional[List[float]] = None,
-        arrival: Optional[str] = None,
-        departure: Optional[str] = None,
+        transport_mode: str,
+        origin: Optional[List] = None,
+        departure_time: Optional[datetime] = None,
+        destination: Optional[List] = None,
+        arrival_time: Optional[datetime] = None,
+        routing_mode: Optional[str] = "fast",
+        shape_max_points: Optional[int] = None,
+        optimised_for: Optional[str] = "balanced",
+        avoid_features: Optional[List[str]] = None,
+        truck: Optional[Truck] = None,
+        origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
+        destination_place_options: Optional[PlaceOptions] = None,
+        destination_waypoint_options: Optional[WayPointOptions] = None,
     ) -> IsolineResponse:
         """Calculate isoline routing.
 
@@ -149,53 +153,85 @@ class LS:
         leaving from one defined center with either a specified length
         or specified travel time.
 
-        :param mode: A string representing how the route is calculated.
-            Example: ``Type;TransportModes;TrafficMode;Feature``.
-            ``fastest;car;traffic:disabled;motorway:-3``
         :param range: A string representing a range of isoline, unit is defined by
             parameter range type. Example: range='1000' or range='1000,2000,3000'
-        :param range_type: A string representing a type of `range`. Possible values are
+        :param range_type: A string representing a type of ``range``. Possible values are
             ``distance``, ``time`` and ``consumption``. For distance the unit meters. For a
-            time the unit is seconds.For consumption, it is defined by the consumption
+            time the unit is seconds. For consumption, it is defined by the consumption
             model.
-        :param start: A list of latitude and longitude representing the center of isoline
-            request. Isoline will cover all the roads which can be reached from this
-            point within a given range. It can not be used in combination with the
-            ``destination`` parameter.
-        :param destination: A list of latitude and longitude representing the center of
-            isoline request. Isoline will cover all roads from which this point can be
-            reached within a given range. It can not be used in combination with the
-            ``start`` parameter.
-        :param arrival: A string representing the time when travel is expected to end.
-            It can be used only if the parameter ``destination`` is also used.
-            Example: arrival= '2013-07-04T17:00:00+02'.
-        :param departure: A string representing the time when travel is expected to
-            start. It can be used only if the parameter ``start`` is also used.
-            Example: departure= '2013-07-04T17:00:00+02'
+        :param transport_mode: A string representing Mode of transport to be used for the
+            calculation of the isolines.
+            Example: ``car``.
+        :param origin: Center of the isoline request. The Isoline(s) will cover the region
+            which can be reached from this point within given range. It cannot be used in
+            combination with ``destination`` parameter.
+        :param departure_time: Specifies the time of departure as defined by either date-time
+            or full-date partial-time in RFC 3339, section 5.6 (for example, 2019-06-24T01:23:45).
+            The requested time is converted to the local time at origin. When the optional timezone
+            offset is not specified, time is assumed to be local. If neither departure_time or
+            arrival_time are specified, current time at departure location will be used. All Time
+            values in the response are returned in the timezone of each location.
+        :param destination: Center of the isoline request. The Isoline(s) will cover the
+            region within the specified range that can reach this point. It cannot be used
+            in combination with ``origin`` parameter.
+        :param arrival_time: Specifies the time of arrival as defined by either date-time or
+            full-date T partial-time in RFC 3339, section 5.6 (for example, 2019-06-24T01:23:45).
+            The requested time is converted to the local time at destination. When the optional
+            timezone offset is not specified, time is assumed to be local. All Time values in
+            the response are returned in the timezone of each location.
+        :param routing_mode: A string to represent routing mode.
+        :param shape_max_points: An integer to Limit the number of points in the resulting isoline
+            geometry. If the isoline consists of multiple components, the sum of points from all
+            components is considered. This parameter doesn't affect performance.
+        :param optimised_for: A string to specify how isoline calculation is optimized.
+        :param avoid_features: Avoid routes that violate these properties. Avoid features
+            are defined in :attr:
+            `AVOID_FEATURES <here_location_services.config.isoline_routing_config.AVOID_FEATURES>`
+        :param truck: Different truck options to use during route calculation when transport_mode
+            = truck. use object of :class:`Truck here_location_services.config.base_config.Truck>`
+        :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
+        :param destination_place_options: :class:`PlaceOptions` optinal place options
+            for ``destination``.
+        :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``destination``.
         :raises ValueError: If ``start`` and ``destination`` are provided togrther.
         :return: :class:`IsolineResponse` object.
         """
 
-        if start and destination:
-            raise ValueError("`start` and `destination` can not be provided together.")
-        if start is None and destination is None:
-            raise ValueError("please provide either `start` or `destination`.")
-        if departure and start is None:
-            raise ValueError("`departure` must be provided with `start`")
-        if arrival and destination is None:
+        if origin and destination:
+            raise ValueError("`origin` and `destination` can not be provided together.")
+        if origin is None and destination is None:
+            raise ValueError("please provide either `origin` or `destination`.")
+        if departure_time and origin is None:
+            raise ValueError("`departure_time` must be provided with `origin`")
+        if arrival_time and destination is None:
             raise ValueError("`arrival` must be provided with `destination`")
 
         resp = self.isoline_routing_api.get_isoline_routing(
-            mode=mode,
             range=range,
             range_type=range_type,
-            start=start,
+            transport_mode=transport_mode,
+            origin=origin,
+            departure_time=departure_time,
             destination=destination,
-            arrival=arrival,
-            departure=departure,
+            arrival_time=arrival_time,
+            routing_mode=routing_mode,
+            shape_max_points=shape_max_points,
+            optimised_for=optimised_for,
+            avoid_features=avoid_features,
+            truck=truck,
+            origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
+            destination_place_options=destination_place_options,
+            destination_waypoint_options=destination_waypoint_options,
         )
-        response = resp.json()["response"]
-        return IsolineResponse.new(response)
+        response = IsolineResponse.new(resp.json())
+
+        if response.notices:
+            raise ValueError("Isolines could not be calculated.")
+        return response
 
     def discover(
         self,
@@ -304,6 +340,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
@@ -323,6 +360,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -352,6 +391,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             departure_time=departure_time,
@@ -373,6 +413,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
@@ -392,6 +433,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -420,6 +463,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             departure_time=departure_time,
@@ -441,6 +485,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
@@ -461,6 +506,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -491,6 +538,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             departure_time=departure_time,
@@ -513,6 +561,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         scooter: Optional[Scooter] = None,
@@ -533,6 +582,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -562,6 +613,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             scooter=scooter,
@@ -584,6 +636,7 @@ class LS:
         destination: List,
         via: Optional[List[Via]] = None,
         origin_place_options: Optional[PlaceOptions] = None,
+        origin_waypoint_options: Optional[WayPointOptions] = None,
         destination_place_options: Optional[PlaceOptions] = None,
         destination_waypoint_options: Optional[WayPointOptions] = None,
         departure_time: Optional[datetime] = None,
@@ -603,6 +656,8 @@ class LS:
         :param destination: A list of ``latitude`` and ``longitude`` of destination point of route.
         :param via: A list of :class:`Via` objects.
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
+        :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
+            for ``origin``.
         :param destination_place_options: :class:`PlaceOptions` optinal place options
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -631,6 +686,7 @@ class LS:
             destination=destination,
             via=via,
             origin_place_options=origin_place_options,
+            origin_waypoint_options=origin_waypoint_options,
             destination_place_options=destination_place_options,
             destination_waypoint_options=destination_waypoint_options,
             departure_time=departure_time,
@@ -650,7 +706,11 @@ class LS:
         self,
         origins: List[Dict],
         region_definition: Union[
-            CircleRegion, BoundingBoxRegion, PolygonRegion, AutoCircleRegion, WorldRegion
+            CircleRegion,
+            BoundingBoxRegion,
+            PolygonRegion,
+            AutoCircleRegion,
+            WorldRegion,
         ],
         async_req: bool = False,
         destinations: Optional[List[Dict]] = None,

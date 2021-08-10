@@ -8,7 +8,7 @@ This module contains classes for accessing the responses from Location Services 
 import json
 
 import flexpolyline as fp
-from geojson import Feature, FeatureCollection, LineString, Point, Polygon
+from geojson import Feature, FeatureCollection, LineString, Point
 from pandas import DataFrame
 
 
@@ -34,7 +34,8 @@ class ApiResponse:
         feature_collection = FeatureCollection([])
         for item in self.response["items"]:
             f = Feature(
-                geometry=Point((item["position"]["lng"], item["position"]["lat"])), properties=item
+                geometry=Point((item["position"]["lng"], item["position"]["lat"])),
+                properties=item,
             )
             feature_collection.features.append(f)
         return feature_collection
@@ -73,18 +74,26 @@ class IsolineResponse(ApiResponse):
 
     def __init__(self, **kwargs):
         super().__init__()
-        self._filters = {"metaInfo": None, "center": None, "isoline": None, "start": None}
+        self._filters = {
+            "departure": None,
+            "arrival": None,
+            "isolines": None,
+            "notices": None,
+        }
         for param, default in self._filters.items():
             setattr(self, param, kwargs.get(param, default))
 
     def to_geojson(self):
         """Return API response as GeoJSON."""
-        points = []
-        for latlons in self.isoline[0]["component"][0]["shape"]:
-            latlon = [float(i) for i in latlons.split(",")]
-            points.append((latlon[1], latlon[0]))
-        feature = Feature(geometry=Polygon([points]))
-        return feature
+        feature_collection = FeatureCollection([])
+        for isoline in self.response["isolines"]:
+            for polygon in isoline["polygons"]:
+                polyline = polygon["outer"]
+                lstring = fp.decode(polyline)
+                lstring = [(coord[1], coord[0]) for coord in lstring]
+                f = Feature(geometry=LineString(lstring), properties=polygon)
+                feature_collection.features.append(f)
+        return feature_collection
 
 
 class DiscoverResponse(ApiResponse):

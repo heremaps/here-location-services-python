@@ -8,13 +8,14 @@ import pytest
 import pytz
 
 from here_location_services import LS
+from here_location_services.config.base_config import ROUTING_MODE
 from here_location_services.config.matrix_routing_config import (
     AVOID_FEATURES,
     MATRIX_ATTRIBUTES,
     AvoidBoundingBox,
     WorldRegion,
 )
-from here_location_services.config.routing_config import ROUTING_MODE, ROUTING_TRANSPORT_MODE
+from here_location_services.config.routing_config import ROUTING_TRANSPORT_MODE
 from here_location_services.platform.credentials import PlatformCredentials
 from here_location_services.responses import GeocoderResponse
 from tests.conftest import env_setup_done
