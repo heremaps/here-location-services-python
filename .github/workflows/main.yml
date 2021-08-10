@@ -68,6 +68,11 @@ jobs:
       env:
         XYZ_TOKEN: ${{ secrets.XYZ_TOKEN }}
         LS_API_KEY: ${{ secrets.LS_API_KEY }}
+        HERE_USER_ID: ${{ secrets.HERE_USER_ID }}
+        HERE_CLIENT_ID: ${{ secrets.HERE_CLIENT_ID }}
+        HERE_ACCESS_KEY_ID: ${{ secrets.HERE_ACCESS_KEY_ID }}
+        HERE_ACCESS_KEY_SECRET: ${{ secrets.HERE_ACCESS_KEY_SECRET }}
+        HERE_TOKEN_ENDPOINT_URL: ${{ secrets.HERE_TOKEN_ENDPOINT_URL }}
       run: |
         sh scripts/build_docs.sh
 
