@@ -23,7 +23,7 @@ transport_mode = {
 }
 
 #: Use this config for transport_mode of isoline routing API.
-#: Example: for ``car`` transportMode use ``ISOLINE_ROUTING_TRANSPORT_MODE.car``.
+#: Example: for ``car`` transport_mode use ``ISOLINE_ROUTING_TRANSPORT_MODE.car``.
 ISOLINE_ROUTING_TRANSPORT_MODE = IsolineRoutingTransportMode(**transport_mode)
 
 

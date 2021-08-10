@@ -42,7 +42,7 @@ def test_isonline_routing(isoline_routing_api):
         origin=[52.5, 13.4],
         range="3000",
         range_type=RANGE_TYPE.distance,
-        transportMode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+        transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
     )
 
     coordinates = result.json()["isolines"][0]["polygons"][0]["outer"]
