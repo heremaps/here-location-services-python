@@ -66,7 +66,7 @@ SHIPPED_HAZARDOUS_GOODS = ShippedHazardousGoods(
 
 class Truck:
     """A class to define different truck options which will be used during route calculation.
-    Truck options should be used when transportMode is ``truck``.
+    Truck options should be used when transport_mode is ``truck``.
     """
 
     def __init__(

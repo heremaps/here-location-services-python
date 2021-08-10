@@ -7,8 +7,8 @@ import pytest
 import requests
 
 from here_location_services.config.isoline_routing_config import (
-    RANGE_TYPE,
     ISOLINE_ROUTING_TRANSPORT_MODE,
+    RANGE_TYPE,
 )
 from here_location_services.config.matrix_routing_config import WorldRegion
 from here_location_services.exceptions import ApiError

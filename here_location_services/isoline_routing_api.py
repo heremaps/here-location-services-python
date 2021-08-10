@@ -32,7 +32,7 @@ class IsolineRoutingApi(Api):
         self,
         range: str,
         range_type: str,
-        transportMode: str,
+        transport_mode: str,
         origin: Optional[List] = None,
         departure_time: Optional[datetime] = None,
         destination: Optional[List] = None,
@@ -59,7 +59,7 @@ class IsolineRoutingApi(Api):
             ``distance``, ``time`` and ``consumption``. For distance the unit meters. For a
             time the unit is seconds. For consumption, it is defined by the consumption
             model.
-        :param transportMode: A string representing Mode of transport to be used for the
+        :param transport_mode: A string representing Mode of transport to be used for the
             calculation of the isolines.
             Example: ``car``.
         :param origin: Center of the isoline request. The Isoline(s) will cover the region
@@ -87,7 +87,7 @@ class IsolineRoutingApi(Api):
         :param avoid_features: Avoid routes that violate these properties. Avoid features
             are defined in :attr:
             `AVOID_FEATURES <here_location_services.config.isoline_routing_config.AVOID_FEATURES>`
-        :param truck: Different truck options to use during route calculation when transportMode
+        :param truck: Different truck options to use during route calculation when transport_mode
             = truck. use object of :class:`Truck here_location_services.config.base_config.Truck>`
         :param origin_place_options: :class:`PlaceOptions` optinal place options for ``origin``.
         :param origin_waypoint_options: :class:`WayPointOptions` optional waypoint options
@@ -104,7 +104,7 @@ class IsolineRoutingApi(Api):
         params: Dict[str, str] = {
             "range[type]": range_type,
             "range[values]": range,
-            "transportMode": transportMode,
+            "transportMode": transport_mode,
         }
         if origin:
             params["origin"] = (",".join([str(i) for i in origin]),)

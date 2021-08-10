@@ -86,9 +86,7 @@ class LS:
             api_key=api_key, auth=auth, proxies=proxies, country=country
         )
 
-    def geocode(
-        self, query: str, limit: int = 20, lang: str = "en-US"
-    ) -> GeocoderResponse:
+    def geocode(self, query: str, limit: int = 20, lang: str = "en-US") -> GeocoderResponse:
         """Calculate coordinates as result of geocoding for the given ``query``.
 
         :param query: A string containing the input query.
@@ -127,9 +125,7 @@ class LS:
         if not -180 <= lng <= 180:
             raise ValueError("Longitude must be in range -180 to 180.")
 
-        resp = self.geo_search_api.get_reverse_geocoding(
-            lat=lat, lng=lng, limit=limit, lang=lang
-        )
+        resp = self.geo_search_api.get_reverse_geocoding(lat=lat, lng=lng, limit=limit, lang=lang)
         return ReverseGeocoderResponse.new(resp.json())
 
     def calculate_isoline(
@@ -801,9 +797,7 @@ class LS:
             )
             status_url = resp["statusUrl"]
             while True:
-                resp_status = self.matrix_routing_api.get_async_matrix_route_status(
-                    status_url
-                )
+                resp_status = self.matrix_routing_api.get_async_matrix_route_status(status_url)
                 if resp_status.status_code == 200 and resp_status.json().get("error"):
                     raise ApiError(resp_status)
                 elif resp_status.status_code == 303:

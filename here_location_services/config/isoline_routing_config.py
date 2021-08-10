@@ -43,9 +43,7 @@ class RangeType(Bunch):
 
 #: Use this config s optimised_for of isoline routing API.
 #: Example: for optimising for ``balanced`` mode use ``OPTIMISED_FOR.balanced``.
-RANGE_TYPE = RangeType(
-    **{"distance": "distance", "time": "time", "consumption": "consumption"}
-)
+RANGE_TYPE = RangeType(**{"distance": "distance", "time": "time", "consumption": "consumption"})
 
 
 class OptimisedFor(Bunch):
