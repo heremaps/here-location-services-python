@@ -18,6 +18,7 @@ from here_location_services.config.base_config import (
     WayPointOptions,
 )
 from here_location_services.config.isoline_routing_config import (
+    ISOLINE_ROUTING_AVOID_FEATURES,
     ISOLINE_ROUTING_TRANSPORT_MODE,
     RANGE_TYPE,
 )
@@ -108,21 +109,63 @@ def test_ls_reverse_geocoding_exception():
 def test_isonline_routing():
     """Test isonline routing api."""
     ls = LS(api_key=LS_API_KEY)
+    place_options = PlaceOptions(
+        course=ROUTE_COURSE.west,
+        sideof_street_hint=[52.512149, 13.304076],
+        match_sideof_street=ROUTE_MATCH_SIDEOF_STREET.always,
+        radius=10,
+        min_course_distance=10,
+    )
+    assert json.loads(place_options.__str__()) == {
+        "course": 270,
+        "sideOfStreetHint": "52.512149,13.304076",
+        "matchSideOfStreet": "always",
+        "namehint": None,
+        "radius": 10,
+        "minCourseDistance": 10,
+    }
+    origin_waypoint_options = WayPointOptions(stop_duration=0)
+
     result = ls.calculate_isoline(
         origin=[52.5, 13.4],
-        range="3000",
+        range="1000,3000",
         range_type=RANGE_TYPE.time,
         transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
         departure_time=datetime.now(),
+        truck=Truck(
+            shipped_hazardous_goods=[SHIPPED_HAZARDOUS_GOODS.explosive],
+            gross_weight=100,
+            weight_per_axle=10,
+            height=10,
+            width=10,
+            length=10,
+            tunnel_category="B",
+            axle_count=4,
+        ),
+        shape_max_points=100,
+        avoid_features=[ISOLINE_ROUTING_AVOID_FEATURES.tollRoad],
+        origin_place_options=place_options,
+        origin_waypoint_options=origin_waypoint_options,
     )
 
     assert result.isolines
     assert result.departure
     coordinates = result.isolines[0]["polygons"][0]["outer"]
-
     assert coordinates
     geo_json = result.to_geojson()
     assert geo_json.type == "FeatureCollection"
+
+    destination_waypoint_options = WayPointOptions(stop_duration=0)
+    result2 = ls.calculate_isoline(
+        destination=[52.51578, 13.37749],
+        range="600",
+        range_type=RANGE_TYPE.time,
+        transport_mode=ISOLINE_ROUTING_TRANSPORT_MODE.car,
+        destination_place_options=place_options,
+        destination_waypoint_options=destination_waypoint_options,
+    )
+    assert result2.isolines
+    assert result2.arrival
 
     with pytest.raises(ValueError):
         ls.calculate_isoline(

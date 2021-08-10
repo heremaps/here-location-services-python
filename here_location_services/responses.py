@@ -74,7 +74,12 @@ class IsolineResponse(ApiResponse):
 
     def __init__(self, **kwargs):
         super().__init__()
-        self._filters = {"departure": None, "isolines": None, "notices": None}
+        self._filters = {
+            "departure": None,
+            "arrival": None,
+            "isolines": None,
+            "notices": None,
+        }
         for param, default in self._filters.items():
             setattr(self, param, kwargs.get(param, default))
 

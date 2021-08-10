@@ -69,13 +69,13 @@ OPTIMISED_FOR = OptimisedFor(
 )
 
 
-class AvoidFeatures(Bunch):
+class IsolineRoutingAvoidFeatures(Bunch):
     """A class to define constant values for features to avoid during isoline calculation."""
 
 
 #: Use this config for avoid_features of isoline API.
-#: Example: for ``tollRoad`` avoid_features  use ``AVOID_FEATURES.tollRoad``.
-AVOID_FEATURES = AvoidFeatures(
+#: Example: for ``tollRoad`` avoid_features  use ``ISOLINE_ROUTING_AVOID_FEATURES.tollRoad``.
+ISOLINE_ROUTING_AVOID_FEATURES = IsolineRoutingAvoidFeatures(
     **{
         "tollRoad": "tollRoad",
         "controlledAccessHighway": "controlledAccessHighway",

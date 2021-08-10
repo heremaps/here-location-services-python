@@ -101,15 +101,15 @@ class IsolineRoutingApi(Api):
         """
         path = "v8/isolines"
         url = f"{self._base_url}/{path}"
-        params: Dict[str, str] = {
+        params: Dict[str, Any] = {
             "range[type]": range_type,
             "range[values]": range,
             "transportMode": transport_mode,
         }
         if origin:
-            params["origin"] = (",".join([str(i) for i in origin]),)
+            params["origin"] = ",".join([str(i) for i in origin])
         if destination:
-            params["destination"] = (",".join([str(i) for i in destination]),)
+            params["destination"] = ",".join([str(i) for i in destination])
         if arrival_time:
             params["arrivalTime"] = arrival_time.isoformat(timespec="seconds")
         if departure_time:
