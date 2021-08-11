@@ -54,7 +54,7 @@ class IsolineRoutingApi(Api):
         or specified travel time.
 
         :param range: A string representing a range of isoline, unit is defined by
-            parameter range type. Example: range='1000' or range='1000,2000,3000'
+            parameter ``range_type``. Example: range='1000' or range='1000,2000,3000'
         :param range_type: A string representing a type of ``range``. Possible values are
             ``distance``, ``time`` and ``consumption``. For distance the unit meters. For a
             time the unit is seconds. For consumption, it is defined by the consumption

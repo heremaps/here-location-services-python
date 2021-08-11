@@ -28,7 +28,7 @@ ISOLINE_ROUTING_TRANSPORT_MODE = IsolineRoutingTransportMode(**transport_mode)
 
 
 class RangeType(Bunch):
-    """A Class to define constant values for specifying the type of range for Isoline Routings Api
+    """A Class to define constant values for specifying the type of range for Isoline Routing API
 
     ``distance``:
     Units in meters
@@ -43,11 +43,13 @@ class RangeType(Bunch):
 
 #: Use this config s optimised_for of isoline routing API.
 #: Example: for optimising for ``balanced`` mode use ``OPTIMISED_FOR.balanced``.
-RANGE_TYPE = RangeType(**{"distance": "distance", "time": "time", "consumption": "consumption"})
+RANGE_TYPE = RangeType(
+    **{"distance": "distance", "time": "time", "consumption": "consumption"}
+)
 
 
 class OptimisedFor(Bunch):
-    """A Class to define constant values for optimising calculation for Isoline Routings Api
+    """A Class to define constant values for optimising calculation for Isoline Routing API
 
     ``quality``:
     Calculation of isoline focuses on quality, that is, the graph used for isoline calculation
@@ -70,7 +72,7 @@ OPTIMISED_FOR = OptimisedFor(
 
 
 class IsolineRoutingAvoidFeatures(Bunch):
-    """A class to define constant values for features to avoid during isoline calculation."""
+    """A class to define constant values for features to avoid features during isoline calculation."""
 
 
 #: Use this config for avoid_features of isoline API.
