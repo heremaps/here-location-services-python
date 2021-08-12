@@ -84,7 +84,7 @@ Attributes
         "transport_mode", "string", "Use values from config: :attr:`ROUTING_TRANSPORT_MODE <here_location_services.config.routing_config.ROUTING_TRANSPORT_MODE>`"
         "avoid_features", "list", "Use values from config: :attr:`AVOID_FEATURES <here_location_services.config.matrix_routing_config.AVOID_FEATURES>`"
         "avoid_areas", "list", "Use object of :class:`AvoidBoundingBox <here_location_services.config.matrix_routing_config.AvoidBoundingBox>` to define avoid areas."
-        "truck", "object of :class:`Truck <here_location_services.config.matrix_routing_config.Truck>`", "Used to define truck options when transport mode is truck"
+        "truck", "object of :class:`Truck <here_location_services.config.base_config.Truck>`", "Used to define truck options when transport mode is truck"
         "matrix_attributes", "list", "Use values from config: :attr:`MATRIX_ATTRIBUTES <here_location_services.config.matrix_routing_config.MATRIX_ATTRIBUTES>`"
 
 
