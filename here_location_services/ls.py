@@ -15,6 +15,8 @@ from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
 from here_location_services.platform.auth import Auth
 from here_location_services.platform.credentials import PlatformCredentials
 
+from .autosuggest_api import AutosuggestApi
+from .config.autosuggest_config import SearchBox, SearchCircle
 from .config.base_config import PlaceOptions, Truck, WayPointOptions
 from .config.matrix_routing_config import (
     AutoCircleRegion,
@@ -29,6 +31,7 @@ from .geocoding_search_api import GeocodingSearchApi
 from .isoline_routing_api import IsolineRoutingApi
 from .matrix_routing_api import MatrixRoutingApi
 from .responses import (
+    AutosuggestResponse,
     BrowseResponse,
     DiscoverResponse,
     GeocoderResponse,
@@ -84,6 +87,12 @@ class LS:
         )
         self.matrix_routing_api = MatrixRoutingApi(
             api_key=api_key, auth=self.auth, proxies=proxies, country=country
+        )
+        self.autosuggest_api = AutosuggestApi(
+            api_key=api_key,
+            auth=self.auth,
+            proxies=proxies,
+            country=country,
         )
 
     def geocode(self, query: str, limit: int = 20, lang: str = "en-US") -> GeocoderResponse:
@@ -231,6 +240,53 @@ class LS:
 
         if response.notices:
             raise ValueError("Isolines could not be calculated.")
+        return response
+
+    def autosuggest(
+        self,
+        q: str,
+        at: Optional[List] = None,
+        search_in_circle: Optional[SearchCircle] = None,
+        search_in_box: Optional[SearchBox] = None,
+        in_country: Optional[List] = None,
+        limit: Optional[int] = None,
+        terms_limit: Optional[int] = None,
+        lang: Optional[List] = None,
+        political_view: Optional[str] = None,
+        show: Optional[str] = None,
+    ) -> AutosuggestResponse:
+        """Calculate isoline routing.
+
+        Request a polyline that connects the endpoints of all routes
+        leaving from one defined center with either a specified length
+        or specified travel time.
+
+
+        """
+
+        if search_in_circle and search_in_box and at:
+            raise ValueError(
+                "`search_in_circle` and `search_in_box` and `at` can not be provided together."
+            )
+        if search_in_circle is None and search_in_box is None and at is None:
+            raise ValueError(
+                "please provide either `search_in_circle` or `search_in_box` or `at`."
+            )
+
+        resp = self.autosuggest_api.get_autosuggest(
+            q=q,
+            at=at,
+            search_in_box=search_in_box,
+            search_in_circle=search_in_circle,
+            in_country=in_country,
+            limit=limit,
+            terms_limit=terms_limit,
+            lang=lang,
+            political_view=political_view,
+            show=show,
+        )
+        response = AutosuggestResponse.new(resp.json())
+
         return response
 
     def discover(
