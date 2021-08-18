@@ -19,20 +19,6 @@ class SearchCircle:
         self.radius = radius
 
 
-class SearchBox:
-    """A class to define ``SearchBox``
-
-    Results will be returned if they are located within the specified rectangular
-        area defined by its west longitude, south latitude, east longitude, north latitude
-    """
-
-    def __init__(self, westLng: str, southLat: str, eastLng: str, northLat: str):
-        self.west = westLng
-        self.south = southLat
-        self.east = eastLng
-        self.north = northLat
-
-
 class PoliticalView(Bunch):
     """A Class to define constant values for political view
 

@@ -21,7 +21,7 @@ LS_API_KEY = get_apikey()
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
 def test_autosuggest(autosuggest_api):
     """Test autosuggest api."""
-    resp = autosuggest_api.get_autosuggest(q="res", limit=5, at=["52.93175,12.77165"])
+    resp = autosuggest_api.get_autosuggest(query="res", limit=5, at=["52.93175,12.77165"])
     assert type(resp) == requests.Response
     assert resp.status_code == 200
 
