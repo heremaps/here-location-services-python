@@ -10,7 +10,12 @@ import pytz
 from geojson import FeatureCollection
 
 from here_location_services import LS
-from here_location_services.config.autosuggest_config import SearchBox, SearchCircle
+from here_location_services.config.autosuggest_config import (
+    POLITICAL_VIEW,
+    SHOW,
+    SearchBox,
+    SearchCircle,
+)
 from here_location_services.config.base_config import (
     ROUTING_MODE,
     SHIPPED_HAZARDOUS_GOODS,
@@ -57,12 +62,29 @@ def test_ls_autosuggest():
     """Test autosuggest api."""
     ls = LS(api_key=LS_API_KEY)
     resp = ls.autosuggest(q="res", limit=5, at=["52.93175,12.77165"])
-    print(resp)
     assert resp.items
+
     search_in_circle1 = SearchCircle(lat=52.53, lng="13.38", radius="10000")
     search_in_box1 = SearchBox(
         westLng="13.08836", southLat="52.3381", eastLng="13.761", northLat="52.6755"
     )
+
+    # resp2 = ls.autosuggest(q="res", limit=5, search_in_box=search_in_box1)
+    resp2 = ls.autosuggest(q="res", limit=5, at=["-13.163068,-72.545128"], in_country=["USA"])
+    assert resp2.items
+
+    resp3 = ls.autosuggest(q="res", limit=5, search_in_circle=search_in_circle1, lang=["en"])
+    assert resp3.items
+
+    resp4 = ls.autosuggest(
+        q="res",
+        limit=5,
+        search_in_box=search_in_box1,
+        terms_limit=3,
+        show=[SHOW.phonemes],
+        political_view=POLITICAL_VIEW.RUS,
+    )
+    assert resp4.items
 
     with pytest.raises(ValueError):
         ls.autosuggest(
@@ -75,6 +97,13 @@ def test_ls_autosuggest():
             at=["-13.163068,-72.545128"],
             search_in_box=search_in_box1,
             search_in_circle=search_in_circle1,
+        )
+
+    with pytest.raises(ApiError):
+        ls2 = LS(api_key="dummy")
+        ls2.autosuggest(
+            q="res",
+            at=["-13.163068,-72.545128"],
         )
 
 

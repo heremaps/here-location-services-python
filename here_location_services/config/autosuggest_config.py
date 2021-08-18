@@ -9,7 +9,8 @@ from .base_config import Bunch
 class SearchCircle:
     """A class to define ``SearchCircle``
 
-    Results will be returned if they are located within the specified circular area defined by its center and radius(in meters).
+    Results will be returned if they are located within the specified circular area
+        defined by its center and radius(in meters).
     """
 
     def __init__(self, lat: str, lng: str, radius: int):
@@ -21,7 +22,8 @@ class SearchCircle:
 class SearchBox:
     """A class to define ``SearchBox``
 
-    Results will be returned if they are located within the specified rectangular area defined by its west longitude, south latitude, east longitude, north latitude
+    Results will be returned if they are located within the specified rectangular
+        area defined by its west longitude, south latitude, east longitude, north latitude
     """
 
     def __init__(self, westLng: str, southLat: str, eastLng: str, northLat: str):
@@ -47,4 +49,28 @@ class PoliticalView(Bunch):
 
 #: Use this config for political_view of Autosuggest API.
 #: Example: for ``RUS`` political_view use ``POLITICAL_VIEW.RUS``.
-POLITICAL_VIEW = PoliticalView(**{"RUS": "RUS", "SRB": "SRB", "MAR": "MAR", })
+POLITICAL_VIEW = PoliticalView(
+    **{
+        "RUS": "RUS",
+        "SRB": "SRB",
+        "MAR": "MAR",
+    }
+)
+
+
+class Show(Bunch):
+    """A Class to define constant values for showing additional fields to be
+        rendered in the response
+
+    ``phonemes``:
+    Renders phonemes for address and place names into the results.
+
+    ``tz``:
+    BETA: Renders result items with additional time zone information.
+        Please note that this may impact latency significantly.
+    """
+
+
+#: Use this config for show of Autosuggest API.
+#: Example: for ``RUS`` show use ``SHOW.phonemes``.
+SHOW = Show(**{"phonemes": "phonemes", "tz": "tz"})

@@ -253,21 +253,49 @@ class LS:
         terms_limit: Optional[int] = None,
         lang: Optional[List] = None,
         political_view: Optional[str] = None,
-        show: Optional[str] = None,
+        show: Optional[List] = None,
     ) -> AutosuggestResponse:
-        """Calculate isoline routing.
+        """Suggest address or place candidates based on an incomplete or misspelled query
 
-        Request a polyline that connects the endpoints of all routes
-        leaving from one defined center with either a specified length
-        or specified travel time.
-
-
+        :param q: A string for free-text query. Example: res, rest
+        :param at: Specify the center of the search context expressed as coordinates
+            One of `at`, `search_in_circle` or `search_in_box` is required.
+            Parameters "at", "search_in_circle" and "search_in_box" are mutually exclusive. Only
+            one of them is allowed.
+        :param search_in_circle: Search within a circular geographic area provided as
+            latitude, longitude, and radius (in meters)
+        :param search_in_box: Search within a rectangular bounding box geographic area provided
+            as west longitude, south latitude, east longitude, north latitude
+        :param in_country: Search within a specific or multiple countries provided as
+            comma-separated ISO 3166-1 alpha-3 country codes. The country codes are to be
+            provided in all uppercase. Must be accompanied by exactly one of
+            `at`, `search_in_circle` or `search_in_box`.
+        :param limit: An integer specifiying maximum number of results to be returned.
+        :param terms_limit: An integer specifiying maximum number of Query Terms Suggestions
+            to be returned.
+        :param lang: Array of string to select the language to be used for result rendering
+            from a list of BCP 47 compliant language codes.
+        :param political_view: Toggle the political view.
+        :param show: Select additional fields to be rendered in the response. Please note
+            that some of the fields involve additional webservice calls and can increase
+            the overall response time.
+        :return: :class:`requests.Response` object.
+        :raises ValueError: If ``search_in_circle``,``search_in_box`` and ``destination``
+            are provided togrther.
         """
 
         if search_in_circle and search_in_box and at:
             raise ValueError(
                 "`search_in_circle` and `search_in_box` and `at` can not be provided together."
             )
+        if search_in_circle and search_in_box:
+            raise ValueError(
+                "`search_in_circle` and `search_in_box` can not be provided together."
+            )
+        if search_in_box and at:
+            raise ValueError("`search_in_box` and `at` can not be provided together.")
+        if search_in_circle and at:
+            raise ValueError("`search_in_circle` and `at` can not be provided together.")
         if search_in_circle is None and search_in_box is None and at is None:
             raise ValueError(
                 "please provide either `search_in_circle` or `search_in_box` or `at`."

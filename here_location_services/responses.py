@@ -183,7 +183,7 @@ class MatrixRoutingResponse(ApiResponse):
 
 
 class AutosuggestResponse(ApiResponse):
-    """A class representing the Reverse Isoline routing API response data."""
+    """A class representing the Autosuggest API response data."""
 
     def __init__(self, **kwargs):
         super().__init__()
