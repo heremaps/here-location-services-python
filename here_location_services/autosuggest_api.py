@@ -42,7 +42,7 @@ class AutosuggestApi(Api):
         """Suggest address or place candidates based on an incomplete or misspelled query
 
         :param query: A string for free-text query. Example: res, rest
-        :param at: Specify the center of the search context expressed as coordinates
+        :param at: Specify the center of the search context expressed as list of coordinates
             One of `at`, `search_in_circle` or `search_in_bbox` is required.
             Parameters "at", "search_in_circle" and "search_in_bbox" are mutually exclusive. Only
             one of them is allowed.
