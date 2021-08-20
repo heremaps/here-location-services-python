@@ -26,6 +26,7 @@ A Python client for `HERE Location Services`_.
   Discover <discover>
   Browse <browse>
   Lookup <lookup>
+  Autosugggest <autosuggest>
 
 .. toctree::
   :maxdepth: 1

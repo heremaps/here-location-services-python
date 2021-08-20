@@ -180,3 +180,16 @@ class MatrixRoutingResponse(ApiResponse):
                 distances[i : i + dest_count] for i in range(0, len(distances), dest_count)
             ]
             return DataFrame(nested_distances, columns=range(dest_count))
+
+
+class AutosuggestResponse(ApiResponse):
+    """A class representing the Autosuggest API response data."""
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._filters = {
+            "items": None,
+            "queryTerms": None,
+        }
+        for param, default in self._filters.items():
+            setattr(self, param, kwargs.get(param, default))

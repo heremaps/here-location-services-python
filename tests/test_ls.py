@@ -10,6 +10,7 @@ import pytz
 from geojson import FeatureCollection
 
 from here_location_services import LS
+from here_location_services.config.autosuggest_config import POLITICAL_VIEW, SHOW, SearchCircle
 from here_location_services.config.base_config import (
     ROUTING_MODE,
     SHIPPED_HAZARDOUS_GOODS,
@@ -49,6 +50,66 @@ from here_location_services.responses import GeocoderResponse
 from here_location_services.utils import get_apikey
 
 LS_API_KEY = get_apikey()
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_ls_autosuggest():
+    """Test autosuggest api."""
+    ls = LS(api_key=LS_API_KEY)
+    resp = ls.autosuggest(query="bar", limit=5, at=["-13.163068,-72.545128"], in_country=["USA"])
+    assert resp.items
+    assert len(resp.items) <= 5
+
+    search_in_circle1 = SearchCircle(lat=52.53, lng="13.38", radius="10000")
+    search_in_bbox1 = ("13.08836", "52.33812", "13.761", "52.6755")
+
+    resp3 = ls.autosuggest(query="bar", limit=5, search_in_circle=search_in_circle1, lang=["en"])
+    assert resp3.items
+    assert len(resp3.items) <= 5
+
+    resp4 = ls.autosuggest(
+        query="res",
+        limit=5,
+        search_in_bbox=search_in_bbox1,
+        terms_limit=3,
+        show=[SHOW.phonemes],
+        political_view=POLITICAL_VIEW.RUS,
+    )
+    assert resp4.items
+    assert len(resp4.items) <= 5
+    assert len(resp4.queryTerms) == 3
+
+    for item in resp4.items:
+        if item["resultType"] == "place":
+            assert item["politicalView"]
+            assert item["phonemes"]
+
+    with pytest.raises(ValueError):
+        ls.autosuggest(
+            query="res",
+        )
+
+    with pytest.raises(ValueError):
+        ls.autosuggest(
+            query="res",
+            search_in_bbox=search_in_bbox1,
+            search_in_circle=search_in_circle1,
+        )
+
+    with pytest.raises(ValueError):
+        ls.autosuggest(
+            query="res",
+            at=["-13.163068,-72.545128"],
+            search_in_bbox=search_in_bbox1,
+            search_in_circle=search_in_circle1,
+        )
+
+    with pytest.raises(ApiError):
+        ls2 = LS(api_key="dummy")
+        ls2.autosuggest(
+            query="res",
+            at=["-13.163068,-72.545128"],
+        )
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")

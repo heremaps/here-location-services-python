@@ -8,13 +8,15 @@ import urllib
 import urllib.request
 from datetime import datetime
 from time import sleep
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from here_location_services.config.routing_config import Scooter, Via
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
 from here_location_services.platform.auth import Auth
 from here_location_services.platform.credentials import PlatformCredentials
 
+from .autosuggest_api import AutosuggestApi
+from .config.autosuggest_config import SearchCircle
 from .config.base_config import PlaceOptions, Truck, WayPointOptions
 from .config.matrix_routing_config import (
     AutoCircleRegion,
@@ -29,6 +31,7 @@ from .geocoding_search_api import GeocodingSearchApi
 from .isoline_routing_api import IsolineRoutingApi
 from .matrix_routing_api import MatrixRoutingApi
 from .responses import (
+    AutosuggestResponse,
     BrowseResponse,
     DiscoverResponse,
     GeocoderResponse,
@@ -84,6 +87,12 @@ class LS:
         )
         self.matrix_routing_api = MatrixRoutingApi(
             api_key=api_key, auth=self.auth, proxies=proxies, country=country
+        )
+        self.autosuggest_api = AutosuggestApi(
+            api_key=api_key,
+            auth=self.auth,
+            proxies=proxies,
+            country=country,
         )
 
     def geocode(self, query: str, limit: int = 20, lang: str = "en-US") -> GeocoderResponse:
@@ -196,7 +205,7 @@ class LS:
             for ``destination``.
         :param destination_waypoint_options: :class:`WayPointOptions` optional waypoint options
             for ``destination``.
-        :raises ValueError: If ``start`` and ``destination`` are provided togrther.
+        :raises ValueError: If ``origin`` and ``destination`` are provided together.
         :return: :class:`IsolineResponse` object.
         """
 
@@ -231,6 +240,70 @@ class LS:
 
         if response.notices:
             raise ValueError("Isolines could not be calculated.")
+        return response
+
+    def autosuggest(
+        self,
+        query: str,
+        at: Optional[List] = None,
+        search_in_circle: Optional[SearchCircle] = None,
+        search_in_bbox: Optional[Tuple] = None,
+        in_country: Optional[List[str]] = None,
+        limit: Optional[int] = 20,
+        terms_limit: Optional[int] = None,
+        lang: Optional[List[str]] = None,
+        political_view: Optional[str] = None,
+        show: Optional[List[str]] = None,
+    ) -> AutosuggestResponse:
+        """Suggest address or place candidates based on an incomplete or misspelled query
+
+        :param query: A string for free-text query. Example: res, rest
+        :param at: Specify the center of the search context expressed as list of coordinates
+            One of `at`, `search_in_circle` or `search_in_bbox` is required.
+            Parameters "at", "search_in_circle" and "search_in_bbox" are mutually exclusive. Only
+            one of them is allowed.
+        :param search_in_circle: Search within a circular geographic area provided as
+            latitude, longitude, and radius (in meters)
+        :param search_in_bbox: Search within a rectangular bounding box geographic area provided
+            as tuple of west longitude, south latitude, east longitude, north latitude
+        :param in_country: Search within a specific or multiple countries provided as
+            comma-separated ISO 3166-1 alpha-3 country codes. The country codes are to be
+            provided in all uppercase. Must be accompanied by exactly one of
+            `at`, `search_in_circle` or `search_in_bbox`.
+        :param limit: An integer specifiying maximum number of results to be returned.
+        :param terms_limit: An integer specifiying maximum number of Query Terms Suggestions
+            to be returned.
+        :param lang: List of strings to select the language to be used for result rendering
+            from a list of BCP 47 compliant language codes.
+        :param political_view: Toggle the political view.
+        :param show: Select additional fields to be rendered in the response. Please note
+            that some of the fields involve additional webservice calls and can increase
+            the overall response time.
+        :return: :class:`requests.Response` object.
+        :raises ValueError: If ``search_in_circle``,``search_in_bbox`` and ``destination``
+            are provided together.
+        """
+
+        i = iter([search_in_circle, search_in_bbox, at])
+        if not (any(i) and not any(i)):
+            raise ValueError(
+                "Exactly one of `search_in_circle` or `search_in_bbox` or `at` must be provided."
+            )
+
+        resp = self.autosuggest_api.get_autosuggest(
+            query=query,
+            at=at,
+            search_in_bbox=search_in_bbox,
+            search_in_circle=search_in_circle,
+            in_country=in_country,
+            limit=limit,
+            terms_limit=terms_limit,
+            lang=lang,
+            political_view=political_view,
+            show=show,
+        )
+        response = AutosuggestResponse.new(resp.json())
+
         return response
 
     def discover(

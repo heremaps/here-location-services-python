@@ -6,6 +6,7 @@ from collections import namedtuple
 
 import pytest
 
+from here_location_services.autosuggest_api import AutosuggestApi
 from here_location_services.exceptions import ConfigException
 from here_location_services.geocoding_search_api import GeocodingSearchApi
 from here_location_services.isoline_routing_api import IsolineRoutingApi
@@ -40,6 +41,13 @@ def isoline_routing_api():
 def routing_api():
     """Create shared low level Location services IsolineRoutingApi instance as a pytest fixture."""
     api = RoutingApi(api_key=LS_API_KEY)
+    return api
+
+
+@pytest.fixture()
+def autosuggest_api():
+    """Create shared low level Location services AutosuggestApi instance as a pytest fixture."""
+    api = AutosuggestApi(api_key=LS_API_KEY)
     return api
 
 
