@@ -10,7 +10,7 @@ Example
     import os
 
     from here_location_services import LS
-    from here_map_widget import Map, Marker, Group
+    from here_map_widget import Map, MarkerCluster, ObjectLayer
 
     LS_API_KEY = os.environ.get("LS_API_KEY")  # Get API KEY from environment.
     ls = LS(api_key=LS_API_KEY)
@@ -21,33 +21,24 @@ Example
         at=["-13.163068,-72.545128"],
         terms_limit=3,
     )
-
-    print("Query Items:")
-    for item in autosuggest_response.queryTerms:
-      print(item)
-
-    print("Search Items:")
-    for item in autosuggest_response.items:
-      print(item) 
-    
     results = []
     for item in autosuggest_response.items:
         if item["resultType"] == "place":
             results.append(
-                Marker(
+                dict(
                     lat=item["position"]["lat"],
                     lng=item["position"]["lng"],
                     data=item["title"],
                 )
             )
-    group = Group(volatility=True)
-    group.add_objects(results)
+    provider = MarkerCluster(data_points=results, show_bubble=True)
+    layer = ObjectLayer(provider=provider)
     m = Map(
         api_key=LS_API_KEY,
-        center=[-13.163068,-72.545128],
+        center=[-13.16, -72.52],
         zoom=14,
     )
-    m.add_object(group)
+    m.add_layer(layer)
     m
 
 Attributes

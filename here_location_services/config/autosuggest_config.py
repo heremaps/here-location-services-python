@@ -46,14 +46,14 @@ POLITICAL_VIEW = PoliticalView(
 
 class Show(Bunch):
     """A Class to define constant values for showing additional fields to be
-        rendered in the response
+    rendered in the response.
 
     ``phonemes``:
     Renders phonemes for address and place names into the results.
 
     ``tz``:
     BETA: Renders result items with additional time zone information.
-        Please note that this may impact latency significantly.
+    Please note that this may impact latency significantly.
     """
 
 
