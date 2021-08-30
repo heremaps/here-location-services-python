@@ -193,3 +193,15 @@ class AutosuggestResponse(ApiResponse):
         }
         for param, default in self._filters.items():
             setattr(self, param, kwargs.get(param, default))
+
+
+class DestinationWeatherResponse(ApiResponse):
+    """A class representing the Destination Weather API response data."""
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._filters = {
+            "places": None,
+        }
+        for param, default in self._filters.items():
+            setattr(self, param, kwargs.get(param, default))

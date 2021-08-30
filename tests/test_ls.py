@@ -18,6 +18,10 @@ from here_location_services.config.base_config import (
     Truck,
     WayPointOptions,
 )
+from here_location_services.config.dest_weather_config import (
+    DEST_WEATHER_PRODUCT,
+    DEST_WEATHER_UNITS,
+)
 from here_location_services.config.isoline_routing_config import (
     ISOLINE_ROUTING_AVOID_FEATURES,
     ISOLINE_ROUTING_TRANSPORT_MODE,
@@ -53,6 +57,63 @@ LS_API_KEY = get_apikey()
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_ls_dest_weather():
+    """Test destination weather api."""
+    ls = LS(api_key=LS_API_KEY)
+    resp = ls.get_dest_weather(products=[DEST_WEATHER_PRODUCT.observation], query="Chicago")
+    assert resp.places
+    assert resp.places[0]["observations"]
+
+    resp2 = ls.get_dest_weather(
+        products=[DEST_WEATHER_PRODUCT.forecastHourly],
+        query="Chicago",
+        units=DEST_WEATHER_UNITS.imperial,
+    )
+    assert resp2.places
+    assert resp2.places[0]["hourlyforecasts"]
+
+    resp3 = ls.get_dest_weather(
+        products=[DEST_WEATHER_PRODUCT.forecast7days], at=["-13.163068,-72.545128"]
+    )
+    assert resp3.places
+    assert resp3.places[0]["extendedDailyforecasts"]
+
+    resp4 = ls.get_dest_weather(
+        products=[DEST_WEATHER_PRODUCT.forecast7daysSimple, DEST_WEATHER_PRODUCT.observation],
+        zipcode="10025",
+        one_observation=True,
+    )
+    assert resp4.places
+    assert resp4.places[0]["observations"]
+
+    resp5 = ls.get_dest_weather(
+        products=[DEST_WEATHER_PRODUCT.forecast7daysSimple, DEST_WEATHER_PRODUCT.observation],
+        zipcode="10025",
+        at=["-13.163068,-72.545128"],
+        one_observation=True,
+    )
+    assert resp5.places
+    assert resp5.places[0]["observations"]
+
+    with pytest.raises(ValueError):
+        ls.get_dest_weather(products=[DEST_WEATHER_PRODUCT.forecast7days])
+
+    with pytest.raises(ValueError):
+        ls.get_dest_weather(
+            products=[DEST_WEATHER_PRODUCT.forecast7days], query="Chicago", one_observation=True
+        )
+
+    with pytest.raises(ValueError):
+        ls.get_dest_weather(
+            products=[DEST_WEATHER_PRODUCT.forecast7days], query="Chicago", one_observation=True
+        )
+
+    with pytest.raises(ApiError):
+        ls2 = LS(api_key="dummy")
+        ls2.get_dest_weather(products=[DEST_WEATHER_PRODUCT.observation], query="Chicago")
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
 def test_ls_autosuggest():
     """Test autosuggest api."""
     ls = LS(api_key=LS_API_KEY)
@@ -60,7 +121,7 @@ def test_ls_autosuggest():
     assert resp.items
     assert len(resp.items) <= 5
 
-    search_in_circle1 = SearchCircle(lat=52.53, lng="13.38", radius="10000")
+    search_in_circle1 = SearchCircle(lat="52.53", lng="13.38", radius="10000")
     search_in_bbox1 = ("13.08836", "52.33812", "13.761", "52.6755")
 
     resp3 = ls.autosuggest(query="bar", limit=5, search_in_circle=search_in_circle1, lang=["en"])
