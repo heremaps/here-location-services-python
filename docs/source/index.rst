@@ -38,6 +38,12 @@ A Python client for `HERE Location Services`_.
 
 .. toctree::
   :maxdepth: 1
+  :caption: Destination Weather
+
+  Destination Weather <dest_weather>
+
+.. toctree::
+  :maxdepth: 1
   :caption: Reference Guide
 
   API Reference <here_location_services>
