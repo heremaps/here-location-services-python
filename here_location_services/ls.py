@@ -8,7 +8,7 @@ import urllib
 import urllib.request
 from datetime import datetime
 from time import sleep
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from here_location_services.config.routing_config import Scooter, Via
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
@@ -320,7 +320,7 @@ class LS:
         at: Optional[List] = None,
         query: Optional[str] = None,
         zipcode: Optional[str] = None,
-        hourly_date: Optional[datetime] = None,
+        hourly_date: Optional[Any] = None,
         one_observation: Optional[bool] = None,
         language: Optional[str] = None,
         units: Optional[str] = None,
@@ -364,6 +364,54 @@ class LS:
             one_observation=one_observation,
             language=language,
             units=units,
+        )
+        response = DestinationWeatherResponse.new(resp.json())
+        return response
+
+    def get_weather_alerts(
+        self,
+        feature_type: str,
+        geometry_type: str,
+        geometry_coordinates: List,
+        start_time: datetime,
+        id: Optional[str] = None,
+        weather_severity: Optional[int] = None,
+        weather_type: Optional[str] = None,
+        country: Optional[str] = None,
+        end_time: Optional[datetime] = None,
+        width: Optional[int] = 50000,
+    ) -> DestinationWeatherResponse:
+        """Retrieves weather reports, weather forecasts, severe weather alerts
+            and moon and sun rise and set information.
+
+        :param feature_type: String to define feature type
+        :param geometry_type: Point or LineString or Polygon or MultiPolygon
+        :param geometry_coordinates: Array of coordinates corressponding to type provided
+        :param start_time: Start time of the event
+        :param id: Unique weather alert id.
+        :param weather_severity: Defines the severity of the weather event as defined
+            in :class:`WeatherSeverity`.
+        :param weather_type: Defines the type of the weather event as defined
+            in :class:`WeatherType`.
+        :param country: String for ISO-3166-1 2-letter country code.
+        :param end_time: End time of the event. If not present, warning is valid until
+            it is not removed from the feed by national weather institutes
+            (valid until warning is present in the response)
+        :param width: int. default 50000
+        :return: :class:`DestinationWeatherResponse` object.
+        """
+
+        resp = self.destination_weather_api.get_weather_alerts(
+            feature_type=feature_type,
+            geometry_type=geometry_type,
+            geometry_coordinates=geometry_coordinates,
+            id=id,
+            weather_severity=weather_severity,
+            weather_type=weather_type,
+            country=country,
+            start_time=start_time,
+            end_time=end_time,
+            width=width,
         )
         response = DestinationWeatherResponse.new(resp.json())
         return response

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from argparse import Namespace
+from datetime import datetime
 
 import pytest
 import requests
@@ -20,10 +21,23 @@ LS_API_KEY = get_apikey()
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
-def test_destination(destination_weather_api):
+def test_destination_weather(destination_weather_api):
     """Test Destination Weather api."""
     resp = destination_weather_api.get_dest_weather(
         products=[DEST_WEATHER_PRODUCT.observation], query="Chicago"
+    )
+    assert type(resp) == requests.Response
+    assert resp.status_code == 200
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_weather_alerts(destination_weather_api):
+    """Test Destination Weather api."""
+    resp = destination_weather_api.get_weather_alerts(
+        feature_type="Feature",
+        geometry_type="Point",
+        geometry_coordinates=[15.256, 23.456],
+        start_time=datetime.now(),
     )
     assert type(resp) == requests.Response
     assert resp.status_code == 200

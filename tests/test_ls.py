@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 import pytest
@@ -21,6 +21,8 @@ from here_location_services.config.base_config import (
 from here_location_services.config.dest_weather_config import (
     DEST_WEATHER_PRODUCT,
     DEST_WEATHER_UNITS,
+    WEATHER_SEVERITY,
+    WEATHER_TYPE,
 )
 from here_location_services.config.isoline_routing_config import (
     ISOLINE_ROUTING_AVOID_FEATURES,
@@ -54,6 +56,41 @@ from here_location_services.responses import GeocoderResponse
 from here_location_services.utils import get_apikey
 
 LS_API_KEY = get_apikey()
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_ls_weather_alerts():
+    """Test weather alerts endpoint of destination weather api."""
+    ls = LS(api_key=LS_API_KEY)
+    resp = ls.get_weather_alerts(
+        feature_type="Feature",
+        geometry_type="Point",
+        geometry_coordinates=[15.256, 23.456],
+        start_time=datetime.now(),
+        width=3000,
+    )
+    assert resp
+
+    resp2 = ls.get_weather_alerts(
+        feature_type="Feature",
+        geometry_type="Point",
+        geometry_coordinates=[15.256, 23.456],
+        start_time=datetime.now(),
+        weather_type=WEATHER_TYPE.ice,
+        weather_severity=WEATHER_SEVERITY.high,
+        country="US",
+        end_time=datetime.now() + timedelta(days=7),
+    )
+    assert resp2
+
+    with pytest.raises(ApiError):
+        ls2 = LS(api_key="dummy")
+        ls2.get_weather_alerts(
+            feature_type="Feature",
+            geometry_type="Point",
+            geometry_coordinates=[15.256, 23.456],
+            start_time=datetime.now(),
+        )
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
@@ -121,7 +158,7 @@ def test_ls_autosuggest():
     assert resp.items
     assert len(resp.items) <= 5
 
-    search_in_circle1 = SearchCircle(lat="52.53", lng="13.38", radius="10000")
+    search_in_circle1 = SearchCircle(lat=52.53, lng=13.38, radius="10000")
     search_in_bbox1 = ("13.08836", "52.33812", "13.761", "52.6755")
 
     resp3 = ls.autosuggest(query="bar", limit=5, search_in_circle=search_in_circle1, lang=["en"])

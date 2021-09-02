@@ -4,8 +4,9 @@
 """This module contains classes for accessing `HERE Destination Weather API <https://developer.here.com/documentation/destination-weather/dev_guide/topics/overview.html>`_.
 """  # noqa E501
 
+import time
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from here_location_services.platform.auth import Auth
 
@@ -32,7 +33,7 @@ class DestinationWeatherApi(Api):
         at: Optional[List] = None,
         query: Optional[str] = None,
         zipcode: Optional[str] = None,
-        hourly_date: Optional[datetime] = None,
+        hourly_date: Optional[Any] = None,
         one_observation: Optional[bool] = None,
         language: Optional[str] = None,
         units: Optional[str] = None,
@@ -79,6 +80,81 @@ class DestinationWeatherApi(Api):
             params["units"] = units
 
         resp = self.get(url, params=params, proxies=self.proxies)
+        if resp.status_code == 200:
+            return resp
+        else:
+            raise ApiError(resp)
+
+    def get_weather_alerts(
+        self,
+        feature_type: str,
+        geometry_type: str,
+        geometry_coordinates: List,
+        start_time: datetime,
+        id: Optional[str] = None,
+        weather_severity: Optional[int] = None,
+        weather_type: Optional[str] = None,
+        country: Optional[str] = None,
+        end_time: Optional[datetime] = None,
+        width: Optional[int] = 50000,
+    ):
+        """Retrieves weather reports, weather forecasts, severe weather alerts and moon and sun rise and set information.
+
+        See further information `Here Destination Weather API <https://developer.here.com/documentation/destination-weather/dev_guide/topics/overview.html>_`.
+
+        :param feature_type: String to define feature type
+        :param geometry_type: Point or LineString or Polygon or MultiPolygon
+        :param geometry_coordinates: Array of coordinates corressponding to type provided
+        :param start_time: Start time of the event
+        :param id: Unique weather alert id.
+        :param weather_severity: Defines the severity of the weather event as defined
+            in :class:`WeatherSeverity`.
+        :param weather_type: Defines the type of the weather event as defined
+            in :class:`WeatherType`.
+        :param country: String for ISO-3166-1 2-letter country code.
+        :param end_time: End time of the event. If not present, warning is valid until
+            it is not removed from the feed by national weather institutes
+            (valid until warning is present in the response)
+        :param width: int. default 50000
+        :return: :class:`requests.Response` object.
+        :raises ApiError: If ``status_code`` of API response is not 200.
+        """  # noqa E501
+
+        path = "v3/alerts"
+        url = f"{self._base_url}/{path}"
+        data: Dict[str, Any] = {
+            "type": "FeatureCollection",
+        }
+        features: Dict[str, Any] = {
+            "type": feature_type,
+        }
+
+        if id:
+            features["id"] = id
+
+        geometry: Dict[str, Any] = {"type": geometry_type, "coordinates": geometry_coordinates}
+
+        properties: Dict[str, Any] = {
+            "width": width,
+        }
+        weather_warnings: Dict[str, Any] = {
+            "startTime": time.mktime(start_time.timetuple()),
+        }
+
+        if weather_severity:
+            weather_warnings["severity"] = weather_severity
+        if weather_type:
+            weather_warnings["type"] = weather_type
+        if country:
+            weather_warnings["country"] = country
+        if end_time:
+            weather_warnings["endTime"] = time.mktime(end_time.timetuple())
+
+        properties["warnings"] = [weather_warnings]
+        features["properties"] = properties
+        features["geometry"] = geometry
+        data["features"] = [features]
+        resp = self.post(url, data=data)
         if resp.status_code == 200:
             return resp
         else:

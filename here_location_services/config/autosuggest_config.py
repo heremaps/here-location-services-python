@@ -13,7 +13,7 @@ class SearchCircle:
         defined by its center and radius(in meters).
     """
 
-    def __init__(self, lat: str, lng: str, radius: int):
+    def __init__(self, lat: float, lng: float, radius: int):
         self.lat = lat
         self.lng = lng
         self.radius = radius

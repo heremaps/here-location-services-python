@@ -200,8 +200,6 @@ class DestinationWeatherResponse(ApiResponse):
 
     def __init__(self, **kwargs):
         super().__init__()
-        self._filters = {
-            "places": None,
-        }
+        self._filters = {"places": None, "features": None}
         for param, default in self._filters.items():
             setattr(self, param, kwargs.get(param, default))
