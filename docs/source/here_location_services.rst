@@ -19,6 +19,7 @@ Submodules
    here_location_services.config.base_config
    here_location_services.config.autosuggest_config
    here_location_services.config.isoline_routing_config
+   here_location_services.config.dest_weather_config
    here_location_services.config.routing_config
    here_location_services.config.matrix_routing_config
    here_location_services.config.search_config.rst
@@ -33,4 +34,4 @@ Submodules
    here_location_services.routing_api.rst
    here_location_services.utils
    here_location_services.platform
-   here_location_services.destination_weather_api
+   here_location_services.destination_weather_api.rst

@@ -327,6 +327,7 @@ class LS:
     ) -> DestinationWeatherResponse:
         """Retrieves weather reports, weather forecasts, severe weather alerts
             and moon and sun rise and set information.
+
         :param products: List of :class:`DestWeatherProduct` identifying the type of
             report to obtain.
         :param at: A list of ``latitude`` and ``longitude`` specifying the area covered
@@ -345,6 +346,7 @@ class LS:
             DEST_WEATHER_PRODUCT.observation in `products`
         :return: :class:`DestinationWeatherResponse` object.
         """
+
         if at is None and query is None and zipcode is None:
             raise ValueError("please provide either `at` or `query` or `zipcode`.")
         if "observation" not in products and one_observation:
