@@ -1,6 +1,6 @@
 # Development, use pip install -e .[dev]
 coverage
-black
+black[jupyter]>=21.8b0
 mypy
 proxy.py
 pytest

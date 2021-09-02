@@ -3,7 +3,7 @@
 all: black build install typing lint test docs
 
 black:
-	black -l 99 here_location_services tests
+	black -l 99 here_location_services tests docs/notebooks
 	isort --atomic .
 
 build:
@@ -42,7 +42,7 @@ typing:
 lint:
 	isort --check --diff here_location_services tests
 	flake8 -v --statistics --count .
-	black -l 99 --diff --check here_location_services tests
+	black -l 99 --diff --check here_location_services tests docs/notebooks
 
 test:
 	pytest -v -s --cov=here_location_services tests

@@ -7,6 +7,7 @@
 import pytest
 
 from here_location_services import LS
+from here_location_services.apis import Api as BaseApi
 from here_location_services.exceptions import (
     ApiError,
     AuthenticationException,
@@ -48,3 +49,10 @@ def test_raise_response_exception():
     mock_response = get_mock_response(500, reason, text)
     with pytest.raises(Exception):
         Api.raise_response_exception(mock_response)
+
+
+def test_auth_exception():
+    """Test if both api key and auth token in not provided."""
+    api = BaseApi(api_key=None, auth=None)
+    with pytest.raises(Exception):
+        api._get_url_string()
