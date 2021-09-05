@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import pytest
 import pytz
-from geojson import FeatureCollection
+from geojson import FeatureCollection, Point
 
 from here_location_services import LS
 from here_location_services.config.autosuggest_config import POLITICAL_VIEW, SHOW, SearchCircle
@@ -63,18 +63,14 @@ def test_ls_weather_alerts():
     """Test weather alerts endpoint of destination weather api."""
     ls = LS(api_key=LS_API_KEY)
     resp = ls.get_weather_alerts(
-        feature_type="Feature",
-        geometry_type="Point",
-        geometry_coordinates=[15.256, 23.456],
+        geometry=Point(coordinates=[15.256, 23.456]),
         start_time=datetime.now(),
         width=3000,
     )
     assert resp
 
     resp2 = ls.get_weather_alerts(
-        feature_type="Feature",
-        geometry_type="Point",
-        geometry_coordinates=[15.256, 23.456],
+        geometry=Point(coordinates=[15.256, 23.456]),
         start_time=datetime.now(),
         weather_type=WEATHER_TYPE.ice,
         weather_severity=WEATHER_SEVERITY.high,
@@ -86,9 +82,7 @@ def test_ls_weather_alerts():
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")
         ls2.get_weather_alerts(
-            feature_type="Feature",
-            geometry_type="Point",
-            geometry_coordinates=[15.256, 23.456],
+            geometry=Point(coordinates=[15.256, 23.456]),
             start_time=datetime.now(),
         )
 

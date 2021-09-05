@@ -6,9 +6,11 @@
 import os
 import urllib
 import urllib.request
-from datetime import datetime
+from datetime import date, datetime
 from time import sleep
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
+
+from geojson import LineString, MultiPolygon, Point, Polygon
 
 from here_location_services.config.routing_config import Scooter, Via
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
@@ -320,7 +322,7 @@ class LS:
         at: Optional[List] = None,
         query: Optional[str] = None,
         zipcode: Optional[str] = None,
-        hourly_date: Optional[Any] = None,
+        hourly_date: Optional[Union[date, datetime]] = None,
         one_observation: Optional[bool] = None,
         language: Optional[str] = None,
         units: Optional[str] = None,
@@ -335,7 +337,8 @@ class LS:
         :param query: Free text query. Examples: "125, Berliner, berlin", "Beacon, Boston"
         :param zipcode: ZIP code of the location. This parameter is supported only for locations in
             the United States of America.
-        :param hourly_date: Date for which hourly forecasts are to be retrieved.
+        :param hourly_date: Date for which hourly forecasts are to be retrieved. Can be either a
+            `date` or `datetime` object
         :param one_observation: Boolean, if set to true, the response only includes the closest
             location. Only available when the `product` parameter is set to
             `DEST_WEATHER_PRODUCT.observation`.
@@ -370,9 +373,7 @@ class LS:
 
     def get_weather_alerts(
         self,
-        feature_type: str,
-        geometry_type: str,
-        geometry_coordinates: List,
+        geometry: Union[Point, LineString, Polygon, MultiPolygon],
         start_time: datetime,
         id: Optional[str] = None,
         weather_severity: Optional[int] = None,
@@ -384,9 +385,8 @@ class LS:
         """Retrieves weather reports, weather forecasts, severe weather alerts
             and moon and sun rise and set information.
 
-        :param feature_type: String to define feature type
-        :param geometry_type: Point or LineString or Polygon or MultiPolygon
-        :param geometry_coordinates: Array of coordinates corressponding to type provided
+        :param geometry: Point or LineString or Polygon or MultiPolygon defining the route or
+            a single location
         :param start_time: Start time of the event
         :param id: Unique weather alert id.
         :param weather_severity: Defines the severity of the weather event as defined
@@ -402,9 +402,7 @@ class LS:
         """
 
         resp = self.destination_weather_api.get_weather_alerts(
-            feature_type=feature_type,
-            geometry_type=geometry_type,
-            geometry_coordinates=geometry_coordinates,
+            geometry=geometry,
             id=id,
             weather_severity=weather_severity,
             weather_type=weather_type,

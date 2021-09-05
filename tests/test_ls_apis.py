@@ -6,6 +6,7 @@ from datetime import datetime
 
 import pytest
 import requests
+from geojson import Point
 
 from here_location_services.config.dest_weather_config import DEST_WEATHER_PRODUCT
 from here_location_services.config.isoline_routing_config import (
@@ -34,9 +35,7 @@ def test_destination_weather(destination_weather_api):
 def test_weather_alerts(destination_weather_api):
     """Test Destination Weather api."""
     resp = destination_weather_api.get_weather_alerts(
-        feature_type="Feature",
-        geometry_type="Point",
-        geometry_coordinates=[15.256, 23.456],
+        geometry=Point(coordinates=[15.256, 23.456]),
         start_time=datetime.now(),
     )
     assert type(resp) == requests.Response

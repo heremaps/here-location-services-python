@@ -5,8 +5,10 @@
 """  # noqa E501
 
 import time
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from datetime import date, datetime
+from typing import Any, Dict, List, Optional, Union
+
+from geojson import Feature, FeatureCollection, LineString, MultiPolygon, Point, Polygon
 
 from here_location_services.platform.auth import Auth
 
@@ -33,7 +35,7 @@ class DestinationWeatherApi(Api):
         at: Optional[List] = None,
         query: Optional[str] = None,
         zipcode: Optional[str] = None,
-        hourly_date: Optional[Any] = None,
+        hourly_date: Optional[Union[date, datetime]] = None,
         one_observation: Optional[bool] = None,
         language: Optional[str] = None,
         units: Optional[str] = None,
@@ -49,7 +51,8 @@ class DestinationWeatherApi(Api):
         :param query: Free text query. Examples: "125, Berliner, berlin", "Beacon, Boston"
         :param zipcode: ZIP code of the location. This parameter is supported only for locations in
             the United States of America.
-        :param hourly_date: Date for which hourly forecasts are to be retrieved.
+        :param hourly_date: Date for which hourly forecasts are to be retrieved. Can be either a `date` or
+            `datetime` object
         :param one_observation: Boolean, if set to true, the response only includes the closest
             location. Only available when the `product` parameter is set to
             `DEST_WEATHER_PRODUCT.observation`.
@@ -71,7 +74,10 @@ class DestinationWeatherApi(Api):
         if zipcode:
             params["zipCode"] = zipcode
         if hourly_date:
-            params["hourlyDate"] = hourly_date.strftime("%Y-%m-%dT%H:%M:%S")
+            if type(hourly_date) is datetime.date:
+                params["hourlyDate"] = hourly_date.strftime("%Y-%m-%d")
+            else:
+                params["hourlyDate"] = hourly_date.strftime("%Y-%m-%dT%H:%M:%S")
         if one_observation:
             params["oneObservation"] = "true" if one_observation else "false"
         if language:
@@ -87,9 +93,7 @@ class DestinationWeatherApi(Api):
 
     def get_weather_alerts(
         self,
-        feature_type: str,
-        geometry_type: str,
-        geometry_coordinates: List,
+        geometry: Union[Point, LineString, Polygon, MultiPolygon],
         start_time: datetime,
         id: Optional[str] = None,
         weather_severity: Optional[int] = None,
@@ -102,9 +106,8 @@ class DestinationWeatherApi(Api):
 
         See further information `Here Destination Weather API <https://developer.here.com/documentation/destination-weather/dev_guide/topics/overview.html>_`.
 
-        :param feature_type: String to define feature type
-        :param geometry_type: Point or LineString or Polygon or MultiPolygon
-        :param geometry_coordinates: Array of coordinates corressponding to type provided
+        :param geometry: Point or LineString or Polygon or MultiPolygon defining the route or
+            a single location
         :param start_time: Start time of the event
         :param id: Unique weather alert id.
         :param weather_severity: Defines the severity of the weather event as defined
@@ -122,17 +125,6 @@ class DestinationWeatherApi(Api):
 
         path = "v3/alerts"
         url = f"{self._base_url}/{path}"
-        data: Dict[str, Any] = {
-            "type": "FeatureCollection",
-        }
-        features: Dict[str, Any] = {
-            "type": feature_type,
-        }
-
-        if id:
-            features["id"] = id
-
-        geometry: Dict[str, Any] = {"type": geometry_type, "coordinates": geometry_coordinates}
 
         properties: Dict[str, Any] = {
             "width": width,
@@ -151,10 +143,19 @@ class DestinationWeatherApi(Api):
             weather_warnings["endTime"] = time.mktime(end_time.timetuple())
 
         properties["warnings"] = [weather_warnings]
-        features["properties"] = properties
-        features["geometry"] = geometry
-        data["features"] = [features]
-        resp = self.post(url, data=data)
+
+        f = Feature(
+            geometry=geometry,
+            properties=properties,
+        )
+
+        if id:
+            f.id = id
+
+        feature_collection = FeatureCollection([])
+        feature_collection.features.append(f)
+
+        resp = self.post(url, data=feature_collection)
         if resp.status_code == 200:
             return resp
         else:
