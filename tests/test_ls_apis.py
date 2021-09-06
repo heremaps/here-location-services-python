@@ -2,10 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from argparse import Namespace
+from datetime import datetime
 
 import pytest
 import requests
+from geojson import Point
 
+from here_location_services.config.dest_weather_config import DEST_WEATHER_PRODUCT
 from here_location_services.config.isoline_routing_config import (
     ISOLINE_ROUTING_TRANSPORT_MODE,
     RANGE_TYPE,
@@ -16,6 +19,27 @@ from here_location_services.matrix_routing_api import MatrixRoutingApi
 from here_location_services.utils import get_apikey
 
 LS_API_KEY = get_apikey()
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_destination_weather(destination_weather_api):
+    """Test Destination Weather api."""
+    resp = destination_weather_api.get_dest_weather(
+        products=[DEST_WEATHER_PRODUCT.observation], query="Chicago"
+    )
+    assert type(resp) == requests.Response
+    assert resp.status_code == 200
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_weather_alerts(destination_weather_api):
+    """Test Destination Weather api."""
+    resp = destination_weather_api.get_weather_alerts(
+        geometry=Point(coordinates=[15.256, 23.456]),
+        start_time=datetime.now(),
+    )
+    assert type(resp) == requests.Response
+    assert resp.status_code == 200
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")

@@ -6,9 +6,11 @@
 import os
 import urllib
 import urllib.request
-from datetime import datetime
+from datetime import date, datetime
 from time import sleep
 from typing import Dict, List, Optional, Tuple, Union
+
+from geojson import LineString, MultiPolygon, Point, Polygon
 
 from here_location_services.config.routing_config import Scooter, Via
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
@@ -26,6 +28,7 @@ from .config.matrix_routing_config import (
     PolygonRegion,
     WorldRegion,
 )
+from .destination_weather_api import DestinationWeatherApi
 from .exceptions import ApiError
 from .geocoding_search_api import GeocodingSearchApi
 from .isoline_routing_api import IsolineRoutingApi
@@ -33,6 +36,7 @@ from .matrix_routing_api import MatrixRoutingApi
 from .responses import (
     AutosuggestResponse,
     BrowseResponse,
+    DestinationWeatherResponse,
     DiscoverResponse,
     GeocoderResponse,
     IsolineResponse,
@@ -89,6 +93,12 @@ class LS:
             api_key=api_key, auth=self.auth, proxies=proxies, country=country
         )
         self.autosuggest_api = AutosuggestApi(
+            api_key=api_key,
+            auth=self.auth,
+            proxies=proxies,
+            country=country,
+        )
+        self.destination_weather_api = DestinationWeatherApi(
             api_key=api_key,
             auth=self.auth,
             proxies=proxies,
@@ -304,6 +314,104 @@ class LS:
         )
         response = AutosuggestResponse.new(resp.json())
 
+        return response
+
+    def get_dest_weather(
+        self,
+        products: List[str],
+        at: Optional[List] = None,
+        query: Optional[str] = None,
+        zipcode: Optional[str] = None,
+        hourly_date: Optional[Union[date, datetime]] = None,
+        one_observation: Optional[bool] = None,
+        language: Optional[str] = None,
+        units: Optional[str] = None,
+    ) -> DestinationWeatherResponse:
+        """Retrieves weather reports, weather forecasts, severe weather alerts
+            and moon and sun rise and set information.
+
+        :param products: List of :class:`DestWeatherProduct` identifying the type of
+            report to obtain.
+        :param at: A list of ``latitude`` and ``longitude`` specifying the area covered
+            by the weather report.
+        :param query: Free text query. Examples: "125, Berliner, berlin", "Beacon, Boston"
+        :param zipcode: ZIP code of the location. This parameter is supported only for locations in
+            the United States of America.
+        :param hourly_date: Date for which hourly forecasts are to be retrieved. Can be either a
+            `date` or `datetime` object
+        :param one_observation: Boolean, if set to true, the response only includes the closest
+            location. Only available when the `product` parameter is set to
+            `DEST_WEATHER_PRODUCT.observation`.
+        :param language: Defines the language used in the descriptions in the response.
+        :param units: Defines whether units or imperial units are used in the response.
+        :raises ValueError: If neither `at`, `query` or `zipcode` are passed.
+        :raises ValueError: If `one_observation` is set to true without passing
+            DEST_WEATHER_PRODUCT.observation in `products`
+        :return: :class:`DestinationWeatherResponse` object.
+        """
+
+        if at is None and query is None and zipcode is None:
+            raise ValueError("please provide either `at` or `query` or `zipcode`.")
+        if "observation" not in products and one_observation:
+            raise ValueError(
+                "`one_observation` can only be set when the `products` parameter "
+                + "is set to DEST_WEATHER_PRODUCT.observation"
+            )
+
+        resp = self.destination_weather_api.get_dest_weather(
+            products=products,
+            at=at,
+            query=query,
+            zipcode=zipcode,
+            hourly_date=hourly_date,
+            one_observation=one_observation,
+            language=language,
+            units=units,
+        )
+        response = DestinationWeatherResponse.new(resp.json())
+        return response
+
+    def get_weather_alerts(
+        self,
+        geometry: Union[Point, LineString, Polygon, MultiPolygon],
+        start_time: datetime,
+        id: Optional[str] = None,
+        weather_severity: Optional[int] = None,
+        weather_type: Optional[str] = None,
+        country: Optional[str] = None,
+        end_time: Optional[datetime] = None,
+        width: Optional[int] = 50000,
+    ) -> DestinationWeatherResponse:
+        """Retrieves weather reports, weather forecasts, severe weather alerts
+            and moon and sun rise and set information.
+
+        :param geometry: Point or LineString or Polygon or MultiPolygon defining the route or
+            a single location
+        :param start_time: Start time of the event
+        :param id: Unique weather alert id.
+        :param weather_severity: Defines the severity of the weather event as defined
+            in :class:`WeatherSeverity`.
+        :param weather_type: Defines the type of the weather event as defined
+            in :class:`WeatherType`.
+        :param country: String for ISO-3166-1 2-letter country code.
+        :param end_time: End time of the event. If not present, warning is valid until
+            it is not removed from the feed by national weather institutes
+            (valid until warning is present in the response)
+        :param width: int. default 50000
+        :return: :class:`DestinationWeatherResponse` object.
+        """
+
+        resp = self.destination_weather_api.get_weather_alerts(
+            geometry=geometry,
+            id=id,
+            weather_severity=weather_severity,
+            weather_type=weather_type,
+            country=country,
+            start_time=start_time,
+            end_time=end_time,
+            width=width,
+        )
+        response = DestinationWeatherResponse.new(resp.json())
         return response
 
     def discover(
