@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+here-location-services 0.4.0 (2021-09-07)
+-----------------------------------------
+- Added Destination Weather API
+- Added Autosuggest API
+- Updated Isoline Routing API from v7 to v8
+- Added support for authentication token from HERE platform
+
 here-location-services 0.3.0 (2021-07-22)
 -----------------------------------------
 
