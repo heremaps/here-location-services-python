@@ -10,7 +10,7 @@ from datetime import date, datetime
 from time import sleep
 from typing import Dict, List, Optional, Tuple, Union
 
-from geojson import LineString, MultiPolygon, Point, Polygon
+from geojson import LineString, Point
 
 from here_location_services.config.routing_config import Scooter, Via
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
@@ -373,7 +373,7 @@ class LS:
 
     def get_weather_alerts(
         self,
-        geometry: Union[Point, LineString, Polygon, MultiPolygon],
+        geometry: Union[Point, LineString],
         start_time: datetime,
         id: Optional[str] = None,
         weather_severity: Optional[int] = None,
@@ -385,8 +385,7 @@ class LS:
         """Retrieves weather reports, weather forecasts, severe weather alerts
             and moon and sun rise and set information.
 
-        :param geometry: Point or LineString or Polygon or MultiPolygon defining the route or
-            a single location
+        :param geometry: Point or LineString defining the route or a single location
         :param start_time: Start time of the event
         :param id: Unique weather alert id.
         :param weather_severity: Defines the severity of the weather event as defined

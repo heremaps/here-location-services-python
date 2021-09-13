@@ -85,7 +85,7 @@ Attributes
 ====================   ===============================================================================================================       ===
 Attribute              Type                                                                                                                  Doc
 ====================   ===============================================================================================================       ===
-geometry               Point or LineString or Polygon or MultiPolygon                                                                        Point or LineString or Polygon or MultiPolygon defining the route or a single location
+geometry               Point or LineString                                                                                                   Point or LineString defining the route or a single location
 start_time             :func:`datetime.datetime`                                                                                             Start time of the event
 id                     str                                                                                                                   optional Unique weather alert id.
 weather_severity       :class:`WeatherSeverity <here_location_services.config.dest_weather_config.WeatherSeverity>`                          optional Defines the severity of the weather event

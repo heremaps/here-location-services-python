@@ -8,7 +8,7 @@ import time
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Union
 
-from geojson import Feature, FeatureCollection, LineString, MultiPolygon, Point, Polygon
+from geojson import Feature, FeatureCollection, LineString, Point
 
 from here_location_services.platform.auth import Auth
 
@@ -93,7 +93,7 @@ class DestinationWeatherApi(Api):
 
     def get_weather_alerts(
         self,
-        geometry: Union[Point, LineString, Polygon, MultiPolygon],
+        geometry: Union[Point, LineString],
         start_time: datetime,
         id: Optional[str] = None,
         weather_severity: Optional[int] = None,
@@ -106,8 +106,7 @@ class DestinationWeatherApi(Api):
 
         See further information `Here Destination Weather API <https://developer.here.com/documentation/destination-weather/dev_guide/topics/overview.html>_`.
 
-        :param geometry: Point or LineString or Polygon or MultiPolygon defining the route or
-            a single location
+        :param geometry: Point or LineString defining the route or a single location
         :param start_time: Start time of the event
         :param id: Unique weather alert id.
         :param weather_severity: Defines the severity of the weather event as defined
