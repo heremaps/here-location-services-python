@@ -100,7 +100,7 @@ class DestinationWeatherApi(Api):
         weather_type: Optional[str] = None,
         country: Optional[str] = None,
         end_time: Optional[datetime] = None,
-        width: Optional[int] = 50000,
+        width: Optional[int] = None,
     ):
         """Retrieves weather reports, weather forecasts, severe weather alerts and moon and sun rise and set information.
 
@@ -117,7 +117,7 @@ class DestinationWeatherApi(Api):
         :param end_time: End time of the event. If not present, warning is valid until
             it is not removed from the feed by national weather institutes
             (valid until warning is present in the response)
-        :param width: int. default 50000
+        :param width: int
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200.
         """  # noqa E501

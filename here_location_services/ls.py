@@ -380,7 +380,7 @@ class LS:
         weather_type: Optional[str] = None,
         country: Optional[str] = None,
         end_time: Optional[datetime] = None,
-        width: Optional[int] = 50000,
+        width: Optional[int] = None,
     ) -> DestinationWeatherResponse:
         """Retrieves weather reports, weather forecasts, severe weather alerts
             and moon and sun rise and set information.
@@ -396,9 +396,16 @@ class LS:
         :param end_time: End time of the event. If not present, warning is valid until
             it is not removed from the feed by national weather institutes
             (valid until warning is present in the response)
-        :param width: int. default 50000
+        :param width: int
+        :raises ValueError: If maximum width exceeds 100000 for point type geometry
+            or width exceeds 25000 for LineString geometry
         :return: :class:`DestinationWeatherResponse` object.
         """
+
+        if type(geometry) is Point and width and width > 100000:
+            raise ValueError("Maximum width is 100000 for Point geometry")
+        if type(geometry) is LineString and width and width > 25000:
+            raise ValueError("Maximum width is 25000 for LineString geometry")
 
         resp = self.destination_weather_api.get_weather_alerts(
             geometry=geometry,

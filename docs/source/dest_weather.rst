@@ -92,5 +92,5 @@ weather_severity       :class:`WeatherSeverity <here_location_services.config.de
 weather_type           :class:`WeatherType <here_location_services.config.dest_weather_config.WeatherType>`                                  optional Defines the type of the weather event
 country                str                                                                                                                   optional String for ISO-3166-1 2-letter country code.
 end_time               :func:`datetime.datetime`                                                                                             optional End time of the event. If not present, warning is valid until it is not removed from the feed by national weather institutes (valid until warning is present in the response)
-width                  int                                                                                                                   optional int. default 50000
+width                  int                                                                                                                   optional int.
 ====================   ===============================================================================================================       ===
