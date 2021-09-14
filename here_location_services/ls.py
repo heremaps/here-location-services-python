@@ -10,7 +10,7 @@ from datetime import date, datetime
 from time import sleep
 from typing import Dict, List, Optional, Tuple, Union
 
-from geojson import LineString, MultiPolygon, Point, Polygon
+from geojson import LineString, Point
 
 from here_location_services.config.routing_config import Scooter, Via
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
@@ -44,6 +44,7 @@ from .responses import (
     MatrixRoutingResponse,
     ReverseGeocoderResponse,
     RoutingResponse,
+    WeatherAlertsResponse,
 )
 from .routing_api import RoutingApi
 
@@ -373,20 +374,19 @@ class LS:
 
     def get_weather_alerts(
         self,
-        geometry: Union[Point, LineString, Polygon, MultiPolygon],
+        geometry: Union[Point, LineString],
         start_time: datetime,
         id: Optional[str] = None,
         weather_severity: Optional[int] = None,
         weather_type: Optional[str] = None,
         country: Optional[str] = None,
         end_time: Optional[datetime] = None,
-        width: Optional[int] = 50000,
-    ) -> DestinationWeatherResponse:
+        width: Optional[int] = None,
+    ) -> WeatherAlertsResponse:
         """Retrieves weather reports, weather forecasts, severe weather alerts
             and moon and sun rise and set information.
 
-        :param geometry: Point or LineString or Polygon or MultiPolygon defining the route or
-            a single location
+        :param geometry: Point or LineString defining the route or a single location
         :param start_time: Start time of the event
         :param id: Unique weather alert id.
         :param weather_severity: Defines the severity of the weather event as defined
@@ -397,9 +397,16 @@ class LS:
         :param end_time: End time of the event. If not present, warning is valid until
             it is not removed from the feed by national weather institutes
             (valid until warning is present in the response)
-        :param width: int. default 50000
-        :return: :class:`DestinationWeatherResponse` object.
+        :param width: int
+        :raises ValueError: If maximum width exceeds 100000 for point type geometry
+            or width exceeds 25000 for LineString geometry
+        :return: :class:`WeatherAlertsResponse` object.
         """
+
+        if type(geometry) is Point and width and width > 100000:
+            raise ValueError("Maximum width is 100000 for Point geometry")
+        if type(geometry) is LineString and width and width > 25000:
+            raise ValueError("Maximum width is 25000 for LineString geometry")
 
         resp = self.destination_weather_api.get_weather_alerts(
             geometry=geometry,
@@ -411,7 +418,7 @@ class LS:
             end_time=end_time,
             width=width,
         )
-        response = DestinationWeatherResponse.new(resp.json())
+        response = WeatherAlertsResponse.new(resp.json())
         return response
 
     def discover(

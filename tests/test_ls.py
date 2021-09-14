@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 import pytz
 from geojson import FeatureCollection, Point
+from geojson.geometry import LineString
 
 from here_location_services import LS
 from here_location_services.config.autosuggest_config import POLITICAL_VIEW, SHOW, SearchCircle
@@ -63,11 +64,13 @@ def test_ls_weather_alerts():
     """Test weather alerts endpoint of destination weather api."""
     ls = LS(api_key=LS_API_KEY)
     resp = ls.get_weather_alerts(
-        geometry=Point(coordinates=[15.256, 23.456]),
+        geometry=LineString([(8.919, 44.4074), (8.923, 44.4075)]),
         start_time=datetime.now(),
-        width=3000,
+        width=25000,
     )
     assert resp
+    geo_json = resp.to_geojson()
+    assert geo_json.type == "FeatureCollection"
 
     resp2 = ls.get_weather_alerts(
         geometry=Point(coordinates=[15.256, 23.456]),
@@ -78,6 +81,20 @@ def test_ls_weather_alerts():
         end_time=datetime.now() + timedelta(days=7),
     )
     assert resp2
+
+    with pytest.raises(ValueError):
+        ls.get_weather_alerts(
+            geometry=LineString([(8.919, 44.4074), (8.923, 44.4075)]),
+            start_time=datetime.now(),
+            width=50000,
+        )
+
+    with pytest.raises(ValueError):
+        ls.get_weather_alerts(
+            geometry=Point(coordinates=[15.256, 23.456]),
+            start_time=datetime.now(),
+            width=1000000,
+        )
 
     with pytest.raises(ApiError):
         ls2 = LS(api_key="dummy")

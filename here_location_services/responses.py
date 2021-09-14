@@ -200,6 +200,28 @@ class DestinationWeatherResponse(ApiResponse):
 
     def __init__(self, **kwargs):
         super().__init__()
-        self._filters = {"places": None, "features": None}
+        self._filters = {"places": None}
         for param, default in self._filters.items():
             setattr(self, param, kwargs.get(param, default))
+
+    def to_geojson(self):
+        """Return API response as GeoJSON."""
+        raise NotImplementedError("This method is not valid for DestinationWeatherResponse.")
+
+
+class WeatherAlertsResponse(ApiResponse):
+    """A class representing the Destination Weather API response data."""
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._filters = {"features": None}
+        for param, default in self._filters.items():
+            setattr(self, param, kwargs.get(param, default))
+
+    def to_geojson(self):
+        """Return API response as GeoJSON."""
+        feature_collection = FeatureCollection([])
+        for feature in self.response["features"]:
+            f = Feature(geometry=feature["geometry"], properties=feature["properties"])
+            feature_collection.features.append(f)
+        return feature_collection

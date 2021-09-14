@@ -8,7 +8,7 @@ import time
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Union
 
-from geojson import Feature, FeatureCollection, LineString, MultiPolygon, Point, Polygon
+from geojson import Feature, FeatureCollection, LineString, Point
 
 from here_location_services.platform.auth import Auth
 
@@ -93,21 +93,20 @@ class DestinationWeatherApi(Api):
 
     def get_weather_alerts(
         self,
-        geometry: Union[Point, LineString, Polygon, MultiPolygon],
+        geometry: Union[Point, LineString],
         start_time: datetime,
         id: Optional[str] = None,
         weather_severity: Optional[int] = None,
         weather_type: Optional[str] = None,
         country: Optional[str] = None,
         end_time: Optional[datetime] = None,
-        width: Optional[int] = 50000,
+        width: Optional[int] = None,
     ):
         """Retrieves weather reports, weather forecasts, severe weather alerts and moon and sun rise and set information.
 
         See further information `Here Destination Weather API <https://developer.here.com/documentation/destination-weather/dev_guide/topics/overview.html>_`.
 
-        :param geometry: Point or LineString or Polygon or MultiPolygon defining the route or
-            a single location
+        :param geometry: Point or LineString defining the route or a single location
         :param start_time: Start time of the event
         :param id: Unique weather alert id.
         :param weather_severity: Defines the severity of the weather event as defined
@@ -118,7 +117,7 @@ class DestinationWeatherApi(Api):
         :param end_time: End time of the event. If not present, warning is valid until
             it is not removed from the feed by national weather institutes
             (valid until warning is present in the response)
-        :param width: int. default 50000
+        :param width: int
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200.
         """  # noqa E501
