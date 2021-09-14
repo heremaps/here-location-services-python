@@ -44,6 +44,7 @@ from .responses import (
     MatrixRoutingResponse,
     ReverseGeocoderResponse,
     RoutingResponse,
+    WeatherAlertsResponse,
 )
 from .routing_api import RoutingApi
 
@@ -381,7 +382,7 @@ class LS:
         country: Optional[str] = None,
         end_time: Optional[datetime] = None,
         width: Optional[int] = None,
-    ) -> DestinationWeatherResponse:
+    ) -> WeatherAlertsResponse:
         """Retrieves weather reports, weather forecasts, severe weather alerts
             and moon and sun rise and set information.
 
@@ -399,7 +400,7 @@ class LS:
         :param width: int
         :raises ValueError: If maximum width exceeds 100000 for point type geometry
             or width exceeds 25000 for LineString geometry
-        :return: :class:`DestinationWeatherResponse` object.
+        :return: :class:`WeatherAlertsResponse` object.
         """
 
         if type(geometry) is Point and width and width > 100000:
@@ -417,7 +418,7 @@ class LS:
             end_time=end_time,
             width=width,
         )
-        response = DestinationWeatherResponse.new(resp.json())
+        response = WeatherAlertsResponse.new(resp.json())
         return response
 
     def discover(
