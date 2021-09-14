@@ -206,7 +206,7 @@ class DestinationWeatherResponse(ApiResponse):
 
     def to_geojson(self):
         """Return API response as GeoJSON."""
-        raise NotImplementedError("This method is not valid for MatrixRoutingResponse.")
+        raise NotImplementedError("This method is not valid for DestinationWeatherResponse.")
 
 
 class WeatherAlertsResponse(ApiResponse):
