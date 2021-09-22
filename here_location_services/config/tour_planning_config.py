@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """This module defines all the configs which will be required as inputs to Tour planning API."""
-from datetime import datetime
 import json
-
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 from here_location_services.config.isoline_routing_config import IsolineRoutingAvoidFeatures
@@ -73,14 +72,95 @@ class Fleet(object):
     A fleet represented by various vehicle types for serving jobs.
     """
 
-    def __init__(self, vehicle_types: List[VehicleType],
-                 vehicle_profiles: List
-                 ):
+    def __init__(self, vehicle_types: List[VehicleType], vehicle_profiles: List):
         l_types = []
         for t in vehicle_types:
             l_types.append(vars(t))
+        self.types = l_types
+
         l_profiles = []
         for l in vehicle_profiles:
             l_profiles.append(vars(l))
-        self.types = l_types
         self.profiles = l_profiles
+
+
+class JobPlaces(object):
+    """A class to define ``JobPlaces``"""
+
+    def __init__(
+        self,
+        duration: int,
+        demand: List[int],
+        location: Tuple,
+        tag: Optional[str] = None,
+        times: Optional[List[List[str]]] = None,
+    ):
+        self.duration = duration
+        self.demand = demand
+        self.location = {"lat": location[0], "lng": location[1]}
+        if tag:
+            self.tag = tag
+        if times:
+            self.times = times
+
+
+class Job(object):
+    """A class to define ``Job``
+
+    A fleet represented by various vehicle types for serving jobs.
+    """
+
+    def __init__(
+        self,
+        id: str,
+        skills: Optional[List] = None,
+        priority: Optional[int] = None,
+        pickups: Optional[JobPlaces] = None,
+        deliveries: Optional[JobPlaces] = None,
+    ):
+        self.id = id
+        if skills:
+            self.skills = skills
+        if priority:
+            self.priority = priority
+        self.places = {}
+        if pickups:
+            l_pickups = []
+            for p in pickups:
+                l_pickups.append(vars(p))
+            self.places["pickups"] = l_pickups
+        if deliveries:
+            l_deliveries = []
+            for d in deliveries:
+                l_deliveries.append(vars(d))
+            self.places["deliveries"] = l_deliveries
+
+
+class Relation(object):
+    """A class to define ``Relation``
+
+    A fleet represented by various vehicle types for serving jobs.
+    """
+
+    def __init__(self, type: str, jobs: List, vehicle_id: str):
+        self.type = type
+        self.jobs = jobs
+        self.vehicleId = vehicle_id
+
+
+class Plan(object):
+    """A class to define ``Plan``
+
+    Represents the list of jobs to be served.
+    """
+
+    def __init__(self, jobs: List[Job], relations: Optional[List[Relation]]):
+        l_jobs = []
+        for p in jobs:
+            l_jobs.append(vars(p))
+            self.jobs = l_jobs
+
+        l_relations = []
+        for p in relations:
+            l_relations.append(vars(p))
+            self.relations = l_relations

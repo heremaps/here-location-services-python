@@ -13,6 +13,7 @@ from typing import Dict, List, Optional, Tuple, Union
 from geojson import LineString, Point
 
 from here_location_services.config.routing_config import Scooter, Via
+from here_location_services.config.tour_planning_config import Fleet, Plan
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
 from here_location_services.platform.auth import Auth
 from here_location_services.platform.credentials import PlatformCredentials
@@ -428,8 +429,14 @@ class LS:
         response = WeatherAlertsResponse.new(resp.json())
         return response
 
-    def solve_problem(
+    def solve_tour_planning(
         self,
+        fleet: Fleet,
+        plan: Plan,
+        id: Optional[str] = None,
+        optimization_traffic: Optional[str] = None,
+        optimization_waiting_time: Optional[Dict] = None,
+        is_async: Optional[bool] = False,
     ) -> WeatherAlertsResponse:
         """Retrieves weather reports, weather forecasts, severe weather alerts
             and moon and sun rise and set information.
@@ -455,11 +462,40 @@ class LS:
         #     raise ValueError("Maximum width is 100000 for Point geometry")
         # if type(geometry) is LineString and width and width > 25000:
         #     raise ValueError("Maximum width is 25000 for LineString geometry")
-
-        resp = self.tour_planning_api.solve_problem()
-        print(resp)
-        response = WeatherAlertsResponse.new(resp.json())
-        return response
+        if is_async is True:
+            resp = self.tour_planning_api.solve_tour_planning(
+                fleet=fleet,
+                plan=plan,
+                id=id,
+                optimization_traffic=optimization_traffic,
+                optimization_waiting_time=optimization_waiting_time,
+                is_async=is_async,
+            )
+            status_url = resp.json()["href"]
+            while True:
+                resp_status = self.tour_planning_api.get_async_tour_planning_status(status_url)
+                if resp_status.status_code == 200 and resp_status.json().get("error"):
+                    raise ApiError(resp_status)
+                elif resp_status.status_code == 200 and resp_status.json()["status"] == "success":
+                    result_url = resp_status.json()["resource"]["href"]
+                    break
+                elif resp_status.status_code in (401, 403, 404, 500):
+                    raise ApiError(resp_status)
+                sleep(2)
+            result = self.matrix_routing_api.get_async_matrix_route_results(result_url)
+            print(result)
+            return result
+        else:
+            resp = self.tour_planning_api.solve_tour_planning(
+                fleet=fleet,
+                plan=plan,
+                id=id,
+                optimization_traffic=optimization_traffic,
+                optimization_waiting_time=optimization_waiting_time,
+                is_async=is_async,
+            )
+            response = WeatherAlertsResponse.new(resp.json())
+            return response
 
     def discover(
         self,

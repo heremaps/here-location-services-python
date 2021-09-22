@@ -7,8 +7,17 @@
 from typing import Dict, List, Optional, Tuple
 
 from _pytest.mark import param
+import requests
 
-from here_location_services.config.tour_planning_config import Fleet, VehicleProfile, VehicleType
+from here_location_services.config.tour_planning_config import (
+    Fleet,
+    Job,
+    JobPlaces,
+    Plan,
+    Relation,
+    VehicleProfile,
+    VehicleType,
+)
 from here_location_services.platform.auth import Auth
 
 from .apis import Api
@@ -28,12 +37,15 @@ class TourPlanningApi(Api):
         super().__init__(api_key, auth=auth, proxies=proxies, country=country)
         self._base_url = f"https://tourplanning.{self._get_url_string()}"
 
-    def solve_problem(
+    def solve_tour_planning(
         self,
-        # fleet: Fleet,
+        fleet: Fleet,
+        plan: Plan,
         id: Optional[str] = None,
+        optimization_traffic: Optional[str] = None,
+        optimization_waiting_time: Optional[Dict] = None,
         is_async: Optional[bool] = False,
-    ):
+    ) -> Dict:
         """Suggest address or place candidates based on an incomplete or misspelled query
 
         :param query: A string for free-text query. Example: res, rest
@@ -69,154 +81,39 @@ class TourPlanningApi(Api):
             path = "v2/problems"
 
         url = f"{self._base_url}/{path}"
-        # params: Dict[str, str] = {
-        #     "fleet": fleet,
-        # }
-        fleet = Fleet(
-            # vehicle_types=[{
-            #     "id": "09c77738-1dba-42f1-b00e-eb63da7147d6",
-            #     "profile": "normal_car",
-            #     "costs": {"fixed": 22, "distance": 0.0001, "time": 0.0048},
-            #     "shifts": [
-            #         {
-            #             "start": {
-            #                 "time": "2020-07-04T09:00:00Z",
-            #                         "location": {"lat": 52.5256, "lng": 13.4542},
-            #             },
-            #             "end": {
-            #                 "time": "2020-07-04T18:00:00Z",
-            #                         "location": {"lat": 52.5256, "lng": 13.4542},
-            #             },
-            #             "breaks": [
-            #                 {
-            #                     "duration": 1800,
-            #                     "times": [
-            #                         ["2020-07-04T11:00:00Z", "2020-07-04T13:00:00Z"]
-            #                     ],
-            #                 }
-            #             ],
-            #         }
-            #     ],
-            #     "capacity": [100, 5],
-            #     "skills": ["fridge"],
-            #     "limits": {"maxDistance": 20000, "shiftTime": 21600},
-            #     "amount": 1,
-            # }], vehicle_profiles=[{"type": "car", "name": "normal_car"}],
-            vehicle_types=[
-                VehicleType(
-                    id="09c77738-1dba-42f1-b00e-eb63da7147d6",
-                    profile="normal_car",
-                    costs_fixed=22,
-                    costs_distance=0.0001,
-                    costs_time=0.0048,
-                    capacity=[100, 5],
-                    skills=["fridge"],
-                    amount=1,
-                    shift_start={
-                        "time": "2020-07-04T09:00:00Z",
-                        "location": {"lat": 52.5256, "lng": 13.4542},
-                    },
-                    limits={
-                        "maxDistance": 20000,
-                        "shiftTime": 21600
-                    },
-                    shift_end={
-                        "location": {
-                            "lat": 52.5256,
-                            "lng": 13.4542
-                        },
-                        "time": "2020-07-04T18:00:00Z"
-                    },
-                    shift_breaks=[{
-                        "duration": 1800,
-                        "times": [
-                            [
-                                "2020-07-04T11:00:00Z",
-                                "2020-07-04T13:00:00Z"
-                            ]
-                        ]
-                    }]
-                )
-            ],
-            vehicle_profiles=[VehicleProfile(name="normal_car", vehicle_mode="car")],
-        )
 
         data: Dict[str, str] = {
-            "id": "7f3423c2-784a-4983-b472-e14107d5a54a",
-            "configuration": {
-                "optimizations": {
-                    "traffic": "liveOrHistorical",
-                    "waitingTime": {"reduce": True, "bufferTime": 15},
-                }
-            },
-
-            "plan": {
-                "jobs": [
-                    {
-                        "id": "4bbc206d-1583-4266-bac9-d1580f412ac0",
-                        "places": {
-                            "pickups": [
-                                {
-                                    "times": [["2020-07-04T10:00:00Z", "2020-07-04T12:00:00Z"]],
-                                    "location": {"lat": 52.53088, "lng": 13.38471},
-                                    "duration": 180,
-                                    "demand": [10],
-                                }
-                            ],
-                            "deliveries": [
-                                {
-                                    "times": [["2020-07-04T14:00:00Z", "2020-07-04T16:00:00Z"]],
-                                    "location": {"lat": 52.54016, "lng": 13.40241},
-                                    "duration": 300,
-                                    "demand": [10],
-                                }
-                            ],
-                        },
-                        "skills": ["fridge"],
-                        "priority": 2,
-                    }
-                ],
-                "relations": [
-                    {
-                        "type": "sequence",
-                        "jobs": ["departure", "4bbc206d-1583-4266-bac9-d1580f412ac0", "arrival"],
-                        "vehicleId": "09c77738-1dba-42f1-b00e-eb63da7147d6_1",
-                    }
-                ],
-            },
+            "configuration": {"optimizations": {}},
         }
 
+        if id:
+            data["id"] = id
+
+        if optimization_traffic:
+            data["configuration"]["optimizations"]["traffic"] = optimization_traffic
+
+        if optimization_traffic:
+            data["configuration"]["optimizations"]["waitingTime"] = optimization_waiting_time
+
         data["fleet"] = vars(fleet)
+        data["plan"] = vars(plan)
 
         print(data)
-        # # if at:
-        # #     params["at"] = ",".join([str(i) for i in at])
-        # if in_country:
-        #     params["in"] = "countryCode:" + ",".join([str(i) for i in in_country])
-        # if search_in_circle:
-        #     params["in"] = (
-        #         "circle:"
-        #         + str(search_in_circle.lat)
-        #         + ","
-        #         + str(search_in_circle.lng)
-        #         + ";r="
-        #         + str(search_in_circle.radius)
-        #     )
-        # if limit:
-        #     params["limit"] = str(limit)
-        # if terms_limit:
-        #     params["termsLimit"] = str(terms_limit)
-        # if lang:
-        #     params["lang"] = ",".join([str(i) for i in lang])
-        # if political_view:
-        #     params["politicalView"] = political_view
-        # if show:
-        #     params["show"] = ",".join([str(i) for i in show])
-        # if search_in_bbox:
-        #     params["in"] = "bbox:" + ",".join([str(i) for i in search_in_bbox])
+
         resp = self.post(url, data=data)
         print(resp.url)
-        if resp.status_code == 200:
+        if resp.status_code == 200 or resp.status_code == 202:
             return resp
         else:
             raise ApiError(resp)
+
+    def get_async_tour_planning_status(self, status_url: str) -> requests.Response:
+        """Get the status of async tour planning calculation for the provided status url."""
+        return self.get(status_url, allow_redirects=False)
+
+    def get_async_tour_planning_results(self, result_url: str) -> requests.Response:
+        """Get the results of async tour planning for the provided result url."""
+        resp = self.get(result_url)
+        if resp.status_code != 200:
+            raise ApiError(resp)
+        return resp.json()
