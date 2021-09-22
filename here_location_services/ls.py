@@ -45,6 +45,7 @@ from .responses import (
     MatrixRoutingResponse,
     ReverseGeocoderResponse,
     RoutingResponse,
+    TourPlanningResponse,
     WeatherAlertsResponse,
 )
 from .routing_api import RoutingApi
@@ -437,31 +438,24 @@ class LS:
         optimization_traffic: Optional[str] = None,
         optimization_waiting_time: Optional[Dict] = None,
         is_async: Optional[bool] = False,
-    ) -> WeatherAlertsResponse:
-        """Retrieves weather reports, weather forecasts, severe weather alerts
-            and moon and sun rise and set information.
+    ) -> TourPlanningResponse:
+        """Requests profile-aware routing data, creates a Vehicle Routing Problem and solves it.
 
-        :param geometry: Point or LineString defining the route or a single location
-        :param start_time: Start time of the event
-        :param id: Unique weather alert id.
-        :param weather_severity: Defines the severity of the weather event as defined
-            in :class:`WeatherSeverity`.
-        :param weather_type: Defines the type of the weather event as defined
-            in :class:`WeatherType`.
-        :param country: String for ISO-3166-1 2-letter country code.
-        :param end_time: End time of the event. If not present, warning is valid until
-            it is not removed from the feed by national weather institutes
-            (valid until warning is present in the response)
-        :param width: int
-        :raises ValueError: If maximum width exceeds 100000 for point type geometry
-            or width exceeds 25000 for LineString geometry
-        :return: :class:`WeatherAlertsResponse` object.
+        :param fleet: A fleet represented by various vehicle types for serving jobs.
+        :param plan: Represents the list of jobs to be served.
+        :param id: A unique identifier of an entity. Avoid referencing any confidential or
+            personal information as part of the Id.
+        :param optimization_traffic: "liveOrHistorical" "historicalOnly" "automatic"
+            Specifies what kind of traffic information should be considered for routing
+        :param optimization_waiting_time: Configures departure time optimization which tries to
+            adapt the starting time of the tour in order to reduce waiting time as a consequence
+            of a vehicle arriving at a stop before the starting time of the time window defined
+            for serving the job.
+        :param is_async: Solves the problem Asynchronously
+        :raises ApiError: If
+        :return: :class:`TourPlanningResponse` object.
         """
 
-        # if type(geometry) is Point and width and width > 100000:
-        #     raise ValueError("Maximum width is 100000 for Point geometry")
-        # if type(geometry) is LineString and width and width > 25000:
-        #     raise ValueError("Maximum width is 25000 for LineString geometry")
         if is_async is True:
             resp = self.tour_planning_api.solve_tour_planning(
                 fleet=fleet,
@@ -474,6 +468,8 @@ class LS:
             status_url = resp.json()["href"]
             while True:
                 resp_status = self.tour_planning_api.get_async_tour_planning_status(status_url)
+                print(resp_status.json()["status"])
+
                 if resp_status.status_code == 200 and resp_status.json().get("error"):
                     raise ApiError(resp_status)
                 elif resp_status.status_code == 200 and resp_status.json()["status"] == "success":
@@ -483,8 +479,8 @@ class LS:
                     raise ApiError(resp_status)
                 sleep(2)
             result = self.matrix_routing_api.get_async_matrix_route_results(result_url)
-            print(result)
-            return result
+            response = TourPlanningResponse.new(result)
+            return response
         else:
             resp = self.tour_planning_api.solve_tour_planning(
                 fleet=fleet,
@@ -494,7 +490,7 @@ class LS:
                 optimization_waiting_time=optimization_waiting_time,
                 is_async=is_async,
             )
-            response = WeatherAlertsResponse.new(resp.json())
+            response = TourPlanningResponse.new(resp.json())
             return response
 
     def discover(

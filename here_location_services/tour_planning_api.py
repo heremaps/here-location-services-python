@@ -4,20 +4,11 @@
 """This module contains classes for accessing `HERE Tour Planning API <https://developer.here.com/documentation/tour-planning/2.3.0/api-reference-swagger.html>`_.
 """  # noqa E501
 
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional
 
-from _pytest.mark import param
 import requests
 
-from here_location_services.config.tour_planning_config import (
-    Fleet,
-    Job,
-    JobPlaces,
-    Plan,
-    Relation,
-    VehicleProfile,
-    VehicleType,
-)
+from here_location_services.config.tour_planning_config import Fleet, Plan
 from here_location_services.platform.auth import Auth
 
 from .apis import Api
@@ -45,33 +36,22 @@ class TourPlanningApi(Api):
         optimization_traffic: Optional[str] = None,
         optimization_waiting_time: Optional[Dict] = None,
         is_async: Optional[bool] = False,
-    ) -> Dict:
-        """Suggest address or place candidates based on an incomplete or misspelled query
+    ):
+        """Requests profile-aware routing data, creates a Vehicle Routing Problem and solves it.
 
-        :param query: A string for free-text query. Example: res, rest
-        :param at: Specify the center of the search context expressed as list of coordinates
-            One of `at`, `search_in_circle` or `search_in_bbox` is required.
-            Parameters "at", "search_in_circle" and "search_in_bbox" are mutually exclusive. Only
-            one of them is allowed.
-        :param search_in_circle: Search within a circular geographic area provided as
-            latitude, longitude, and radius (in meters)
-        :param search_in_bbox: Search within a rectangular bounding box geographic area provided
-            as tuple of west longitude, south latitude, east longitude, north latitude
-        :param in_country: Search within a specific or multiple countries provided as
-            comma-separated ISO 3166-1 alpha-3 country codes. The country codes are to be
-            provided in all uppercase. Must be accompanied by exactly one of
-            `at`, `search_in_circle` or `search_in_bbox`.
-        :param limit: An integer specifiying maximum number of results to be returned.
-        :param terms_limit: An integer specifiying maximum number of Query Terms Suggestions
-            to be returned.
-        :param lang: List of strings to select the language to be used for result rendering
-            from a list of BCP 47 compliant language codes.
-        :param political_view: Toggle the political view.
-        :param show: Select additional fields to be rendered in the response. Please note
-            that some of the fields involve additional webservice calls and can increase
-            the overall response time.
+        :param fleet: A fleet represented by various vehicle types for serving jobs.
+        :param plan: Represents the list of jobs to be served.
+        :param id: A unique identifier of an entity. Avoid referencing any confidential or
+            personal information as part of the Id.
+        :param optimization_traffic: "liveOrHistorical" "historicalOnly" "automatic"
+            Specifies what kind of traffic information should be considered for routing
+        :param optimization_waiting_time: Configures departure time optimization which tries to
+            adapt the starting time of the tour in order to reduce waiting time as a consequence
+            of a vehicle arriving at a stop before the starting time of the time window defined
+            for serving the job.
+        :param is_async: Solves the problem Asynchronously
         :return: :class:`requests.Response` object.
-        :raises ApiError: If ``status_code`` of API response is not 200.
+        :raises ApiError: If ``status_code`` of API response is not 200 or 202.
 
         """
         path = ""
@@ -82,7 +62,7 @@ class TourPlanningApi(Api):
 
         url = f"{self._base_url}/{path}"
 
-        data: Dict[str, str] = {
+        data: Dict[Any, Any] = {
             "configuration": {"optimizations": {}},
         }
 
@@ -98,10 +78,7 @@ class TourPlanningApi(Api):
         data["fleet"] = vars(fleet)
         data["plan"] = vars(plan)
 
-        print(data)
-
         resp = self.post(url, data=data)
-        print(resp.url)
         if resp.status_code == 200 or resp.status_code == 202:
             return resp
         else:
@@ -111,9 +88,9 @@ class TourPlanningApi(Api):
         """Get the status of async tour planning calculation for the provided status url."""
         return self.get(status_url, allow_redirects=False)
 
-    def get_async_tour_planning_results(self, result_url: str) -> requests.Response:
+    def get_async_tour_planning_results(self, result_url: str):
         """Get the results of async tour planning for the provided result url."""
         resp = self.get(result_url)
         if resp.status_code != 200:
             raise ApiError(resp)
-        return resp.json()
+        return resp
