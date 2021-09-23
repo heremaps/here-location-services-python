@@ -131,7 +131,7 @@ class VehicleProfile(object):
         name: str,
         vehicle_mode: str,
         departure_time: Optional[datetime] = None,
-        avoid: Optional[List[IsolineRoutingAvoidFeatures]] = None,
+        avoid: Optional[List[TourPlanningAvoidFeatures]] = None,
         truck_options: Optional[Truck] = None,
         allow_highway_for_scooter: Optional[bool] = None,
     ):
@@ -223,7 +223,7 @@ class Job(object):
         other delivery.
     :param deliveries: Places where sub jobs to be performed. All pickups are done before any
         other delivery.
-    :raises ValueError: If no subjob is speficified either as pickup or delivery.
+    :raises ValueError: If no subjob is specified either as pickup or delivery.
 
     """
 
@@ -236,7 +236,7 @@ class Job(object):
         deliveries: Optional[List[JobPlaces]] = None,
     ):
         if pickups is None and deliveries is None:
-            raise ValueError("Atleast one subjob must be specified as pickup or delivery")
+            raise ValueError("At least one subjob must be specified as pickup or delivery")
         self.id = id
         if skills:
             self.skills = skills
@@ -283,7 +283,7 @@ class Plan(object):
     Represents the list of jobs to be served.
     """
 
-    def __init__(self, jobs: List[Job], relations: Optional[List[Relation]]):
+    def __init__(self, jobs: List[Job], relations: Optional[List[Relation]] = None):
         l_jobs = []
         for p in jobs:
             l_jobs.append(vars(p))
