@@ -468,8 +468,6 @@ class LS:
             status_url = resp.json()["href"]
             while True:
                 resp_status = self.tour_planning_api.get_async_tour_planning_status(status_url)
-                print(resp_status.json()["status"])
-
                 if resp_status.status_code == 200 and resp_status.json().get("error"):
                     raise ApiError(resp_status)
                 elif resp_status.status_code == 200 and resp_status.json()["status"] == "success":

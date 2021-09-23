@@ -5,8 +5,6 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
-from here_location_services.config.isoline_routing_config import IsolineRoutingAvoidFeatures
-
 from .base_config import Bunch, Truck
 
 
@@ -59,9 +57,9 @@ class VehicleType(object):
         shift_start: Dict,
         shift_end: Optional[Dict] = None,
         shift_breaks: Optional[List] = None,
-        costs_fixed: Optional[float] = 0,
-        costs_distance: Optional[float] = 0,
-        costs_time: Optional[float] = 0,
+        costs_fixed: float = 0,
+        costs_distance: float = 0,
+        costs_time: float = 0,
         skills: Optional[List[str]] = None,
         limits: Optional[Dict] = None,
     ):
