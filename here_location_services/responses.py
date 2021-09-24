@@ -225,3 +225,17 @@ class WeatherAlertsResponse(ApiResponse):
             f = Feature(geometry=feature["geometry"], properties=feature["properties"])
             feature_collection.features.append(f)
         return feature_collection
+
+
+class TourPlanningResponse(ApiResponse):
+    """A class representing the Tour Planning API response data."""
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._filters = {"problemId": None, "statistic": None, "tours": None, "unassigned": None}
+        for param, default in self._filters.items():
+            setattr(self, param, kwargs.get(param, default))
+
+    def to_geojson(self):
+        """Return API response as GeoJSON."""
+        raise NotImplementedError("This method is not valid for TourPlanningResponse.")

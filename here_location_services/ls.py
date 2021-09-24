@@ -13,6 +13,7 @@ from typing import Dict, List, Optional, Tuple, Union
 from geojson import LineString, Point
 
 from here_location_services.config.routing_config import Scooter, Via
+from here_location_services.config.tour_planning_config import Fleet, Plan
 from here_location_services.platform.apis.aaa_oauth2_api import AAAOauth2Api
 from here_location_services.platform.auth import Auth
 from here_location_services.platform.credentials import PlatformCredentials
@@ -44,9 +45,11 @@ from .responses import (
     MatrixRoutingResponse,
     ReverseGeocoderResponse,
     RoutingResponse,
+    TourPlanningResponse,
     WeatherAlertsResponse,
 )
 from .routing_api import RoutingApi
+from .tour_planning_api import TourPlanningApi
 
 
 class LS:
@@ -100,6 +103,12 @@ class LS:
             country=country,
         )
         self.destination_weather_api = DestinationWeatherApi(
+            api_key=api_key,
+            auth=self.auth,
+            proxies=proxies,
+            country=country,
+        )
+        self.tour_planning_api = TourPlanningApi(
             api_key=api_key,
             auth=self.auth,
             proxies=proxies,
@@ -420,6 +429,67 @@ class LS:
         )
         response = WeatherAlertsResponse.new(resp.json())
         return response
+
+    def solve_tour_planning(
+        self,
+        fleet: Fleet,
+        plan: Plan,
+        id: Optional[str] = None,
+        optimization_traffic: Optional[str] = None,
+        optimization_waiting_time: Optional[Dict] = None,
+        is_async: Optional[bool] = False,
+    ) -> TourPlanningResponse:
+        """Requests profile-aware routing data, creates a Vehicle Routing Problem and solves it.
+
+        :param fleet: A fleet represented by various vehicle types for serving jobs.
+        :param plan: Represents the list of jobs to be served.
+        :param id: A unique identifier of an entity. Avoid referencing any confidential or
+            personal information as part of the Id.
+        :param optimization_traffic: "liveOrHistorical" "historicalOnly" "automatic"
+            Specifies what kind of traffic information should be considered for routing
+        :param optimization_waiting_time: Configures departure time optimization which tries to
+            adapt the starting time of the tour in order to reduce waiting time as a consequence
+            of a vehicle arriving at a stop before the starting time of the time window defined
+            for serving the job.
+        :param is_async: Solves the problem Asynchronously
+        :raises ApiError: If
+        :return: :class:`TourPlanningResponse` object.
+        """
+
+        if is_async is True:
+            resp = self.tour_planning_api.solve_tour_planning(
+                fleet=fleet,
+                plan=plan,
+                id=id,
+                optimization_traffic=optimization_traffic,
+                optimization_waiting_time=optimization_waiting_time,
+                is_async=is_async,
+            )
+            status_url = resp.json()["href"]
+            while True:
+                resp_status = self.tour_planning_api.get_async_tour_planning_status(status_url)
+                if resp_status.status_code == 200 and resp_status.json().get("error"):
+                    raise ApiError(resp_status)
+                elif resp_status.status_code == 200 and resp_status.json()["status"] == "success":
+                    result_url = resp_status.json()["resource"]["href"]
+                    break
+                elif resp_status.status_code in (401, 403, 404, 500):
+                    raise ApiError(resp_status)
+                sleep(2)
+            result = self.matrix_routing_api.get_async_matrix_route_results(result_url)
+            response = TourPlanningResponse.new(result)
+            return response
+        else:
+            resp = self.tour_planning_api.solve_tour_planning(
+                fleet=fleet,
+                plan=plan,
+                id=id,
+                optimization_traffic=optimization_traffic,
+                optimization_waiting_time=optimization_waiting_time,
+                is_async=is_async,
+            )
+            response = TourPlanningResponse.new(resp.json())
+            return response
 
     def discover(
         self,

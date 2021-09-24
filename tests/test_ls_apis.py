@@ -14,11 +14,94 @@ from here_location_services.config.isoline_routing_config import (
     RANGE_TYPE,
 )
 from here_location_services.config.matrix_routing_config import WorldRegion
+from here_location_services.config.tour_planning_config import (
+    VEHICLE_MODE,
+    Fleet,
+    Job,
+    JobPlaces,
+    Plan,
+    Relation,
+    VehicleProfile,
+    VehicleType,
+)
 from here_location_services.exceptions import ApiError
 from here_location_services.matrix_routing_api import MatrixRoutingApi
 from here_location_services.utils import get_apikey
 
 LS_API_KEY = get_apikey()
+
+
+@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+def test_tour_planning(tour_planning_api):
+    """Test tour planning api."""
+    fleet = Fleet(
+        vehicle_types=[
+            VehicleType(
+                id="09c77738-1dba-42f1-b00e-eb63da7147d6",
+                profile_name="normal_car",
+                costs_fixed=22,
+                costs_distance=0.0001,
+                costs_time=0.0048,
+                capacity=[100, 5],
+                skills=["fridge"],
+                amount=1,
+                shift_start={
+                    "time": "2020-07-04T09:00:00Z",
+                    "location": {"lat": 52.5256, "lng": 13.4542},
+                },
+                limits={"maxDistance": 20000, "shiftTime": 21600},
+                shift_end={
+                    "location": {"lat": 52.5256, "lng": 13.4542},
+                    "time": "2020-07-04T18:00:00Z",
+                },
+                shift_breaks=[
+                    {
+                        "duration": 1800,
+                        "times": [["2020-07-04T11:00:00Z", "2020-07-04T13:00:00Z"]],
+                    }
+                ],
+            )
+        ],
+        vehicle_profiles=[VehicleProfile(name="normal_car", vehicle_mode=VEHICLE_MODE.car)],
+    )
+
+    plan = Plan(
+        jobs=[
+            Job(
+                id="4bbc206d-1583-4266-bac9-d1580f412ac0",
+                pickups=[
+                    JobPlaces(
+                        duration=180,
+                        demand=[10],
+                        location=(52.53088, 13.38471),
+                        times=[["2020-07-04T10:00:00Z", "2020-07-04T12:00:00Z"]],
+                    )
+                ],
+                deliveries=[
+                    JobPlaces(
+                        duration=300,
+                        demand=[10],
+                        location=(52.53088, 13.38471),
+                        times=[["2020-07-04T14:00:00Z", "2020-07-04T16:00:00Z"]],
+                    )
+                ],
+                skills=["fridge"],
+                priority=2,
+            )
+        ],
+        relations=[
+            Relation(
+                type="sequence",
+                jobs=["departure", "4bbc206d-1583-4266-bac9-d1580f412ac0", "arrival"],
+                vehicle_id="09c77738-1dba-42f1-b00e-eb63da7147d6_1",
+            )
+        ],
+    )
+    resp = tour_planning_api.solve_tour_planning(
+        fleet=fleet, plan=plan, id="7f3423c2-784a-4983-b472-e14107d5a54a"
+    )
+    assert type(resp) == requests.Response
+    assert resp.status_code == 200
 
 
 @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
