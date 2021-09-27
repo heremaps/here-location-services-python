@@ -44,6 +44,12 @@ A Python client for `HERE Location Services`_.
 
 .. toctree::
   :maxdepth: 1
+  :caption: Tour Planning
+
+  Tour Planning <tour_planning>
+
+.. toctree::
+  :maxdepth: 1
   :caption: Reference Guide
 
   API Reference <here_location_services>
