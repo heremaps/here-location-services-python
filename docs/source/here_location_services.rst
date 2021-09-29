@@ -35,3 +35,5 @@ Submodules
    here_location_services.utils
    here_location_services.platform
    here_location_services.destination_weather_api.rst
+   here_location_services.config.tour_planning_config
+   here_location_services.tour_planning_api
