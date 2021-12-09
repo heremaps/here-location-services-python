@@ -63,26 +63,26 @@ class VehicleType(object):
         skills: Optional[List[str]] = None,
         limits: Optional[Dict] = None,
     ):
-        """
+        """Initializer.
+
         :param id: Specifies id of the vehicle type. Avoid assigning real-life identifiers,
-          such as vehicle license plate as the id of a vehicle
+            such as vehicle license plate as the id of a vehicle
         :param profile_name: characters ^[a-zA-Z0-9_-]+$ Specifies the name of the profile.
-          Avoid assigning real-life identifiers, such as a vehicle license plate Id or
-          personal name as the profileName of the routing profile.
+            Avoid assigning real-life identifiers, such as a vehicle license plate Id or
+            personal name as the profileName of the routing profile.
         :param amount: Amount of vehicles available.
         :param capacity: Unit of measure, e.g. volume, mass, size, etc.
         :param shift_start: Represents a depot: a place where a vehicle starts
         :param costs_fixed: A fixed cost to start using vehicle of this type. It is
-          optional with a default value of zero
+            optional with a default value of zero
         :param shift_end: Represents a depot: a place where a vehicle ends
         :param shift_breaks: Represents a depot: a place where a vehicle takes breaks
         :param costs_distance: A cost per meter. It is optional with a default value of zero.
         :param costs_time: A cost per second. It is optional with a default value of zero.
-          In case time and distance costs are zero then a small time cost 0.00000000001
-          will be used instead
+            In case time and distance costs are zero then a small time cost 0.00000000001
+            will be used instead
         :param skills: A list of skills for a vehicle or a job.
         :param limits: Contains constraints applied to a vehicle type.
-
         """
         self.id = id
         self.profile = profile_name

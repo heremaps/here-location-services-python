@@ -17,6 +17,7 @@ class ApiError(Exception):
 
         The string simply lists the repsonse's status code, reason and text
         content, separated with commas.
+        :return: string.
         """
         resp = self.args[0]
         return f"{resp.status_code}, {resp.reason}, {resp.text}"
@@ -79,6 +80,7 @@ class TooManyRequestsException(Exception):
 
         The string simply lists the response status code, reason and text
         content, separated with commas.
+        :return: string.
         """
 
         return "TooManyRequestsException: Status \

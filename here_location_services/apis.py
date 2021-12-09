@@ -40,6 +40,7 @@ class Api:
         For china url string ends with ``hereapi.cn`` and for rest of the countries
         deonoted by ``row`` it is ``hereapi.com``.
 
+        :return: string.
         :raises Exception: If ``api_key`` not found in credentials.
         """
         if self.credentials["api_key"] or self.credentials["access_token"]:
@@ -54,6 +55,7 @@ class Api:
         """
         Add api_key in query params dictionary.
 
+        :param params: A dictionary.
         :return: Dict.
         """
         params.update({"apiKey": self.credentials["api_key"]})
