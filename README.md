@@ -137,7 +137,7 @@ $ sh scripts/build_docs.sh
 ```
 
 ## Hello World Example
-The following are tiny "Hello World" like examples that you can run to have a successful first XYZ experience right after installation!
+The following are tiny "Hello World" like examples that you can run to have a successful first HERE Location Services experience right after installation!
 
 #### Using API key
 ```python
