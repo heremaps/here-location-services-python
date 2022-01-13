@@ -42,11 +42,12 @@ A Python client for `HERE Location Services`_.
 
   Destination Weather <dest_weather>
 
+..
 .. toctree::
-  :maxdepth: 1
-  :caption: Tour Planning
+.. :maxdepth: 1
+.. :caption: Tour Planning
 
-  Tour Planning <tour_planning>
+.. Tour Planning <tour_planning>
 
 .. toctree::
   :maxdepth: 1
