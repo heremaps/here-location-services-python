@@ -31,7 +31,8 @@ from here_location_services.utils import get_apikey
 LS_API_KEY = get_apikey()
 
 
-@pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
+@pytest.mark.skipif(True, reason="Works with platform specific credentials")
+# @pytest.mark.skipif(not LS_API_KEY, reason="No api key found.")
 def test_tour_planning(tour_planning_api):
     """Test tour planning api."""
     fleet = Fleet(
