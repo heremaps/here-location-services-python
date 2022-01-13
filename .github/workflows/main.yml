@@ -56,7 +56,7 @@ jobs:
         pytest -v --durations=10 --cov-report=xml --cov=here_location_services tests
 
     - name: Upload coverage to Codecov
-      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
+      if: github.ref == 'refs/heads/master' && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10'
       uses: codecov/codecov-action@v1
       with:
         file: ./coverage.xml
