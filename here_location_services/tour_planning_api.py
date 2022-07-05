@@ -72,7 +72,7 @@ class TourPlanningApi(Api):
         if optimization_traffic:
             data["configuration"]["optimizations"]["traffic"] = optimization_traffic
 
-        if optimization_traffic:
+        if optimization_waiting_time:
             data["configuration"]["optimizations"]["waitingTime"] = optimization_waiting_time
 
         data["fleet"] = vars(fleet)
