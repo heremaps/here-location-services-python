@@ -1,4 +1,6 @@
-# HERE Location Services for Python
+# (DEPRECATED) HERE Location Services for Python
+
+## Note: This library depends on HERE HLS Legacy, which will be deactivated on Dec 31st 2023. See [here](https://www.here.com/learn/blog/further-extension-of-end-of-life-of-predecessor-versions-of-here-location-service) for more information.
 
 [![Tests](https://github.com/heremaps/here-location-services-python/workflows/Tests/badge.svg)](https://github.com/heremaps/here-location-services-python/actions)
 [![Documentation Status](https://readthedocs.org/projects/here-location-services-python/badge/?version=stable)](https://here-location-services-python.readthedocs.io/en/stable/?badge=stable)
