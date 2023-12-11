@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 
 import requests
 
-from here_location_services.config.tour_planning_config import Fleet, Plan
+from here_location_services.config.tour_planning_config import Fleet, Plan, Configuration, Objectives
 from here_location_services.platform.auth import Auth
 
 from .apis import Api
@@ -30,25 +30,16 @@ class TourPlanningApi(Api):
 
     def solve_tour_planning(
         self,
+        configuration: Configuration,
         fleet: Fleet,
         plan: Plan,
-        id: Optional[str] = None,
-        optimization_traffic: Optional[str] = None,
-        optimization_waiting_time: Optional[Dict] = None,
+        objectives: Optional[dict[str]]=None,
         is_async: Optional[bool] = False,
     ):
         """Requests profile-aware routing data, creates a Vehicle Routing Problem and solves it.
 
         :param fleet: A fleet represented by various vehicle types for serving jobs.
         :param plan: Represents the list of jobs to be served.
-        :param id: A unique identifier of an entity. Avoid referencing any confidential or
-            personal information as part of the Id.
-        :param optimization_traffic: "liveOrHistorical" "historicalOnly" "automatic"
-            Specifies what kind of traffic information should be considered for routing
-        :param optimization_waiting_time: Configures departure time optimization which tries to
-            adapt the starting time of the tour in order to reduce waiting time as a consequence
-            of a vehicle arriving at a stop before the starting time of the time window defined
-            for serving the job.
         :param is_async: Solves the problem Asynchronously
         :return: :class:`requests.Response` object.
         :raises ApiError: If ``status_code`` of API response is not 200 or 202.
@@ -56,27 +47,27 @@ class TourPlanningApi(Api):
         """
         path = ""
         if is_async:
-            path = "v2/problems/async"
+            path = "v3/problems/async"
         else:
-            path = "v2/problems"
+            path = "v3/problems"
 
         url = f"{self._base_url}/{path}"
 
-        data: Dict[Any, Any] = {
-            "configuration": {"optimizations": {}},
-        }
+        data: Dict[Any, Any] = {}
 
-        if id:
-            data["id"] = id
 
-        if optimization_traffic:
-            data["configuration"]["optimizations"]["traffic"] = optimization_traffic
-
-        if optimization_waiting_time:
-            data["configuration"]["optimizations"]["waitingTime"] = optimization_waiting_time
-
+        data["configuration"] = vars(configuration)
         data["fleet"] = vars(fleet)
         data["plan"] = vars(plan)
+        l_objectives = []
+        if objectives:
+            for o in objectives:
+                l_objectives.append(o)
+            data["objectives"] = l_objectives
+            print(l_objectives)
+        print(url)
+        # print(data)
+
 
         resp = self.post(url, data=data)
         if resp.status_code == 200 or resp.status_code == 202:
