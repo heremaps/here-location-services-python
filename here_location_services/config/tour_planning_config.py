@@ -6,24 +6,8 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 from .base_config import Bunch, Truck
-
-
-class TourPlanningAvoidFeatures(Bunch):
-    """A class to define values for features to avoid features during tour planning calculation."""
-
-
-#: Use this config for avoid of Tour planning API.
-#: Example: for ``tollRoad`` avoids  use ``TOUR_PLANNING_AVOID_FEATURES.tollRoad``.
-TOUR_PLANNING_AVOID_FEATURES = TourPlanningAvoidFeatures(
-    **{
-        "tollRoad": "tollRoad",
-        "motorway": "motorway",
-        "ferry": "ferry",
-        "tunnel": "tunnel",
-        "dirtRoad": "dirtRoad",
-    }
-)
-
+import json
+from json import JSONEncoder
 
 class VehicleMode(Bunch):
     """A class to define values vehicle mode in vehicle profile."""
@@ -41,10 +25,156 @@ VEHICLE_MODE = VehicleMode(
     }
 )
 
+class Area(object):
+    """A class to define ``Territories``
+    """
+
+    def __init__(
+        self,
+        type: str,
+        north: Optional[int],
+        south: Optional[int],
+        east: Optional[int],
+        west: Optional[int]
+    ):
+        """Initializer.
+        """
+        self.type = str
+        if north:
+            self.north = north
+        if south:
+            self.south = south
+        if east:
+            self.east = east
+        if west:
+            self.west = west
+
+class ZoneCategory(object):
+
+    def __init__(
+        self,
+        categories: List[str],
+        exceptZoneIds: Optional[str]
+    ):
+        """Initializer.
+        """
+        self.categories = categories
+        if exceptZoneIds:
+            self.exceptZoneIds = exceptZoneIds
+
+class TourPlanningAvoidFeatures(object):
+    """A class to define ``Territories``
+    """
+
+    def __init__(
+        self,
+        features: str,
+        areas: Optional[List[Area]],
+        segments: Optional[List[str]],
+        truckRoadTypes: Optional[List[str]],
+        zoneCategories: Optional[ZoneCategory]
+    ):
+        """Initializer.
+        """
+        self.features = features
+        if areas:
+            self.areas = areas
+        if segments:
+            self.segments = segments
+        if truckRoadTypes:
+            self.truckRoadTypes = truckRoadTypes
+        if zoneCategories:
+            self.zoneCategories = zoneCategories
+
+class Teritory(object):
+    """A class to define ``Territories``
+    """
+
+    def __init__(
+        self,
+        id: str,
+        priority: Optional[int],
+    ):
+        """Initializer.
+        """
+        self.id = id
+        if priority:
+            self.priority = priority
+
+class Teritories(object):
+    """A class to define ``Territories``
+    """
+
+    def __init__(
+        self,
+        strict: Optional[bool],
+        items: List[Teritory],
+    ):
+        """Initializer.
+        """
+        self.items = items
+        if strict:
+            self.strict = strict
+
+class VehicleBreak(object):
+    """A class to define ``VehicleBreak``
+    """
+
+    def __init__(
+        self,
+        times: List[str],
+        duration: int,
+        lat: Optional[float] = None,
+        lng: Optional[float] = None,
+        lat_SideOfStreetHint: Optional[float] = None,
+        lng_SideOfStreetHint: Optional[float] = None,
+        matchSideOfStreet_sideOfStreetHint: Optional[str] = None,
+        nameHint: Optional[str] =None,        
+    ):
+        """Initializer.
+        """
+        self.times = times
+        self.duration = duration
+        if lat and lng:
+            location ={}
+            location['lat'] = lat
+            location['lng'] = lng
+            sideOfStreetHint = {}
+            if lat_SideOfStreetHint and lng_SideOfStreetHint and matchSideOfStreet_sideOfStreetHint:
+                sideOfStreetHint['lat'] = lat_SideOfStreetHint
+                sideOfStreetHint['lng'] = lng_SideOfStreetHint
+                sideOfStreetHint['matcheSideOfStreet'] = matchSideOfStreet_sideOfStreetHint
+                location['sideOfStreetHint'] = sideOfStreetHint
+            if nameHint:
+                location['nameHint'] = nameHint
+            self.location = location
+
+class VehicleShift(object):
+    """A class to define ``VehicleShift``
+    """
+
+    def __init__(
+        self,
+        start: Dict,
+        end: Optional[Dict]=None,
+        breaks: Optional[List[VehicleBreak]]=None,
+        reloads: Optional[List[Dict]]=None,
+        stopBaseDuration: Optional[Dict]=None,
+    ):
+        """Initializer.
+        """
+        self.start = start
+        if end:
+            self.end = end 
+        if breaks:
+            self.breaks = breaks 
+        if reloads:
+            self.reloads = reloads 
+        if stopBaseDuration:
+            self.stopBaseDuration = stopBaseDuration 
 
 class VehicleType(object):
     """A class to define ``VehicleType``
-
     Type of vehicle in a fleet
     """
 
@@ -52,121 +182,111 @@ class VehicleType(object):
         self,
         id: str,
         profile_name: str,
-        amount: int,
         capacity: List[int],
-        shift_start: Dict,
-        shift_end: Optional[Dict] = None,
-        shift_breaks: Optional[List] = None,
+        shifts: List[VehicleShift],
         costs_fixed: float = 0,
         costs_distance: float = 0,
         costs_time: float = 0,
+        amount: Optional[int] = None,
         skills: Optional[List[str]] = None,
+        territories: Optional[dict] = None,
+        vehicleIds: Optional[List[str]] = None,
         limits: Optional[Dict] = None,
+        speedFactor: Optional[float] =0
     ):
         """Initializer.
-
-        :param id: Specifies id of the vehicle type. Avoid assigning real-life identifiers,
-            such as vehicle license plate as the id of a vehicle
-        :param profile_name: characters ^[a-zA-Z0-9_-]+$ Specifies the name of the profile.
-            Avoid assigning real-life identifiers, such as a vehicle license plate Id or
-            personal name as the profileName of the routing profile.
-        :param amount: Amount of vehicles available.
-        :param capacity: Unit of measure, e.g. volume, mass, size, etc.
-        :param shift_start: Represents a depot: a place where a vehicle starts
-        :param costs_fixed: A fixed cost to start using vehicle of this type. It is
-            optional with a default value of zero
-        :param shift_end: Represents a depot: a place where a vehicle ends
-        :param shift_breaks: Represents a depot: a place where a vehicle takes breaks
-        :param costs_distance: A cost per meter. It is optional with a default value of zero.
-        :param costs_time: A cost per second. It is optional with a default value of zero.
-            In case time and distance costs are zero then a small time cost 0.00000000001
-            will be used instead
-        :param skills: A list of skills for a vehicle or a job.
-        :param limits: Contains constraints applied to a vehicle type.
         """
         self.id = id
         self.profile = profile_name
-        self.amount = amount
         self.capacity = capacity
         self.costs = {"fixed": costs_fixed, "distance": costs_distance, "time": costs_time}
-        shifts: Dict[Any, Any] = {"start": shift_start}
-        if shift_end:
-            shifts["end"] = shift_end
-        if shift_breaks:
-            l_breaks = []
-            for b in shift_breaks:
-                l_breaks.append(b)
-            shifts["breaks"] = l_breaks
-        self.shifts = [shifts]
-        self.skills = skills
-        self.limits = limits
+        print(self.id)
+        print(self.profile)
+        print(self.capacity)
+        print(self.costs)
+        if amount:
+            self.amount = amount
+            print(self.amount)
+        l_shifts = []
+        for t in shifts:
+            l_shifts.append(vars(t))
+        self.shifts = l_shifts
+        print(self.shifts)
+        if skills:
+            self.skills = skills
+            print(self.skills)
+        if limits:
+            self.limits = limits
+            print(self.limits)
+        if territories:
+            self.territories = territories
+            print(self.territories)
+        l_vehicleIds = []
+        if vehicleIds:
+            for v in vehicleIds:
+                l_vehicleIds.append(v)
+            self.vehicleIds = l_vehicleIds
+            print(self.vehicleIds)
+        if speedFactor:
+            self.speedFactor = speedFactor
 
+class Configuration(object):
+    """A class to define ``Configuration``
+    """
+    def __init__(
+        self,
+        termination: Dict[any,any],
+    ):
+        """Initializer.
+        """
+        self.termination = termination
+
+class Option(object):
+    """A class to define ``Configuration``
+    """
+    def __init__(
+        self,
+        allowHighway: bool,
+        speedCap: int
+    ):
+        """Initializer.
+        """
+        self.allowHighway = allowHighway
+        self.speedCap = speedCap
 
 class VehicleProfile(object):
     """A class to define ``VehicleProfile``
-
-    Profile of vehicle in a fleet
-
-    :param name: Specifies the name of the profile. Avoid assigning real-life identifiers,
-            such as a vehicle license plate Id or personal name as the profileName of
-            the routing profile.
-    :param vehicle_mode: Contains constraints applied to a vehicle type.
-    :param departure_time: Represents time of departure.
-    :param avoid: Avoid routes that violate these properties.
-    :param truck_options: Specifies truck profile options.
-    :param allow_highway_for_scooter: Specifies whether routing calculation should take
-        highways into account. When this parameter isn't provided, then by default
-        highways would be avoided. If the avoid feature motorway is provided, then
-        highways would be avoided, even if this is set to true.
-    :raises ValueError: If ``truck_options`` are provided without setting `vehicle_mode` to
-        ``VEHICLE_MODE.truck``
-    :raises ValueError: If ``allow_highway_for_scooter`` is provided without setting
-        `vehicle_mode` to ``VEHICLE_MODE.scooter``
     """
 
     def __init__(
         self,
         name: str,
-        vehicle_mode: str,
+        type: str,
         departure_time: Optional[datetime] = None,
-        avoid: Optional[List[TourPlanningAvoidFeatures]] = None,
-        truck_options: Optional[Truck] = None,
-        allow_highway_for_scooter: Optional[bool] = None,
+        avoid: Optional[TourPlanningAvoidFeatures] = None,
+        options: Optional[Option] = None,
+        exclude: Optional[Dict] = None,
+        traffic: Optional[Dict] = None,
     ):
-        if vehicle_mode != "truck" and truck_options:
-            raise ValueError(
-                "`truck_options` can only be provided when `vehicle_mode` is `VEHICLE_MODE.truck`"
-            )
-        if vehicle_mode != "scooter" and allow_highway_for_scooter:
-            raise ValueError(
-                "`allow_highway_for_scooter` can only be provided when "
-                + "`vehicle_mode` is `VEHICLE_MODE.scooter`"
-            )
         self.name = name
-        self.type = vehicle_mode
+        self.type = type
         if departure_time:
             self.departureTime = departure_time.isoformat()
         if avoid:
-            self.avoid = {"features": avoid}
-        if truck_options:
-            self.options = vars(truck_options)
-        if allow_highway_for_scooter:
-            self.options = {"allowHighway": allow_highway_for_scooter}
-
+            self.avoid = avoid
+        if options:
+            self.options = options
+        if exclude:
+            self.exclude = exclude
+        if traffic:
+            self.traffic = traffic
 
 class Fleet(object):
     """A class to define ``Fleet``
-
     A fleet represented by various vehicle types for serving jobs.
-
-    :param vehicle_types: A list of vehicle types. The upper limit for the number of vehicle
-        types is 35 for the synchronous problems endpoint and 150 for the asynchronous
-        problems endpoint.
-    :param vehicle_profiles: Specifies the profile of the vehicle.
-
     """
 
-    def __init__(self, vehicle_types: List[VehicleType], vehicle_profiles: List):
+    def __init__(self, vehicle_types: List[VehicleType], vehicle_profiles: List[VehicleProfile],traffic: Optional[str]=None):
         l_types = []
         for t in vehicle_types:
             l_types.append(vars(t))
@@ -176,119 +296,124 @@ class Fleet(object):
         for pro in vehicle_profiles:
             l_profiles.append(vars(pro))
         self.profiles = l_profiles
+        if traffic:
+            self.traffic = traffic
 
 
 class JobPlaces(object):
-    """A class to define ``JobPlaces``
-
-    :param duration: Represents duration in seconds.
-    :param demand: Unit of measure, e.g. volume, mass, size, etc.
-    :param location: Represents geospatial location defined by latitude and longitude.
-    :param tag: A free text associated with the job place. Avoid referencing any confidential
-        or personal information as part of the JobTag.
-    :param times: Represents multiple time windows.
-
-    """
-
     def __init__(
         self,
         duration: int,
-        demand: List[int],
-        location: Tuple,
+        lat: float,
+        lng: float,
+        lat_SideOfStreetHint: Optional[float] = None,
+        lng_SideOfStreetHint: Optional[float] = None,
+        matchSideOfStreet_sideOfStreetHint: Optional[str] = None,
+        nameHint: Optional[str] =None,        
         tag: Optional[str] = None,
+        territoryIds: Optional[List[str]] = None,
         times: Optional[List[List[str]]] = None,
     ):
         self.duration = duration
-        self.demand = demand
-        self.location = {"lat": location[0], "lng": location[1]}
+        location ={}
+        location['lat'] = lat
+        location['lng'] = lng
+        sideOfStreetHint = {}
+        if lat_SideOfStreetHint and lng_SideOfStreetHint and matchSideOfStreet_sideOfStreetHint:
+            sideOfStreetHint['lat'] = lat_SideOfStreetHint
+            sideOfStreetHint['lng'] = lng_SideOfStreetHint
+            sideOfStreetHint['matcheSideOfStreet'] = matchSideOfStreet_sideOfStreetHint
+            location['sideOfStreetHint'] = sideOfStreetHint
+        if nameHint:
+            location['nameHint'] = nameHint
+        self.location = location
         if tag:
             self.tag = tag
         if times:
             self.times = times
+        if territoryIds:
+            self.territoryIds = territoryIds
 
+class Cluster(object):
+    def __init__(
+        self,
+        serviceTimeStrategy: Dict[str,int],
+    ):
+        self.serviceTimeStrategy = serviceTimeStrategy
+
+class Task(object):
+    def __init__(
+        self,
+        places: List[JobPlaces],
+        demand: List[int],
+        order: Optional[int]=None,
+    ):
+        l_places = []
+        for t in places:
+            l_places.append(vars(t))
+        self.places = l_places
+        l_demand = []
+        for t in demand:
+            l_demand.append(t)
+        self.demand = l_demand
+        if order:
+            self.order = order
 
 class Job(object):
-    """A class to define ``Job``
-
-    A fleet represented by various vehicle types for serving jobs.
-
-    :param id: Specifies id of the job. Avoid referencing any sensitive or personal information,
-        such as names, addresses, information about a delivery or service, as part of the jobId.
-    :param skills: A list of skills for a vehicle or a job.
-    :param priority: Specifies the priority of the job with 1 for high priority jobs and
-        2 for normal jobs.
-    :param pickups: Places where sub jobs to be performed. All pickups are done before any
-        other delivery.
-    :param deliveries: Places where sub jobs to be performed. All pickups are done before any
-        other delivery.
-    :raises ValueError: If no subjob is specified either as pickup or delivery.
-
-    """
-
     def __init__(
         self,
         id: str,
-        skills: Optional[List] = None,
+        pickups: Optional[List[Task]]=None,
+        deliveries: Optional[List[Task]]=None,
+        skills: Optional[List[str]]=None,
         priority: Optional[int] = None,
-        pickups: Optional[List[JobPlaces]] = None,
-        deliveries: Optional[List[JobPlaces]] = None,
+        customerId: Optional[str] =None,
     ):
-        if pickups is None and deliveries is None:
-            raise ValueError("At least one subjob must be specified as pickup or delivery")
+        tasks = {}
         self.id = id
+        if pickups:
+            l_pickups = []
+            for t in pickups:
+                l_pickups.append(vars(t))
+            tasks['pickups'] = l_pickups
+        if deliveries:
+            l_deliveries = []
+            for t in deliveries:
+                l_deliveries.append(vars(t))
+            tasks['deliveries'] = l_deliveries
+        self.tasks = tasks            
         if skills:
             self.skills = skills
         if priority:
             self.priority = priority
-        self.places = {}
-        if pickups:
-            l_pickups = []
-            for p in pickups:
-                l_pickups.append(vars(p))
-            self.places["pickups"] = l_pickups
-        if deliveries:
-            l_deliveries = []
-            for d in deliveries:
-                l_deliveries.append(vars(d))
-            self.places["deliveries"] = l_deliveries
-
+        if customerId:
+            self.customerId = customerId
+    
 
 class Relation(object):
-    """A class to define ``Relation``
-
-    Represents a list of preferred relations between jobs, vehicles.
-
-    :param type: "sequence" "tour" "flexible"
-        Defines a relation between jobs and a specific vehicle
-    :param jobs: Ids of jobs or reserved activities. There are three reserved activity ids:
-        - departure: specifies departure activity. Should be first in the list.
-        - break: specifies vehicle break activity
-        - arrival: specifies arrival activity. Should be last in the list.
-    :param vehicle_id: A unique identifier of an entity. Avoid referencing any confidential or
-        personal information as part of the Id.
-
-    """
-
     def __init__(self, type: str, jobs: List, vehicle_id: str):
         self.type = type
         self.jobs = jobs
         self.vehicleId = vehicle_id
 
-
 class Plan(object):
-    """A class to define ``Plan``
-
-    Represents the list of jobs to be served.
-    """
-
-    def __init__(self, jobs: List[Job], relations: Optional[List[Relation]] = None):
+    def __init__(self, jobs: List[Job], relations: Optional[List[Relation]]=None, clustering: Optional[Cluster]=None):
         l_jobs = []
         for p in jobs:
             l_jobs.append(vars(p))
-            self.jobs = l_jobs
+        self.jobs = l_jobs
+        print(self.jobs)
 
         if relations:
             l_relations = []
             for r in relations:
                 l_relations.append(vars(r))
-                self.relations = l_relations
+            self.relations = l_relations
+            print(self.relations)
+        if clustering:        
+            self.clustering=clustering
+
+class Objectives(object):
+    def __init__(self, type: List[str]):
+        self.type = type
+
